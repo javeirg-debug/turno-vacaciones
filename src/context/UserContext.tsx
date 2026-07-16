@@ -6,7 +6,10 @@ import {
   useState,
 } from "react";
 
-import { useRouter } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
 import { datosUsuarioActual } from "@/services/auth";
@@ -26,6 +29,8 @@ export function UserProvider({
 
   const router = useRouter();
 
+  const pathname = usePathname();
+
 
 
   async function cargarUsuario() {
@@ -37,17 +42,37 @@ export function UserProvider({
 
 
 
-    if (
-      datos &&
-      datos.debe_cambiar_clave
-    ) {
+    if (datos) {
 
-      router.push(
-        "/cambiar-clave?obligatorio=true"
-      );
+
+      // Si tiene que cambiar contraseña,
+      // tiene prioridad
+
+      if (datos.debe_cambiar_clave) {
+
+        router.push(
+          "/cambiar-clave?obligatorio=true"
+        );
+
+        setCargando(false);
+
+        return;
+
+      }
+
+
+
+      // Si ya está logueado y entra al login,
+      // lo mandamos al inicio
+
+      if (pathname === "/login") {
+
+        router.push("/inicio");
+
+      }
+
 
     }
-
 
 
     setCargando(false);
@@ -81,7 +106,8 @@ export function UserProvider({
     };
 
 
-  }, [router]);
+  }, [router, pathname]);
+
 
 
 
