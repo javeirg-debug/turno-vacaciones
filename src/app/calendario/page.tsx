@@ -552,17 +552,13 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
 
 
 
-                        <div className="mt-1 text-xs leading-tight">
+                        <div className="flex items-center justify-center gap-1 font-bold text-sm">
 
-  <span className="hidden sm:inline">
-    {obtenerTurno(
-      dia,
-      mes,
-      anio
-    )}
+  <span>
+    {dia}
   </span>
 
-  <span className="inline sm:hidden">
+  <span>
     {obtenerTurno(
       dia,
       mes,
