@@ -543,12 +543,6 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
 
                       <>
 
-                        <div className="font-bold text-sm">
-
-                          {dia}
-
-                        </div>
-
 
 
 
