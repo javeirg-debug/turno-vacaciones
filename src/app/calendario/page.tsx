@@ -524,7 +524,7 @@ function colorDia(personas:number){
 
 
 
-className={`aspect-square overflow-hidden rounded-xl p-1 text-xs cursor-pointer ${
+className={`aspect-square overflow-hidden rounded-xl p-2 text-xs cursor-pointer ${
   dia
     ? dia === hoy.getDate() &&
       mes === hoy.getMonth() &&
@@ -552,7 +552,7 @@ className={`aspect-square overflow-hidden rounded-xl p-1 text-xs cursor-pointer 
 
 
 
-                        <div className="mt-1 text-[10px] leading-tight truncate">
+                        <div className="mt-1 text-[11px] leading-tight">
 
                           {obtenerTurno(
                             dia,
@@ -569,7 +569,7 @@ className={`aspect-square overflow-hidden rounded-xl p-1 text-xs cursor-pointer 
 {
   fuera.length > 0 && (
 
-<div className="mt-1 text-[10px] font-semibold text-slate-700 truncate">
+<div className="mt-1 text-[11px] font-semibold text-slate-700">
 
       {fuera.length} fuera
 
