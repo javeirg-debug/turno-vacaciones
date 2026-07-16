@@ -405,7 +405,7 @@ function colorDia(personas:number){
 
 
 
-      <div className="mt-6 rounded-3xl bg-white p-5 shadow">
+      <div className="mt-6 rounded-2xl bg-white p-2 shadow">
 
 
 
@@ -473,7 +473,7 @@ function colorDia(personas:number){
 
 
 
-        <div className="mt-6 grid grid-cols-7 gap-2 text-center font-semibold">
+        <div className="mt-6 grid grid-cols-7 gap-0 text-center font-semibold">
 
 
           <div>L</div>
@@ -524,7 +524,7 @@ function colorDia(personas:number){
 
 
 
-className={`aspect-square overflow-hidden rounded-xl p-2 text-xs cursor-pointer ${
+className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cursor-pointer ${
   dia
     ? dia === hoy.getDate() &&
       mes === hoy.getMonth() &&
