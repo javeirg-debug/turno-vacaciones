@@ -552,16 +552,25 @@ className={`aspect-square overflow-hidden rounded-xl p-2 text-xs cursor-pointer 
 
 
 
-                        <div className="mt-1 text-[11px] leading-tight">
+                        <div className="mt-1 text-xs leading-tight">
 
-                          {obtenerTurno(
-                            dia,
-                            mes,
-                            anio
-                          )}
+  <span className="hidden sm:inline">
+    {obtenerTurno(
+      dia,
+      mes,
+      anio
+    )}
+  </span>
 
-                        </div>
+  <span className="inline sm:hidden">
+    {obtenerTurno(
+      dia,
+      mes,
+      anio
+    ).split(" ")[0]}
+  </span>
 
+</div>
 
 
 
@@ -569,7 +578,7 @@ className={`aspect-square overflow-hidden rounded-xl p-2 text-xs cursor-pointer 
 {
   fuera.length > 0 && (
 
-<div className="mt-1 text-[11px] font-semibold text-slate-700">
+<div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
 
       {fuera.length} fuera
 
