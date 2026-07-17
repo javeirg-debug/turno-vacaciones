@@ -145,8 +145,7 @@ export default function Solicitudes() {
 
 
 onClick={() => {
-  console.log("Abriendo /solicitudes/nueva");
-  router.replace("/solicitudes/nueva");
+  window.location.href = "/solicitudes/nueva";
 }}
 
 
