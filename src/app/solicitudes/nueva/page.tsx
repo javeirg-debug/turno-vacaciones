@@ -10,7 +10,8 @@ export default function NuevaSolicitud() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const vieneDelCalendario = searchParams.has("fecha");
-
+console.log("¿Viene del calendario?", vieneDelCalendario);
+console.log("Fecha:", searchParams.get("fecha"));
 const [tipo, setTipo] = useState(
   vieneDelCalendario ? "🟢 AP" : "🌴 Vacaciones"
 );  const [fechaInicio, setFechaInicio] = useState("");
