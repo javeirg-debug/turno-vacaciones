@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useSearchParams, useRouter } from "next/navigation";import { supabase } from "@/lib/supabase";
 import BottomNav from "@/components/navigation/BottomNav";
 import { obtenerTodasLasSolicitudes } from "@/services/solicitudes";
 
@@ -115,16 +115,27 @@ function obtenerTurno(
 export default function Calendario() {
 
 
+  const router = useRouter();
+
   const hoy = new Date();
+
+  const searchParams = useSearchParams();
+
+  const mesUrl = searchParams.get("mes");
+  const anioUrl = searchParams.get("anio");
 
 
   const [mes,setMes] = useState(
-    hoy.getMonth()
+    mesUrl
+      ? Number(mesUrl)
+      : hoy.getMonth()
   );
 
 
   const [anio,setAnio] = useState(
-    hoy.getFullYear()
+    anioUrl
+      ? Number(anioUrl)
+      : hoy.getFullYear()
   );
 
 
@@ -144,6 +155,23 @@ useEffect(()=>{
   cargarConfiguracion();
 
 },[]);
+
+
+
+useEffect(()=>{
+
+  const nuevoMes = searchParams.get("mes");
+  const nuevoAnio = searchParams.get("anio");
+
+
+  if(nuevoMes && nuevoAnio){
+
+    setMes(Number(nuevoMes));
+    setAnio(Number(nuevoAnio));
+
+  }
+
+},[searchParams]);
 
 
 
@@ -526,11 +554,14 @@ function colorDia(personas:number){
 
 className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cursor-pointer ${
   dia
-    ? dia === hoy.getDate() &&
-      mes === hoy.getMonth() &&
-      anio === hoy.getFullYear()
-      ? `${colorDia(fuera.length)} border-2 border-blue-500`
-      : colorDia(fuera.length)
+    ? colorDia(fuera.length)
+    : ""
+}
+${
+  dia === hoy.getDate() &&
+  mes === hoy.getMonth() &&
+  anio === hoy.getFullYear()
+    ? "shadow-lg scale-105 rounded-lg z-10 relative"
     : ""
 }`}
 
@@ -591,7 +622,21 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
 
         </div>
 
-      </div>
+            </div>
+
+
+      <button
+
+        onClick={() => router.push("/calendario/anual")}
+
+        className="mt-6 w-full rounded-xl bg-slate-700 py-3 text-white font-semibold"
+
+      >
+
+        📅 Vista anual
+
+      </button>
+
 
       <BottomNav />
 
