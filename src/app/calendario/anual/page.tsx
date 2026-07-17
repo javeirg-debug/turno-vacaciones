@@ -405,7 +405,6 @@ className="rounded-2xl bg-slate-100 p-3 shadow cursor-pointer"
 
 <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs">
 
-
 {
 
 Array.from({
@@ -422,8 +421,14 @@ diasDelMes(index,anio)
 key={dia}
 
 className={`
-
-rounded p-1
+aspect-square
+flex
+items-center
+justify-center
+rounded
+p-1
+text-[10px]
+overflow-hidden
 
 
 ${
