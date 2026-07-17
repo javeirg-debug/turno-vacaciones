@@ -132,7 +132,7 @@ export default function Solicitudes() {
 
       <h1 className="text-3xl font-bold text-slate-800">
 
-         📝 Solicitudes V2
+         📝 Solicitudes
 
       </h1>
 
@@ -144,9 +144,10 @@ export default function Solicitudes() {
       <button
 
 
-        onClick={() =>
-          router.push("/solicitudes/nueva")
-        }
+onClick={() => {
+  console.log("Abriendo /solicitudes/nueva");
+  router.replace("/solicitudes/nueva");
+}}
 
 
         className="mt-6 w-full rounded-2xl bg-blue-600 py-3 text-lg font-semibold text-white"
