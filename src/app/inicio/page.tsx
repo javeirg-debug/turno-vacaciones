@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import BottomNav from "@/components/navigation/BottomNav";
 import { supabase } from "@/lib/supabase";
 import { obtenerAvisoActivo } from "@/services/avisos";
-
+import { obtenerConflictosUsuario } from "@/services/conflictos";
 
 const inicioTurno = new Date(2026, 6, 16);
 
@@ -79,8 +79,10 @@ type Aviso = {
   } | null;
 };
 
-
-
+type FechaConflictiva = {
+  fecha: string;
+  personas: number;
+};
 
 export default function Inicio() {
 
@@ -102,7 +104,8 @@ export default function Inicio() {
   const [aviso, setAviso] =
     useState<Aviso | null>(null);
 
-
+const [fechasConflictivas, setFechasConflictivas] =
+  useState<FechaConflictiva[]>([]);
 
   const [cargando, setCargando] =
     useState(true);
@@ -174,15 +177,15 @@ export default function Inicio() {
 
 
 
-      setSolicitudes(data || []);
+setSolicitudes(data || []);
 
+const conflictos =
+  await obtenerConflictosUsuario(user.id);
 
+setFechasConflictivas(conflictos);
 
-
-
-
-      const avisoActivo =
-        await obtenerAvisoActivo();
+const avisoActivo =
+  await obtenerAvisoActivo();
 
 
 
@@ -387,11 +390,62 @@ export default function Inicio() {
       </div>
 
 
+<div
+  className={`mt-6 rounded-3xl p-6 shadow ${
+    fechasConflictivas.length > 0
+      ? "border border-red-200 bg-red-50"
+      : "border border-green-200 bg-green-50"
+  }`}
+>
+
+  <h2
+    className={`text-xl font-bold ${
+      fechasConflictivas.length > 0
+        ? "text-red-900"
+        : "text-green-900"
+    }`}
+  >
+    🚨 Fechas conflictivas
+  </h2>
 
 
+  {fechasConflictivas.length > 0 ? (
+
+    <>
+
+      <p className="mt-3 text-slate-700">
+        Tienes coincidencias en días con alta ocupación:
+      </p>
 
 
+      <ul className="mt-3 space-y-2 text-slate-700">
 
+        {fechasConflictivas.map((f) => (
+
+          <li key={f.fecha}>
+            • {new Date(f.fecha).toLocaleDateString("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })} ({f.personas} personas)
+          </li>
+
+        ))}
+
+      </ul>
+
+
+    </>
+
+  ) : (
+
+    <p className="mt-3 text-green-800">
+      No tienes coincidencias en días de alta ocupación.
+    </p>
+
+  )}
+
+</div>
 
 
       <div className="mt-6 rounded-3xl bg-white p-6 shadow">
