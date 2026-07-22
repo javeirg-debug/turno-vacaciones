@@ -105,7 +105,7 @@ export default function Inicio() {
     useState<Aviso | null>(null);
 
 const [fechasConflictivas, setFechasConflictivas] =
-  useState<FechaConflictiva[]>([]);
+  useState<FechaConflictiva[] | null>(null);
 
   const [cargando, setCargando] =
     useState(true);
@@ -391,59 +391,66 @@ const avisoActivo =
 
 
 <div
-  className={`mt-6 rounded-3xl p-6 shadow ${
-    fechasConflictivas.length > 0
-      ? "border border-red-200 bg-red-50"
-      : "border border-green-200 bg-green-50"
-  }`}
+className={`mt-6 rounded-3xl p-6 shadow ${
+  fechasConflictivas === null
+    ? "border border-slate-200 bg-white"
+    : fechasConflictivas.length > 0
+    ? "border border-red-200 bg-red-50"
+    : "border border-green-200 bg-green-50"
+}`}
 >
 
-  <h2
-    className={`text-xl font-bold ${
-      fechasConflictivas.length > 0
-        ? "text-red-900"
-        : "text-green-900"
-    }`}
-  >
+<h2
+  className={`text-xl font-bold ${
+    fechasConflictivas === null
+      ? "text-slate-800"
+      : fechasConflictivas.length > 0
+      ? "text-red-900"
+      : "text-green-900"
+  }`}
+>
     🚨 Fechas conflictivas
   </h2>
 
 
-  {fechasConflictivas.length > 0 ? (
+  {fechasConflictivas === null ? (
 
-    <>
+  <p className="mt-3 text-slate-500">
+    Comprobando ocupación...
+  </p>
 
-      <p className="mt-3 text-slate-700">
-        Tienes coincidencias en días con alta ocupación:
-      </p>
+) : fechasConflictivas.length > 0 ? (
 
-
-      <ul className="mt-3 space-y-2 text-slate-700">
-
-        {fechasConflictivas.map((f) => (
-
-          <li key={f.fecha}>
-            • {new Date(f.fecha).toLocaleDateString("es-ES", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })} ({f.personas} personas)
-          </li>
-
-        ))}
-
-      </ul>
-
-
-    </>
-
-  ) : (
-
-    <p className="mt-3 text-green-800">
-      No tienes coincidencias en días de alta ocupación.
+  <>
+    <p className="mt-3 text-slate-700">
+      Tienes coincidencias en días con alta ocupación:
     </p>
 
-  )}
+    <ul className="mt-3 space-y-2 text-slate-700">
+
+      {fechasConflictivas.map((f) => (
+
+        <li key={f.fecha}>
+          • {new Date(f.fecha).toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })} ({f.personas} personas)
+        </li>
+
+      ))}
+
+    </ul>
+
+  </>
+
+) : (
+
+  <p className="mt-3 text-green-800">
+    No tienes coincidencias en días de alta ocupación.
+  </p>
+
+)}
 
 </div>
 

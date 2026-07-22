@@ -20,18 +20,18 @@ const [tipo, setTipo] = useState(
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
 
-    const fecha = searchParams.get("fecha");
+  const fecha = searchParams.get("fecha");
 
-    if (fecha) {
-      setTipo("🟢 AP");
-      setFechaInicio(fecha);
-      setFechaFin(fecha);
+  if (fecha) {
 
-    }
+    setFechaInicio(fecha);
+    setFechaFin(fecha);
 
-  }, [searchParams]);
+  }
+
+}, [searchParams]);
 
   async function guardar() {
 
@@ -56,14 +56,14 @@ const [tipo, setTipo] = useState(
 
       setCargando(true);
 
-      await guardarSolicitud({
+await guardarSolicitud({
 
-        tipo,
-        fechaInicio,
-        fechaFin,
-        observaciones,
+  tipo,
+  fechaInicio,
+  fechaFin: tipo === "🌴 Vacaciones" ? fechaFin : fechaInicio,
+  observaciones,
 
-      });
+});
 
       setMensaje("✅ Solicitud guardada correctamente");
 
@@ -98,16 +98,6 @@ const [tipo, setTipo] = useState(
 </h1>
 
 
-{vieneDelCalendario && (
-
-<div className="mt-4 rounded-3xl bg-amber-50 border border-amber-200 p-4 text-amber-900 text-center">
-     Desde el esta opción solo pueden solicitarse permisos de un día.
-    <br />
-    Las vacaciones y los permisos de varios días deben solicitarse desde Solicitudes.
-
-  </div>
-
-)}
 
 
 <div className="mt-6 rounded-3xl bg-white p-5 shadow space-y-5">
@@ -125,9 +115,7 @@ const [tipo, setTipo] = useState(
   className="mt-2 w-full rounded-xl border p-3"
 >
 
-  {!vieneDelCalendario && (
-    <option>🌴 Vacaciones</option>
-  )}
+<option>🌴 Vacaciones</option>
 
   <option>🟢 AP</option>
   <option>⏰ Compensación horaria</option>
@@ -139,11 +127,13 @@ const [tipo, setTipo] = useState(
 
         <div>
 
-          <label className="font-semibold">
+<label className="font-semibold">
 
-            Desde
+  {tipo === "🌴 Vacaciones"
+    ? "Desde"
+    : "Fecha"}
 
-          </label>
+</label>
 
           <input
 
@@ -159,27 +149,31 @@ const [tipo, setTipo] = useState(
 
         </div>
 
-        <div>
+{tipo === "🌴 Vacaciones" && (
 
-          <label className="font-semibold">
+<div>
 
-            Hasta
+  <label className="font-semibold">
 
-          </label>
+    Hasta
 
-          <input
+  </label>
 
-            type="date"
+  <input
 
-            value={fechaFin}
+    type="date"
 
-            onChange={(e) => setFechaFin(e.target.value)}
+    value={fechaFin}
 
-            className="mt-2 w-full rounded-xl border p-3"
+    onChange={(e) => setFechaFin(e.target.value)}
 
-          />
+    className="mt-2 w-full rounded-xl border p-3"
 
-        </div>
+  />
+
+</div>
+
+)}
 
         <div>
 

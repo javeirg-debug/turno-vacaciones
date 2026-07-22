@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";import { supabase } from "@/lib/supabase";
 import BottomNav from "@/components/navigation/BottomNav";
 import { obtenerTodasLasSolicitudes } from "@/services/solicitudes";
-
+import { obtenerConflictosMes } from "@/services/conflictos";
 
 const meses = [
   "Enero",
@@ -146,7 +146,13 @@ const [solicitudes,setSolicitudes] =
 const [configuracion,setConfiguracion] =
   useState<ConfiguracionOcupacion[]>([]);
 
+type FechaConflictiva = {
+  fecha: string;
+  personas: number;
+};
 
+const [fechasConflictivas, setFechasConflictivas] =
+  useState<FechaConflictiva[] | null>(null);
 
 
 useEffect(()=>{
@@ -174,7 +180,11 @@ useEffect(()=>{
 },[searchParams]);
 
 
+useEffect(() => {
 
+  cargarConflictosMes();
+
+}, [mes, anio]);
 
 
 async function cargarSolicitudes(){
@@ -211,7 +221,19 @@ async function cargarConfiguracion(){
 }
 
 
+async function cargarConflictosMes(){
 
+  setFechasConflictivas(null);
+
+  const conflictos =
+    await obtenerConflictosMes(
+      mes,
+      anio
+    );
+
+  setFechasConflictivas(conflictos);
+
+}
 
 
 function personasFuera(dia:number){
@@ -497,10 +519,6 @@ function colorDia(personas:number){
 
 
 
-
-
-
-
         <div className="mt-6 grid grid-cols-7 gap-0 text-center font-semibold">
 
 
@@ -599,9 +617,9 @@ ${
 {
   fuera.length > 0 && (
 
-<div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
+    <div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
 
-      {fuera.length} fuera
+      {fuera.length} {fuera.length === 1 ? "Apuntado" : "Apuntados"}
 
     </div>
 
@@ -636,6 +654,63 @@ ${
         📅 Vista anual
 
       </button>
+
+
+<div
+  className={`mt-6 rounded-3xl p-5 shadow ${
+    fechasConflictivas === null
+      ? "border border-slate-200 bg-white"
+      : fechasConflictivas.length > 0
+      ? "border border-red-300 bg-red-50"
+      : "border border-green-300 bg-green-50"
+  }`}
+>
+
+  <h2 className="text-xl font-bold">
+
+    {fechasConflictivas === null
+      ? "⏳ Fechas conflictivas"
+      : fechasConflictivas.length > 0
+      ? "⚠️ Fechas conflictivas"
+      : "✅ Fechas conflictivas"}
+
+  </h2>
+
+  {fechasConflictivas === null ? (
+
+    <p className="mt-3 text-slate-500">
+      Comprobando ocupación...
+    </p>
+
+  ) : fechasConflictivas.length > 0 ? (
+
+    <>
+      <p className="mt-3 text-slate-700">
+        Este mes tiene días con alta ocupación:
+      </p>
+
+      <ul className="mt-3 space-y-2">
+
+        {fechasConflictivas.map((f) => (
+
+          <li key={f.fecha}>
+            • {new Date(f.fecha).toLocaleDateString("es-ES")} ({f.personas} personas)
+          </li>
+
+        ))}
+
+      </ul>
+    </>
+
+  ) : (
+
+    <p className="mt-3 text-green-800">
+      Este mes no tiene días con alta ocupación.
+    </p>
+
+  )}
+
+</div>
 
 
       <BottomNav />

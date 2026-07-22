@@ -10,6 +10,7 @@ import {
 
 
 type Solicitud = {
+  
   id: string;
   tipo: string;
   fecha_inicio: string;
@@ -22,6 +23,9 @@ type Solicitud = {
   } | null;
 };
 
+function formatearFecha(fecha: string) {
+  return new Date(fecha).toLocaleDateString("es-ES");
+}
 
 export default function Solicitudes() {
 
@@ -260,21 +264,19 @@ onClick={() => {
 
 
 
-                  <p>
+                 {solicitud.tipo === "🌴 Vacaciones" ? (
 
-                    📅 Desde: {solicitud.fecha_inicio}
+  <p>
+    📅 {formatearFecha(solicitud.fecha_inicio)} → {formatearFecha(solicitud.fecha_fin)}
+  </p>
 
-                  </p>
+) : (
 
+  <p>
+    📅 {formatearFecha(solicitud.fecha_inicio)}
+  </p>
 
-
-                  <p>
-
-                    📅 Hasta: {solicitud.fecha_fin}
-
-                  </p>
-
-
+)}
 
 
                   {
@@ -296,7 +298,7 @@ onClick={() => {
 
                   <p>
 
-                    Estado: {solicitud.estado}
+                    Estado: {solicitud.estado.charAt(0).toUpperCase() + solicitud.estado.slice(1)}
 
                   </p>
 

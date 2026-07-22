@@ -155,14 +155,14 @@ export default function DiaCalendario() {
 
         </div>
 
-        <button
-          onClick={() =>
-            router.push(`/solicitudes/nueva?fecha=${fecha}`)
-          }
-          className="mt-8 w-full rounded-2xl bg-blue-600 py-3 font-semibold text-white"
-        >
-          ➕ Solicitar este día
-        </button>
+<button
+onClick={() =>
+  router.push(`/solicitudes/nueva?fecha=${fecha}`)
+}
+  className="mt-8 w-full rounded-2xl bg-blue-600 py-3 font-semibold text-white"
+>
+  📝 Solicitar permiso
+</button>
 
       </div>
 

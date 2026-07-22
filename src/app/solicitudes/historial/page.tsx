@@ -16,7 +16,9 @@ type Solicitud = {
   motivo: string | null;
   estado: string;
 };
-
+function formatearFecha(fecha: string) {
+  return new Date(fecha).toLocaleDateString("es-ES");
+}
 
 
 export default function HistorialSolicitudes() {
@@ -203,19 +205,19 @@ export default function HistorialSolicitudes() {
 
 
 
-              <p>
+{solicitud.tipo === "🌴 Vacaciones" ? (
 
-                📅 Desde: {solicitud.fecha_inicio}
+  <p>
+    📅 {formatearFecha(solicitud.fecha_inicio)} → {formatearFecha(solicitud.fecha_fin)}
+  </p>
 
-              </p>
+) : (
 
+  <p>
+    📅 {formatearFecha(solicitud.fecha_inicio)}
+  </p>
 
-
-              <p>
-
-                📅 Hasta: {solicitud.fecha_fin}
-
-              </p>
+)}
 
 
 
@@ -237,8 +239,7 @@ export default function HistorialSolicitudes() {
 
               <p>
 
-                Estado: {solicitud.estado}
-
+Estado: {solicitud.estado.charAt(0).toUpperCase() + solicitud.estado.slice(1)}
               </p>
 
 
