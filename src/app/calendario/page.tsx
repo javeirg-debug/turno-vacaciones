@@ -619,7 +619,7 @@ ${
 
     <div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
 
-      {fuera.length} {fuera.length === 1 ? "Apuntado" : "Apuntados"}
+Fuera: {fuera.length}
 
     </div>
 
