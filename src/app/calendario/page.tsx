@@ -281,7 +281,7 @@ function colorDia(personas:number){
 
   if(regla.color === "verde"){
 
-    return "bg-green-100";
+    return "bg-green-200";
 
   }
 
@@ -289,7 +289,7 @@ function colorDia(personas:number){
 
   if(regla.color === "amarillo"){
 
-    return "bg-yellow-100";
+    return "bg-yellow-200";
 
   }
 
@@ -297,7 +297,7 @@ function colorDia(personas:number){
 
   if(regla.color === "naranja"){
 
-    return "bg-orange-100";
+    return "bg-orange-200";
 
   }
 
@@ -305,7 +305,7 @@ function colorDia(personas:number){
 
   if(regla.color === "rojo"){
 
-    return "bg-red-100";
+    return "bg-red-200";
 
   }
 
@@ -572,10 +572,11 @@ function colorDia(personas:number){
 
 className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cursor-pointer ${
   dia
-    ? colorDia(fuera.length)
+    ? obtenerTurno(dia, mes, anio) === "⚪ Libre"
+      ? "bg-white"
+      : colorDia(fuera.length)
     : ""
-}
-${
+} ${
   dia === hoy.getDate() &&
   mes === hoy.getMonth() &&
   anio === hoy.getFullYear()
@@ -614,17 +615,14 @@ ${
 
 
 
-{
-  fuera.length > 0 && (
+{obtenerTurno(dia, mes, anio) !== "⚪ Libre" &&
+ fuera.length > 0 && (
 
-    <div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
+  <div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
+    Fuera: {fuera.length}
+  </div>
 
-Fuera: {fuera.length}
-
-    </div>
-
-  )
-}
+)}
 
                       </>
 

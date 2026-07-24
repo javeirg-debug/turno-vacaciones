@@ -33,6 +33,13 @@ export default function BottomNav() {
         </span>
       </Link>
 
+      <Link href="/estadisticas" className="text-center">
+        📊
+        <span className="block text-xs">
+          Estadísticas
+        </span>
+      </Link>
+
       {usuario?.rol === "admin" && (
 
         <Link href="/usuarios" className="text-center">

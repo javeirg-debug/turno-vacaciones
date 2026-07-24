@@ -38,6 +38,9 @@ export default function Solicitudes() {
   const [solicitudesActuales, setSolicitudesActuales] =
     useState<Solicitud[]>([]);
 
+const [solicitudesVista, setSolicitudesVista] =
+    useState<any[]>([]);
+
   const [cargando, setCargando] = useState(true);
 
 
@@ -72,7 +75,51 @@ export default function Solicitudes() {
 
       setSolicitudesActuales(actuales);
 
+const agrupadas:any[] = [];
 
+actuales.forEach((s) => {
+
+  if (
+    s.tipo === "🎄 Navidad" ||
+    s.tipo === "✝️ Semana Santa"
+  ) {
+
+    let grupo = agrupadas.find(
+      (x) =>
+        x.tipo === s.tipo
+    );
+
+
+    if (grupo) {
+
+      grupo.dias.push(
+        s.fecha_inicio
+      );
+
+    } else {
+
+      agrupadas.push({
+
+        ...s,
+        dias:[
+          s.fecha_inicio
+        ]
+
+      });
+
+    }
+
+
+  } else {
+
+    agrupadas.push(s);
+
+  }
+
+});
+
+
+setSolicitudesVista(agrupadas);
 
     } catch (error) {
 
@@ -231,7 +278,7 @@ onClick={() => {
 
 
           {
-            solicitudesActuales.map((solicitud) => (
+            solicitudesVista.map((solicitud) => (
 
 
 
@@ -264,17 +311,36 @@ onClick={() => {
 
 
 
-                 {solicitud.tipo === "🌴 Vacaciones" ? (
+                {solicitud.dias ? (
 
-  <p>
-    📅 {formatearFecha(solicitud.fecha_inicio)} → {formatearFecha(solicitud.fecha_fin)}
-  </p>
+<div>
+
+{
+solicitud.dias.map(
+(dia:string,index:number)=>(
+
+<p key={dia}>
+📅 Día {index+1}: {formatearFecha(dia)}
+</p>
+
+))
+}
+
+</div>
+
+) : solicitud.tipo === "🌴 Vacaciones" ? (
+
+<p>
+📅 {formatearFecha(solicitud.fecha_inicio)}
+→
+{formatearFecha(solicitud.fecha_fin)}
+</p>
 
 ) : (
 
-  <p>
-    📅 {formatearFecha(solicitud.fecha_inicio)}
-  </p>
+<p>
+📅 {formatearFecha(solicitud.fecha_inicio)}
+</p>
 
 )}
 

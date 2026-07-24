@@ -99,7 +99,8 @@ export default function Inicio() {
   const [solicitudes, setSolicitudes] =
     useState<Solicitud[]>([]);
 
-
+const [solicitudesVista, setSolicitudesVista] =
+    useState<any[]>([]);
 
   const [aviso, setAviso] =
     useState<Aviso | null>(null);
@@ -177,7 +178,65 @@ const [fechasConflictivas, setFechasConflictivas] =
 
 
 
-setSolicitudes(data || []);
+const lista = data || [];
+
+const agrupadas:any[] = [];
+
+
+lista.forEach((s) => {
+
+
+  if (
+    s.tipo === "🎄 Navidad" ||
+    s.tipo === "✝️ Semana Santa"
+  ) {
+
+
+    let grupo = agrupadas.find(
+      (x) =>
+        x.tipo === s.tipo
+    );
+
+
+    if (grupo) {
+
+      grupo.dias.push(
+        s.fecha_inicio
+      );
+
+
+    } else {
+
+
+      agrupadas.push({
+
+        ...s,
+
+        dias:[
+          s.fecha_inicio
+        ]
+
+      });
+
+
+    }
+
+
+  } else {
+
+
+    agrupadas.push(s);
+
+
+  }
+
+
+});
+
+
+setSolicitudes(lista);
+
+setSolicitudesVista(agrupadas);
 
 const conflictos =
   await obtenerConflictosUsuario(user.id);
@@ -489,7 +548,7 @@ className={`mt-6 rounded-3xl p-6 shadow ${
           <div className="mt-4 space-y-3">
 
 
-            {solicitudes.map((solicitud) => (
+            {solicitudesVista.map((solicitud) => (
 
 
               <div
@@ -506,14 +565,35 @@ className={`mt-6 rounded-3xl p-6 shadow ${
 
 
 
-                <p className="mt-2">
+                {solicitud.dias ? (
 
-                  📅 {formatearFecha(solicitud.fecha_inicio)}
+<div className="mt-2 space-y-1">
 
-                  {solicitud.fecha_inicio !== solicitud.fecha_fin &&
-                    ` → ${formatearFecha(solicitud.fecha_fin)}`}
+{solicitud.dias.map(
+(dia:string,index:number)=>(
 
-                </p>
+<p key={dia}>
+📅 Día {index + 1}: {formatearFecha(dia)}
+</p>
+
+)
+
+)}
+
+</div>
+
+) : (
+
+<p className="mt-2">
+
+📅 {formatearFecha(solicitud.fecha_inicio)}
+
+{solicitud.fecha_inicio !== solicitud.fecha_fin &&
+` → ${formatearFecha(solicitud.fecha_fin)}`}
+
+</p>
+
+)}
 
 
               </div>

@@ -131,17 +131,22 @@ export async function obtenerSolicitudesDia(fecha: string) {
 // ELIMINAR SOLICITUD
 export async function eliminarSolicitud(id: string) {
 
-  const { error } = await supabase
+  console.log("BORRANDO ID:", id);
+
+  const { data, error } = await supabase
     .from("vacaciones")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .select();
+
+  console.log("BORRADO:", data);
+  console.log("ERROR:", error);
 
   if (error) {
     throw error;
   }
 
 }
-
 
 
 // ACTUALIZAR SOLICITUD

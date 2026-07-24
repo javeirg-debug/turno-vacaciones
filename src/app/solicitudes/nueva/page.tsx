@@ -15,7 +15,10 @@ console.log("Fecha:", searchParams.get("fecha"));
 const [tipo, setTipo] = useState(
   vieneDelCalendario ? "🟢 AP" : "🌴 Vacaciones"
 );  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+const [fechaFin, setFechaFin] = useState("");
+
+const [dia2, setDia2] = useState("");
+const [dia3, setDia3] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -35,6 +38,8 @@ useEffect(() => {
 
   async function guardar() {
 
+  if (tipo === "🌴 Vacaciones") {
+
     if (!fechaInicio || !fechaFin) {
 
       setMensaje("Selecciona las fechas");
@@ -42,50 +47,123 @@ useEffect(() => {
       return;
 
     }
-    if (fechaFin < fechaInicio) {
 
-  setMensaje(
-    "⚠️ La fecha de fin no puede ser anterior a la fecha de inicio."
-  );
+  } else {
 
-  return;
+    if (!fechaInicio) {
 
-}
+      setMensaje("Selecciona la fecha");
 
-    try {
-
-      setCargando(true);
-
-await guardarSolicitud({
-
-  tipo,
-  fechaInicio,
-  fechaFin: tipo === "🌴 Vacaciones" ? fechaFin : fechaInicio,
-  observaciones,
-
-});
-
-      setMensaje("✅ Solicitud guardada correctamente");
-
-      setTimeout(() => {
-
-        router.push("/solicitudes");
-
-      }, 1000);
-
-    } catch (error: any) {
-
-  setMensaje(
-    "⚠️ " + (error?.message || "Error guardando solicitud")
-  );
-
-} finally {
-
-      setCargando(false);
+      return;
 
     }
 
   }
+
+
+  if (
+    tipo === "🌴 Vacaciones" &&
+    fechaFin < fechaInicio
+  ) {
+
+    setMensaje(
+      "⚠️ La fecha de fin no puede ser anterior a la fecha de inicio."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    setCargando(true);
+
+
+    // NAVIDAD Y SEMANA SANTA
+    // SE GUARDAN COMO 3 SOLICITUDES INDEPENDIENTES
+
+    if (
+      tipo === "🎄 Navidad" ||
+      tipo === "✝️ Semana Santa"
+    ) {
+
+
+      const dias = [
+        fechaInicio,
+        dia2,
+        dia3
+      ].filter(Boolean);
+
+
+
+      for (const dia of dias) {
+
+
+        await guardarSolicitud({
+
+          tipo,
+          fechaInicio: dia,
+          fechaFin: dia,
+          observaciones,
+
+        });
+
+
+      }
+
+
+    } else {
+
+
+      await guardarSolicitud({
+
+        tipo,
+        fechaInicio,
+        fechaFin:
+          tipo === "🌴 Vacaciones"
+            ? fechaFin
+            : fechaInicio,
+        observaciones,
+
+      });
+
+
+    }
+
+
+    setMensaje(
+      "✅ Solicitud guardada correctamente"
+    );
+
+
+    setTimeout(() => {
+
+      router.push("/solicitudes");
+
+    }, 1000);
+
+
+
+  } catch (error: any) {
+
+
+    setMensaje(
+      "⚠️ " +
+      (error?.message ||
+      "Error guardando solicitud")
+    );
+
+
+  } finally {
+
+
+    setCargando(false);
+
+
+  }
+
+}
 
   return (
 
@@ -119,8 +197,9 @@ await guardarSolicitud({
 
   <option>🟢 AP</option>
   <option>⏰ Compensación horaria</option>
-  <option>📄 Otros permisos</option>
-
+  <option>🎄 Navidad</option>
+<option>✝️ Semana Santa</option>
+<option>📄 Otros permisos</option>
 </select>
 
         </div>
@@ -129,9 +208,13 @@ await guardarSolicitud({
 
 <label className="font-semibold">
 
-  {tipo === "🌴 Vacaciones"
-    ? "Desde"
-    : "Fecha"}
+  {
+    tipo === "🌴 Vacaciones"
+      ? "Desde"
+      : tipo === "🎄 Navidad" || tipo === "✝️ Semana Santa"
+      ? "Día 1"
+      : "Fecha"
+  }
 
 </label>
 
@@ -146,6 +229,55 @@ await guardarSolicitud({
             className="mt-2 w-full rounded-xl border p-3"
 
           />
+
+{(tipo === "🎄 Navidad" || tipo === "✝️ Semana Santa") && (
+
+  <>
+
+    <div className="mt-5">
+
+      <label className="font-semibold">
+        Día 2 (opcional)
+      </label>
+
+      <input
+
+        type="date"
+
+        value={dia2}
+
+        onChange={(e)=>setDia2(e.target.value)}
+
+        className="mt-2 w-full rounded-xl border p-3"
+
+      />
+
+    </div>
+
+
+    <div className="mt-5">
+
+      <label className="font-semibold">
+        Día 3 (opcional)
+      </label>
+
+      <input
+
+        type="date"
+
+        value={dia3}
+
+        onChange={(e)=>setDia3(e.target.value)}
+
+        className="mt-2 w-full rounded-xl border p-3"
+
+      />
+
+    </div>
+
+  </>
+
+)}
 
         </div>
 
