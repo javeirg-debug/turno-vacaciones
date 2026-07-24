@@ -178,7 +178,6 @@ async function calcularEstadisticas() {
  finMes.toISOString().split("T")[0]
 );
 
-
     if(error){
       console.error(error);
       continue;
@@ -197,22 +196,28 @@ let diasPermiso = 0;
 
 
 const inicioOriginal =
-  new Date(permiso.fecha_inicio);
+  new Date(permiso.fecha_inicio + "T00:00:00");
 
 const finOriginal =
-  new Date(permiso.fecha_fin);
+  new Date(permiso.fecha_fin + "T00:00:00");
 
 
 const inicio =
-  inicioOriginal < inicioMes
-  ? inicioMes
-  : inicioOriginal;
+  new Date(
+    Math.max(
+      inicioOriginal.getTime(),
+      inicioMes.getTime()
+    )
+  );
 
 
 const fin =
-  finOriginal > finMes
-  ? finMes
-  : finOriginal;
+  new Date(
+    Math.min(
+      finOriginal.getTime(),
+      finMes.getTime()
+    )
+  );
 
 
 
@@ -303,7 +308,7 @@ setCalculando(false);
     }
 
     setUsuarios(data || []);
-  }
+      }
 
   return (
 
