@@ -433,21 +433,25 @@ overflow-hidden
 
 ${
 dia >= huecosMes(index,anio)
+&&
+esDiaTrabajo(
+dia-huecosMes(index,anio)+1,
+index,
+anio
+)
 
 ?
 
 colorDia(
-
 personasFuera(
 dia-huecosMes(index,anio)+1,
 index
 )
-
 )
 
 :
 
-""
+"bg-white"
 
 }
 
