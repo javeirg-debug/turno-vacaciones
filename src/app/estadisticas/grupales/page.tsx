@@ -123,6 +123,9 @@ function calcularDiasLaborables(
   const [mostrarInfo, setMostrarInfo] =
   useState(false);
 
+  const [calculando, setCalculando] =
+  useState(false);
+
   useEffect(() => {
     cargarUsuariosActivos();
   }, []);
@@ -141,6 +144,8 @@ useEffect(() => {
 
 
 async function calcularEstadisticas() {
+
+  setCalculando(true);
 
   const resultado: EstadisticaUsuario[] = [];
 
@@ -278,8 +283,9 @@ resultado.push({
   }
 
 
-  setEstadisticas(resultado);
+setEstadisticas(resultado);
 
+setCalculando(false);
 
 }
 
@@ -416,7 +422,15 @@ resultado.push({
 
 
 {
-estadisticas.length === 0 ? (
+calculando ? (
+
+<div className="rounded-2xl bg-slate-100 p-6 text-center text-slate-500">
+
+⏳ Calculando permisos...
+
+</div>
+
+) : estadisticas.length === 0 ? (
 
 <div className="rounded-2xl bg-slate-100 p-6 text-center text-slate-500">
 
