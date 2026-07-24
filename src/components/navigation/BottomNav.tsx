@@ -36,18 +36,20 @@ export default function BottomNav() {
       </Link>
 
 
-      <Link href="/estadisticas" className="text-center">
-        📊
-        <span className="block text-xs">
-          Estadísticas
-        </span>
-      </Link>
-
-
       <Link href="/cursos" className="text-center">
         🔫
         <span className="block text-xs">
           Cursos
+        </span>
+      </Link>
+
+
+
+
+      <Link href="/estadisticas" className="text-center">
+        📊
+        <span className="block text-xs">
+          Estadísticas
         </span>
       </Link>
 
