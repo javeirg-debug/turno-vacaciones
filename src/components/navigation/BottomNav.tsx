@@ -19,12 +19,14 @@ export default function BottomNav() {
         </span>
       </Link>
 
+
       <Link href="/calendario" className="text-center">
         📅
         <span className="block text-xs">
           Calendario
         </span>
       </Link>
+
 
       <Link href="/solicitudes" className="text-center">
         📝
@@ -33,6 +35,7 @@ export default function BottomNav() {
         </span>
       </Link>
 
+
       <Link href="/estadisticas" className="text-center">
         📊
         <span className="block text-xs">
@@ -40,16 +43,26 @@ export default function BottomNav() {
         </span>
       </Link>
 
+
+      <Link href="/cursos" className="text-center">
+        🔫
+        <span className="block text-xs">
+          Cursos
+        </span>
+      </Link>
+
+
       {usuario?.rol === "admin" && (
 
         <Link href="/usuarios" className="text-center">
           ⚙️
           <span className="block text-xs">
-            Administración
+            Admin
           </span>
         </Link>
 
       )}
+
 
     </nav>
 
