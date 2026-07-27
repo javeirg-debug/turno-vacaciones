@@ -174,10 +174,11 @@ async function cargarUsuarios() {
           {/* TABLA */}
 
           <div
-            style={{
-  gridTemplateColumns: "max-content repeat(6,42px)",
-}}
-          >
+  className="grid gap-2"
+  style={{
+    gridTemplateColumns: "max-content repeat(6,42px)",
+  }}
+>
 
             {/* ESQUINA */}
 
