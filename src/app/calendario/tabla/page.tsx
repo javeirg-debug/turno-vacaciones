@@ -101,9 +101,9 @@ async function cargarUsuarios() {
 
         
 
-<div className="mx-auto w-max rounded-3xl bg-white p-6 shadow-xl">
+<div className="mx-auto w-max rounded-3xl bg-white p-2 shadow-xl">
   
- <div className="mb-6">
+ <div className="mb-3">
 
   {/* AÑO */}
 
@@ -174,7 +174,7 @@ async function cargarUsuarios() {
           {/* TABLA */}
 
           <div
-  className="grid gap-2"
+  className="grid gap-1"
   style={{
     gridTemplateColumns: "max-content repeat(6,42px)",
   }}
@@ -212,7 +212,7 @@ async function cargarUsuarios() {
               <>
                 <div
                   key={usuario.id}
-                 className="flex h-[42px] items-center whitespace-nowrap rounded-lg bg-slate-100 px-2 text-[9px] font-semibold"
+                 className="flex h-[42px] items-center whitespace-nowrap rounded-lg bg-slate-100 px-1 text-[9px] font-semibold"
                 >
                   {nombreCorto(usuario.nombre)}
                 </div>
