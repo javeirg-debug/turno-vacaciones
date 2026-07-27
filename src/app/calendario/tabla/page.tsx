@@ -101,11 +101,13 @@ async function cargarUsuarios() {
 
         
 
-<div className="mx-auto w-max rounded-3xl bg-white p-6 shadow-xl"><div className="mb-6 flex items-center justify-center gap-6">
+<div className="mx-auto w-max rounded-3xl bg-white p-6 shadow-xl">
+  
+ <div className="mb-6">
 
-  {/* Año */}
+  {/* AÑO */}
 
-  <div className="flex items-center gap-3">
+  <div className="mb-4 flex items-center justify-center gap-3">
 
     <button
       onClick={() => setAnio(anio - 1)}
@@ -114,7 +116,7 @@ async function cargarUsuarios() {
       ◀
     </button>
 
-    <span className="min-w-[60px] text-center text-lg font-bold text-slate-700">
+    <span className="min-w-[70px] text-center text-lg font-bold text-slate-700">
       {anio}
     </span>
 
@@ -127,31 +129,35 @@ async function cargarUsuarios() {
 
   </div>
 
-  {/* Mes */}
+  {/* MES + CICLO */}
 
-  <select
-    value={mes}
-    onChange={(e) => setMes(Number(e.target.value))}
-    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm"
-  >
-    {meses.map((nombre, i) => (
-      <option key={i} value={i}>
-        {nombre}
-      </option>
-    ))}
-  </select>
+  <div className="flex justify-center gap-3">
 
-<select
-  value={ciclo}
-  onChange={(e) => setCiclo(Number(e.target.value))}
-  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm"
->
-  <option value={1}>1er ciclo</option>
-  <option value={2}>2º ciclo</option>
-  <option value={3}>3er ciclo</option>
-  <option value={4}>4º ciclo</option>
-  <option value={5}>5º ciclo</option>
-</select>
+    <select
+      value={mes}
+      onChange={(e) => setMes(Number(e.target.value))}
+      className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm"
+    >
+      {meses.map((nombre, i) => (
+        <option key={i} value={i}>
+          {nombre}
+        </option>
+      ))}
+    </select>
+
+    <select
+      value={ciclo}
+      onChange={(e) => setCiclo(Number(e.target.value))}
+      className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm"
+    >
+      <option value={1}>1er ciclo</option>
+      <option value={2}>2º ciclo</option>
+      <option value={3}>3er ciclo</option>
+      <option value={4}>4º ciclo</option>
+      <option value={5}>5º ciclo</option>
+    </select>
+
+  </div>
 
 </div>
 
@@ -168,10 +174,9 @@ async function cargarUsuarios() {
           {/* TABLA */}
 
           <div
-            className="grid gap-2"
             style={{
-              gridTemplateColumns: "90px repeat(6,42px)",
-            }}
+  gridTemplateColumns: "max-content repeat(6,42px)",
+}}
           >
 
             {/* ESQUINA */}
@@ -206,7 +211,7 @@ async function cargarUsuarios() {
               <>
                 <div
                   key={usuario.id}
-                  className="flex h-[42px] items-center rounded-lg bg-slate-100 px-2 text-[9px] font-semibold"
+                 className="flex h-[42px] items-center whitespace-nowrap rounded-lg bg-slate-100 px-2 text-[9px] font-semibold"
                 >
                   {nombreCorto(usuario.nombre)}
                 </div>
