@@ -95,13 +95,13 @@ async function cargarUsuarios() {
 
       {/* CENTRAR TODO */}
 
-      <div className="flex justify-center">
+      <div className="w-full overflow-x-auto">
 
         {/* TARJETA */}
 
-        <div className="inline-block rounded-3xl bg-white p-6 shadow-xl">
+        
 
-<div className="mb-6 flex items-center justify-center gap-6">
+<div className="mx-auto w-max rounded-3xl bg-white p-6 shadow-xl"><div className="mb-6 flex items-center justify-center gap-6">
 
   {/* Año */}
 
