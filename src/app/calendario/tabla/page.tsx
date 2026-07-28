@@ -1,12 +1,11 @@
 "use client";
 
 import BottomNav from "@/components/navigation/BottomNav";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 
-const dias = ["16", "17", "18", "19", "20", "21"];
-const semana = ["J", "V", "S", "D", "L", "M"];
+
 
 const meses = [
   "Enero",
@@ -22,6 +21,111 @@ const meses = [
   "Noviembre",
   "Diciembre",
 ];
+
+
+
+const inicioTurno = new Date(2026, 6, 16);
+
+function esDiaTrabajo(fecha: Date) {
+
+  const diferencia = Math.floor(
+    (fecha.getTime() - inicioTurno.getTime()) /
+    (1000 * 60 * 60 * 24)
+  );
+
+  const ciclo =
+    ((diferencia % 12) + 12) % 12;
+
+  return ciclo < 6;
+
+}
+
+function obtenerTurno(fecha: Date) {
+
+  const diferencia = Math.floor(
+    (fecha.getTime() - inicioTurno.getTime()) /
+    (1000 * 60 * 60 * 24)
+  );
+
+  const ciclo =
+    ((diferencia % 12) + 12) % 12;
+
+  switch (ciclo) {
+
+    case 0:
+    case 1:
+      return "M";
+
+    case 2:
+    case 3:
+      return "T";
+
+    case 4:
+    case 5:
+      return "N";
+
+    default:
+      return "";
+
+  }
+
+}
+
+
+function obtenerBloquesTrabajo(
+  anio: number,
+  mes: number
+) {
+
+  const bloques: Date[][] = [];
+
+  let fecha = new Date(anio, mes, 1);
+
+  fecha.setDate(fecha.getDate() - 20);
+
+  const fin = new Date(anio, mes + 1, 20);
+
+  while (fecha <= fin) {
+
+    if (esDiaTrabajo(fecha)) {
+
+      const bloque: Date[] = [];
+
+      for (let i = 0; i < 6; i++) {
+
+        const f = new Date(fecha);
+
+        f.setDate(fecha.getDate() + i);
+
+        bloque.push(f);
+
+      }
+
+      const pertenece = bloque.some(
+        d =>
+          d.getMonth() === mes &&
+          d.getFullYear() === anio
+      );
+
+      if (pertenece) {
+
+        bloques.push(bloque);
+
+      }
+
+      fecha.setDate(fecha.getDate() + 6);
+
+    } else {
+
+      fecha.setDate(fecha.getDate() + 1);
+
+    }
+
+  }
+
+  return bloques;
+
+}
 
 
 type Usuario = {
@@ -47,6 +151,7 @@ function nombreCorto(nombre: string) {
 
 }
 
+
 export default function CalendarioTabla() {
   const [anio, setAnio] =
   useState(new Date().getFullYear());
@@ -56,8 +161,72 @@ const [mes, setMes] =
 
   const [ciclo, setCiclo] = useState(1);
 
-  const [usuarios, setUsuarios] =
-  useState<Usuario[]>([]);
+  const bloques = obtenerBloquesTrabajo(anio, mes);
+
+const bloque = bloques[ciclo - 1] || [];
+
+
+
+
+const [usuarios, setUsuarios] =
+useState<Usuario[]>([]);
+
+function obtenerIncidencia(
+  usuarioId: string,
+  fecha: Date,
+  turno: string
+) {
+
+  
+const fechaTexto = [
+  fecha.getFullYear(),
+  String(fecha.getMonth() + 1).padStart(2, "0"),
+  String(fecha.getDate()).padStart(2, "0"),
+].join("-");
+
+const solicitud = solicitudes.find((s) => {
+
+
+  return (
+    s.usuario_id === usuarioId &&
+    fechaTexto >= s.fecha_inicio &&
+    fechaTexto <= s.fecha_fin
+  );
+
+});
+
+if (!solicitud) return turno;
+
+
+switch (solicitud.tipo) {
+
+  case "🌴 Vacaciones":
+    return "VAC";
+
+  case "🟢 AP":
+    return "AP";
+
+  case "✝️ Semana Santa":
+    return "SS";
+
+  case "🎄 Navidad":
+    return "NAV";
+
+  case "⏰ Compensación horaria":
+    return "CH";
+
+  case "📄 Otros permisos":
+    return "OT";
+
+  default:
+    return turno;
+
+}
+
+}
+
+const [solicitudes, setSolicitudes] =
+  useState<any[]>([]);
 
   useEffect(() => {
 
@@ -77,12 +246,28 @@ async function cargarUsuarios() {
 
   if (error) {
 
-    console.error(error);
+    
     return;
 
   }
 
   setUsuarios(data || []);
+
+
+
+const { data: solicitudesData, error: solicitudesError } =
+  await supabase
+    .from("vacaciones_con_usuario")
+    .select("*");
+
+console.log(JSON.stringify(solicitudesData?.[0], null, 2));
+
+if (solicitudesError) {
+
+} else {
+  setSolicitudes(solicitudesData || []);
+
+}
 
 }
 
@@ -145,17 +330,24 @@ async function cargarUsuarios() {
       ))}
     </select>
 
-    <select
-      value={ciclo}
-      onChange={(e) => setCiclo(Number(e.target.value))}
-      className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm"
+<select
+  value={ciclo}
+  onChange={(e) => setCiclo(Number(e.target.value))}
+  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm"
+>
+
+  {bloques.map((_, i) => (
+
+    <option
+      key={i}
+      value={i + 1}
     >
-      <option value={1}>1er ciclo</option>
-      <option value={2}>2º ciclo</option>
-      <option value={3}>3er ciclo</option>
-      <option value={4}>4º ciclo</option>
-      <option value={5}>5º ciclo</option>
-    </select>
+      {i + 1}º ciclo
+    </option>
+
+  ))}
+
+</select>
 
   </div>
 
@@ -186,19 +378,19 @@ async function cargarUsuarios() {
 
             {/* DÍAS */}
 
-            {dias.map((dia, i) => (
+            {bloque.map((fecha, i) => (
 
               <div
-                key={dia}
+                key={fecha.toISOString()}
                 className="flex h-[42px] w-[42px] flex-col items-center justify-center rounded-lg bg-slate-100"
               >
 
                 <span className="text-[8px] text-slate-500">
-                  {semana[i]}
+                  {["L","M","X","J","V","S","D"][(fecha.getDay()+6)%7]}
                 </span>
 
                 <span className="text-[10px] font-bold">
-                  {dia}
+                  {fecha.getDate()}
                 </span>
 
               </div>
@@ -209,34 +401,45 @@ async function cargarUsuarios() {
 
             {usuarios.map((usuario) => (
 
-              <>
-                <div
+
+
+  <React.Fragment key={usuario.id}>
+
+    <div
                   key={usuario.id}
                  className="flex h-[42px] items-center whitespace-nowrap rounded-lg bg-slate-100 px-1 text-[9px] font-semibold"
                 >
                   {nombreCorto(usuario.nombre)}
                 </div>
 
-                {dias.map((dia) => (
+               {bloque.map((fecha) => (
 
                   <button
-                    key={usuario.id + dia}
-                    className="
-                      h-[42px]
-                      w-[42px]
-                      rounded-lg
-                      bg-white
-                      shadow-sm
-                      ring-1
-                      ring-slate-200
-                      transition
-                      hover:bg-blue-50
-                    "
-                  />
+  key={usuario.id + fecha.toISOString()}
+  className="
+    h-[42px]
+    w-[42px]
+    rounded-lg
+    bg-green-500
+    text-white
+    text-[10px]
+    font-bold
+    shadow-sm
+    ring-1
+    ring-slate-200
+    transition
+  "
+>
+  {obtenerIncidencia(
+  usuario.id,
+  fecha,
+  obtenerTurno(fecha)
+)}
+</button>
 
                 ))}
 
-              </>
+              </React.Fragment>
 
             ))}
 
