@@ -28,6 +28,16 @@ export default function BottomNav() {
       </Link>
 
 
+
+<Link href="/tabla" className="text-center">
+  🧮
+  <span className="block text-xs">
+    Excel
+  </span>
+</Link>
+
+
+
       <Link href="/solicitudes" className="text-center">
         📝
         <span className="block text-xs">
@@ -35,13 +45,6 @@ export default function BottomNav() {
         </span>
       </Link>
 
-
-<Link href="/tabla" className="text-center">
-  📋
-  <span className="block text-xs">
-    Excell
-  </span>
-</Link>
 
 
       <Link href="/estadisticas" className="text-center">

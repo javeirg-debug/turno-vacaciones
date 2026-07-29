@@ -3,8 +3,8 @@
 import BottomNav from "@/components/navigation/BottomNav";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-
-
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
 
 
 const meses = [
@@ -153,6 +153,11 @@ function nombreCorto(nombre: string) {
 
 
 export default function CalendarioTabla() {
+
+const { usuario } = useUser();
+
+const router = useRouter();
+
   const [anio, setAnio] =
   useState(new Date().getFullYear());
 
@@ -167,7 +172,11 @@ const [mostrarLeyenda, setMostrarLeyenda] = useState(false);
 
 const bloque = bloques[ciclo - 1] || [];
 
+const mesesBloque = [...new Set(bloque.map(f => f.getMonth()))];
 
+const tituloBloque = mesesBloque
+  .map(m => meses[m].toUpperCase())
+  .join(" / ");
 
 
 const [usuarios, setUsuarios] =
@@ -189,6 +198,7 @@ const fechaTexto = [
 const solicitud = solicitudes.find((s) => {
 
 
+  
   return (
     s.usuario_id === usuarioId &&
     fechaTexto >= s.fecha_inicio &&
@@ -253,7 +263,15 @@ async function cargarUsuarios() {
 
   }
 
-  setUsuarios(data || []);
+  const lista = data || [];
+
+lista.sort((a, b) => {
+  if (a.id === usuario?.id) return -1;
+  if (b.id === usuario?.id) return 1;
+  return a.nombre.localeCompare(b.nombre);
+});
+
+setUsuarios(lista);
 
 
 
@@ -274,11 +292,11 @@ if (solicitudesError) {
 }
 
   return (
-    <main className="min-h-screen bg-slate-100 p-5 pb-24">
+      <main className="min-h-screen bg-slate-100 p-6 pb-24">
 
-      <h1 className="mb-6 text-2xl font-bold text-slate-800">
-        Calendario en tabla
-      </h1>
+   <h1 className="mb-6 text-3xl font-bold">
+      🧮 Excel
+    </h1>
 
       {/* CENTRAR TODO */}
 
@@ -367,7 +385,7 @@ if (solicitudesError) {
 
   <div className="w-full rounded-xl bg-slate-800 py-2 text-center text-[11px] font-bold tracking-[0.25em] text-white">
 
-    JULIO / AGOSTO
+    {tituloBloque}
 
   </div>
 
@@ -436,8 +454,9 @@ if (fecha.getMonth() !== mes) {
 }
 
 switch (incidencia) {
+
   case "VAC":
-    color = "bg-emerald-500";
+    color = "bg-teal-500";
     break;
 
   case "AP":
@@ -449,40 +468,52 @@ switch (incidencia) {
     break;
 
   case "NAV":
-    color = "bg-red-500";
+    color = "bg-indigo-500";
     break;
 
   case "CH":
-    color = "bg-amber-500";
+   color = "bg-slate-600";
     break;
 
   case "OT":
     color = "bg-fuchsia-500";
     break;
+
 }
 
-  return (
-    <button
-  key={usuario.id + fecha.toISOString()}
-className={`
-  h-[42px]
-  w-[42px]
-  rounded-lg
-  text-[10px]
-  font-bold
-  shadow-sm
-  ring-1
-  ring-slate-200
-  transition
-  ${color}
-  ${color === "bg-white" || color === "bg-slate-200"
-    ? "text-slate-700"
-    : "text-white"}
-`}
->
-  {incidencia}
-</button>
-  );
+  const fechaTexto = [
+  fecha.getFullYear(),
+  String(fecha.getMonth() + 1).padStart(2, "0"),
+  String(fecha.getDate()).padStart(2, "0"),
+].join("-");
+
+return (
+  <button
+    key={usuario.id + fecha.toISOString()}
+    onClick={() => router.push(`/tabla/${fechaTexto}`)}
+    className={`
+      h-[42px]
+      w-[42px]
+      rounded-lg
+      text-[10px]
+      font-bold
+      shadow-sm
+      ring-1
+      ring-slate-200
+      transition
+      hover:scale-105
+      cursor-pointer
+      ${color}
+      ${
+        color === "bg-white" || color === "bg-slate-200"
+          ? "text-slate-700"
+          : "text-white"
+      }
+    `}
+  >
+    {incidencia}
+  </button>
+);
 
 })}
 
@@ -516,7 +547,7 @@ className={`
       <div className="space-y-2 text-sm">
 
         <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-emerald-500"></div>
+         <div className="h-5 w-5 rounded bg-teal-500"></div>
           Vacaciones
         </div>
 
@@ -531,12 +562,12 @@ className={`
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-red-500"></div>
+          <div className="h-5 w-5 rounded bg-indigo-500"></div>
           Navidad
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-amber-500"></div>
+          <div className="h-5 w-5 rounded bg-slate-600"></div>
           Compensación horaria
         </div>
 
