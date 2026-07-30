@@ -182,6 +182,15 @@ const tituloBloque = mesesBloque
 const [usuarios, setUsuarios] =
 useState<Usuario[]>([]);
 
+type ConfiguracionOcupacion = {
+  minimo: number;
+  maximo: number;
+  color: string;
+};
+
+const [configuracion, setConfiguracion] =
+  useState<ConfiguracionOcupacion[]>([]);
+
 function obtenerIncidencia(
   usuarioId: string,
   fecha: Date,
@@ -237,14 +246,94 @@ switch (solicitud.tipo) {
 
 }
 
+
+function colorDia(personas: number) {
+
+  const regla = configuracion.find((c) =>
+
+    personas >= c.minimo &&
+    personas <= c.maximo
+
+  );
+
+  if (!regla) {
+    return "bg-slate-100";
+  }
+
+  if (regla.color === "verde") {
+    return "bg-green-200";
+  }
+
+  if (regla.color === "amarillo") {
+    return "bg-yellow-200";
+  }
+
+  if (regla.color === "naranja") {
+    return "bg-orange-200";
+  }
+
+  if (regla.color === "rojo") {
+    return "bg-red-200";
+  }
+
+  return "bg-slate-100";
+
+}
+
+function personasFuera(fecha: Date) {
+
+  const fechaTexto = [
+    fecha.getFullYear(),
+    String(fecha.getMonth() + 1).padStart(2, "0"),
+    String(fecha.getDate()).padStart(2, "0"),
+  ].join("-");
+
+  return solicitudes.filter((s) =>
+
+    fechaTexto >= s.fecha_inicio &&
+    fechaTexto <= s.fecha_fin
+
+  );
+
+}
+
 const [solicitudes, setSolicitudes] =
   useState<any[]>([]);
 
-  useEffect(() => {
-
+useEffect(() => {
   cargarUsuarios();
+  cargarConfiguracion();
 
+  const hoy = new Date();
+
+  setAnio(hoy.getFullYear());
+  setMes(hoy.getMonth());
+
+  const bloquesHoy = obtenerBloquesTrabajo(
+    hoy.getFullYear(),
+    hoy.getMonth()
+  );
+
+  const indice = bloquesHoy.findIndex((bloque) =>
+    bloque.some((dia) => dia >= hoy)
+  );
+
+  if (indice !== -1) {
+    setCiclo(indice + 1);
+  }
 }, []);
+
+
+async function cargarConfiguracion(){
+
+  const { data } = await supabase
+    .from("configuracion_ocupacion")
+    .select("*")
+    .order("minimo");
+
+  setConfiguracion(data || []);
+
+}
 
 async function cargarUsuarios() {
 
@@ -263,7 +352,12 @@ async function cargarUsuarios() {
 
   }
 
+  
+
   const lista = data || [];
+
+
+  
 
 lista.sort((a, b) => {
   if (a.id === usuario?.id) return -1;
@@ -409,7 +503,7 @@ if (solicitudesError) {
 
               <div
                 key={fecha.toISOString()}
-                className="flex h-[42px] w-[42px] flex-col items-center justify-center rounded-lg bg-slate-100"
+                className={`flex h-[42px] w-[42px] flex-col items-center justify-center rounded-lg ${colorDia(personasFuera(fecha).length)}`}
               >
 
                 <span className="text-[8px] text-slate-500">
@@ -544,39 +638,83 @@ return (
         </button>
       </div>
 
-      <div className="space-y-2 text-sm">
+      <div className="space-y-4 text-sm">
 
-        <div className="flex items-center gap-3">
-         <div className="h-5 w-5 rounded bg-teal-500"></div>
-          Vacaciones
-        </div>
 
-        <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-sky-500"></div>
-          AP
-        </div>
+<div>
+    <h3 className="mb-2 font-bold text-slate-700">
+      Ocupación del turno
+    </h3>
 
-        <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-violet-500"></div>
-          Semana Santa
-        </div>
+    <div className="space-y-2">
 
-        <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-indigo-500"></div>
-          Navidad
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-slate-600"></div>
-          Compensación horaria
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="h-5 w-5 rounded bg-fuchsia-500"></div>
-          Otros permisos
-        </div>
-
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-green-200"></div>
+        Baja ocupación
       </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-yellow-200"></div>
+        Ocupación media
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-orange-200"></div>
+        Ocupación alta
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-red-200"></div>
+        Ocupación crítica
+      </div>
+
+    </div>
+  </div>
+  <div>
+    <h3 className="mb-2 font-bold text-slate-700">
+      Permisos
+    </h3>
+
+    <div className="space-y-2">
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-teal-500"></div>
+        Vacaciones
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-sky-500"></div>
+        AP
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-violet-500"></div>
+        Semana Santa
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-indigo-500"></div>
+        Navidad
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-slate-600"></div>
+        Compensación horaria
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 rounded bg-fuchsia-500"></div>
+        Otros permisos
+      </div>
+
+    </div>
+  </div>
+
+  <hr />
+
+  
+
+</div>
 
     </div>
 
