@@ -22,11 +22,13 @@ const meses = [
 type Usuario = {
   id: string;
   nombre: string;
+  activo: boolean;
 };
 
 type EstadisticaUsuario = {
   id: string;
   nombre: string;
+  activo: boolean;
   dias: number;
   laborables: number;
   porcentaje: number;
@@ -268,20 +270,12 @@ const diasTrabajo =
 
 
 resultado.push({
-
   id: usuario.id,
-
   nombre: usuario.nombre,
-
+  activo: usuario.activo,
   dias: diasPermiso,
-
   laborables: diasTrabajo,
-
-  porcentaje:
-    Math.round(
-      (diasPermiso / diasTrabajo) * 100
-    )
-
+  porcentaje: Math.round((diasPermiso / diasTrabajo) * 100)
 });
 
 
@@ -298,9 +292,8 @@ setCalculando(false);
 
     const { data, error } = await supabase
       .from("usuarios")
-      .select("id,nombre")
-      .eq("activo", true)
-      .order("nombre");
+.select("id,nombre,activo")
+.order("nombre");
 
     if (error) {
       console.error(error);
@@ -479,7 +472,9 @@ className="rounded-2xl bg-slate-100 p-4"
 <div className="flex justify-between items-center">
 
 <span className="font-bold text-slate-800">
-{usuario.nombre}
+  {usuarios.find(u => u.id === usuario.id)?.activo
+  ? usuario.nombre
+  : "🔒 Usuario inactivo"}
 </span>
 
 

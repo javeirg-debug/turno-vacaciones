@@ -154,6 +154,7 @@ type FechaConflictiva = {
 const [fechasConflictivas, setFechasConflictivas] =
   useState<FechaConflictiva[] | null>(null);
 
+const [mostrarLeyenda, setMostrarLeyenda] = useState(false);  
 
 useEffect(()=>{
 
@@ -446,11 +447,20 @@ function colorDia(personas:number){
     <main className="min-h-screen bg-slate-100 p-6 pb-24">
 
 
-      <h1 className="text-3xl font-bold">
+<div className="mb-6 flex items-center justify-between">
 
-        📅 Calendario
+  <h1 className="text-3xl font-bold">
+    📅 Calendario
+  </h1>
 
-      </h1>
+  <button
+    onClick={() => setMostrarLeyenda(true)}
+className="h-9 w-9 rounded-full bg-blue-100 shadow hover:bg-blue-200"    
+  >
+    ℹ️
+  </button>
+
+</div>
 
 
 
@@ -618,9 +628,9 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
 {obtenerTurno(dia, mes, anio) !== "⚪ Libre" &&
  fuera.length > 0 && (
 
-  <div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
-    Fuera: {fuera.length}
-  </div>
+<div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
+  👤{fuera.length}
+</div>
 
 )}
 
@@ -709,6 +719,65 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
   )}
 
 </div>
+
+{mostrarLeyenda && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+
+    <div className="w-80 rounded-2xl bg-white p-6 shadow-2xl">
+
+      <div className="mb-4 flex items-center justify-between">
+
+        <h2 className="text-lg font-bold">
+          ¿Cómo funciona?
+        </h2>
+
+        <button
+          onClick={() => setMostrarLeyenda(false)}
+          className="rounded-full bg-slate-200 px-3 py-1"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <p className="mb-5 text-sm text-slate-600">
+        El color de cada día representa la ocupación prevista según el número de personas de permiso.
+      </p>
+
+      <h3 className="mb-3 text-base font-bold">
+        Leyenda
+      </h3>
+
+      <div className="space-y-3 text-sm">
+
+        {configuracion.map((c) => {
+
+          let color = "bg-slate-200";
+
+          if (c.color === "verde") color = "bg-green-200";
+          if (c.color === "amarillo") color = "bg-yellow-200";
+          if (c.color === "naranja") color = "bg-orange-200";
+          if (c.color === "rojo") color = "bg-red-200";
+
+          return (
+            <div
+              key={c.id}
+              className="flex items-center gap-3"
+            >
+              <div className={`h-5 w-5 rounded ${color}`}></div>
+
+              {c.minimo} - {c.maximo} Personas
+            </div>
+          );
+
+        })}
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
 
       <BottomNav />

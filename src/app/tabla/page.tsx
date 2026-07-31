@@ -131,6 +131,7 @@ function obtenerBloquesTrabajo(
 type Usuario = {
   id: string;
   nombre: string;
+  activo: boolean;
 };
 
 
@@ -339,9 +340,9 @@ async function cargarUsuarios() {
 
   const { data, error } = await supabase
 
-    .from("usuarios")
+.from("usuarios")
 
-    .select("id,nombre")
+.select("id,nombre,activo")
 
     .order("nombre");
 
@@ -530,7 +531,7 @@ if (solicitudesError) {
                   key={usuario.id}
                  className="flex h-[42px] items-center whitespace-nowrap rounded-lg bg-slate-100 px-1 text-[9px] font-semibold"
                 >
-                  {nombreCorto(usuario.nombre)}
+                  {usuario.activo ? nombreCorto(usuario.nombre) : "🔒 Inactivo"}
                 </div>
 
                {bloque.map((fecha) => {
@@ -626,8 +627,9 @@ return (
     <div className="w-80 rounded-2xl bg-white p-6 shadow-2xl">
 
       <div className="mb-4 flex items-center justify-between">
+
         <h2 className="text-lg font-bold">
-          Leyenda
+          ¿Cómo funciona?
         </h2>
 
         <button
@@ -636,85 +638,92 @@ return (
         >
           ✕
         </button>
+
       </div>
+
+      <p className="mb-5 text-sm text-slate-600">
+        El color de cada turno representa la ocupación prevista según el número de Personas de permiso.
+      </p>
 
       <div className="space-y-4 text-sm">
 
+        <div>
 
-<div>
-    <h3 className="mb-2 font-bold text-slate-700">
-      Ocupación del turno
-    </h3>
+          <h3 className="mb-2 font-bold text-slate-700">
+            Ocupación del turno
+          </h3>
 
-    <div className="space-y-2">
+          <div className="space-y-2">
 
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-green-200"></div>
-        Baja ocupación
+            {configuracion.map((c) => {
+
+              let color = "bg-slate-200";
+
+              if (c.color === "verde") color = "bg-green-200";
+              if (c.color === "amarillo") color = "bg-yellow-200";
+              if (c.color === "naranja") color = "bg-orange-200";
+              if (c.color === "rojo") color = "bg-red-200";
+
+              return (
+                <div
+                  key={`${c.minimo}-${c.maximo}`}
+                  className="flex items-center gap-3"
+                >
+                  <div className={`h-5 w-5 rounded ${color}`}></div>
+
+                  {c.minimo} - {c.maximo} Personas
+                </div>
+              );
+
+            })}
+
+          </div>
+
+        </div>
+
+        <div>
+
+          <h3 className="mb-2 font-bold text-slate-700">
+            Permisos
+          </h3>
+
+          <div className="space-y-2">
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-teal-500"></div>
+              Vacaciones
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-sky-500"></div>
+              AP
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-violet-500"></div>
+              Semana Santa
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-indigo-500"></div>
+              Navidad
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-slate-600"></div>
+              Compensación horaria
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-fuchsia-500"></div>
+              Otros permisos
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-yellow-200"></div>
-        Ocupación media
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-orange-200"></div>
-        Ocupación alta
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-red-200"></div>
-        Ocupación crítica
-      </div>
-
-    </div>
-  </div>
-  <div>
-    <h3 className="mb-2 font-bold text-slate-700">
-      Permisos
-    </h3>
-
-    <div className="space-y-2">
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-teal-500"></div>
-        Vacaciones
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-sky-500"></div>
-        AP
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-violet-500"></div>
-        Semana Santa
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-indigo-500"></div>
-        Navidad
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-slate-600"></div>
-        Compensación horaria
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-5 w-5 rounded bg-fuchsia-500"></div>
-        Otros permisos
-      </div>
-
-    </div>
-  </div>
-
-  <hr />
-
-  
-
-</div>
 
     </div>
 
