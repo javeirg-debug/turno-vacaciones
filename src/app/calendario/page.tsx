@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";import { supabase } from "@/lib/supabase";
 import BottomNav from "@/components/navigation/BottomNav";
 import { obtenerTodasLasSolicitudes } from "@/services/solicitudes";
-import { obtenerConflictosMes } from "@/services/conflictos";
+import {
+  obtenerConflictosMes,
+  type FechaConflictiva,
+} from "@/services/conflictos";
 
 const meses = [
   "Enero",
@@ -33,10 +36,10 @@ type Solicitud = {
   fecha_inicio: string;
   fecha_fin: string;
 
-  usuarios: {
-    nombre: string;
-  } | null;
-
+usuarios: {
+  nombre: string;
+  puesto: string;
+} | null;
 };
 
 
@@ -146,10 +149,6 @@ const [solicitudes,setSolicitudes] =
 const [configuracion,setConfiguracion] =
   useState<ConfiguracionOcupacion[]>([]);
 
-type FechaConflictiva = {
-  fecha: string;
-  personas: number;
-};
 
 const [fechasConflictivas, setFechasConflictivas] =
   useState<FechaConflictiva[] | null>(null);
@@ -231,6 +230,8 @@ async function cargarConflictosMes(){
       mes,
       anio
     );
+
+console.log(JSON.stringify(conflictos, null, 2));
 
   setFechasConflictivas(conflictos);
 
@@ -437,11 +438,6 @@ function colorDia(personas:number){
 
 
 
-
-
-
-
-
   return (
 
     <main className="min-h-screen bg-slate-100 p-6 pb-24">
@@ -624,16 +620,14 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
 
 
 
-
 {obtenerTurno(dia, mes, anio) !== "⚪ Libre" &&
- fuera.length > 0 && (
+fuera.length > 0 && (
 
-<div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
-  👤{fuera.length}
-</div>
+  <div className="mt-1 text-[10px] sm:text-[11px] font-semibold text-slate-700">
+    👤{fuera.length}
+  </div>
 
 )}
-
                       </>
 
                     )
@@ -699,13 +693,31 @@ className={`aspect-square overflow-hidden border border-slate-200 p-1 text-xs cu
 
       <ul className="mt-3 space-y-2">
 
-        {fechasConflictivas.map((f) => (
+{fechasConflictivas.map((f) => (
 
-          <li key={f.fecha}>
-            • {new Date(f.fecha).toLocaleDateString("es-ES")} ({f.personas} personas)
-          </li>
+  <li key={f.fecha}>
 
-        ))}
+    <div className="font-medium">
+      • {new Date(f.fecha).toLocaleDateString("es-ES")}
+    </div>
+
+    <div className="ml-5 text-sm text-slate-600">
+
+      🚓 G.A.C.: <strong>{f.gac}</strong>
+
+      {" · "}
+
+      🛡️ Seg.: <strong>{f.seguridad}</strong>
+
+      {" · "}
+
+      🖥️ Sala: <strong>{f.sala}</strong>
+
+    </div>
+
+  </li>
+
+))}
 
       </ul>
     </>

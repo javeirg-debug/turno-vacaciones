@@ -121,7 +121,25 @@ export default async function EditarUsuario({
 
               </div>
 
+<div>
 
+  <p className="text-sm text-slate-500">
+    Puesto
+  </p>
+
+  <p className="text-lg font-semibold">
+
+    {usuario.puesto === "gac"
+      ? "🚓 G.A.C"
+      : usuario.puesto === "seguridad"
+      ? "🛡️ Seguridad"
+      : usuario.puesto === "sala"
+      ? "🖥️ Sala"
+      : "—"}
+
+  </p>
+
+</div>
 
 
               <div>

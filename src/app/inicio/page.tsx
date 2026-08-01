@@ -56,6 +56,7 @@ type Usuario = {
   id: string;
   nombre: string;
   rol: string;
+  puesto: string;
 };
 
 
@@ -81,7 +82,9 @@ type Aviso = {
 
 type FechaConflictiva = {
   fecha: string;
-  personas: number;
+  gac: number;
+  seguridad: number;
+  sala: number;
 };
 
 export default function Inicio() {
@@ -143,7 +146,7 @@ const [fechasConflictivas, setFechasConflictivas] =
       const { data: perfil } =
         await supabase
           .from("usuarios")
-          .select("id,nombre,rol")
+          .select("id,nombre,rol,puesto")
           .eq("id", user.id)
           .single();
 
@@ -240,6 +243,7 @@ setSolicitudesVista(agrupadas);
 
 const conflictos =
   await obtenerConflictosUsuario(user.id);
+console.log(conflictos);
 
 setFechasConflictivas(conflictos);
 
@@ -331,11 +335,23 @@ const avisoActivo =
 
           <p className="mt-2 text-slate-500">
 
-            {usuario?.rol === "admin"
-              ? "👑 Administrador"
-              : "👤 Usuario"}
+  {usuario?.rol === "admin"
+    ? "👑 Administrador"
+    : "👮 Policía"}
 
-          </p>
+</p>
+
+<p className="mt-1 text-slate-500">
+
+  {usuario?.puesto === "gac"
+    ? "🚓 G.A.C"
+    : usuario?.puesto === "seguridad"
+    ? "🛡️ Seguridad"
+    : usuario?.puesto === "sala"
+    ? "🖥️ Sala"
+    : "—"}
+
+</p>
 
 
         </div>
@@ -487,17 +503,35 @@ className={`mt-6 rounded-3xl p-6 shadow ${
 
     <ul className="mt-3 space-y-2 text-slate-700">
 
-      {fechasConflictivas.map((f) => (
+{fechasConflictivas.map((f) => (
 
-        <li key={f.fecha}>
-          • {new Date(f.fecha).toLocaleDateString("es-ES", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })} ({f.personas} personas)
-        </li>
+  <li key={f.fecha}>
 
-      ))}
+    <div>
+      • {new Date(f.fecha).toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })}
+    </div>
+
+    <div className="ml-5 mt-1 text-sm text-slate-600">
+
+      🚓 G.A.C.: <strong>{f.gac}</strong>
+
+      {" · "}
+
+      🛡️ Seg.: <strong>{f.seguridad}</strong>
+
+      {" · "}
+
+      🖥️ Sala: <strong>{f.sala}</strong>
+
+    </div>
+
+  </li>
+
+))}
 
     </ul>
 

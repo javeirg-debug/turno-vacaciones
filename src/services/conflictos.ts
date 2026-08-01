@@ -2,7 +2,9 @@ import { supabase } from "@/lib/supabase";
 
 export type FechaConflictiva = {
   fecha: string;
-  personas: number;
+  gac: number;
+  seguridad: number;
+  sala: number;
 };
 
 

@@ -88,9 +88,20 @@ const usuariosNormales =
 
 
             <p className="mt-2 text-slate-500">
-              👑 Administrador
-            </p>
+  👑 Administrador
+</p>
 
+<p className="mt-1 text-slate-500">
+
+  {usuario.puesto === "gac"
+    ? "🚓 G.A.C"
+    : usuario.puesto === "seguridad"
+    ? "🛡️ Seguridad"
+    : usuario.puesto === "sala"
+    ? "🖥️ Sala"
+    : "—"}
+
+</p>
 
             <Link
 
@@ -136,8 +147,20 @@ const usuariosNormales =
 
 
             <p className="mt-2 text-slate-500">
-              👮 Policía
-            </p>
+  👮 Policía
+</p>
+
+<p className="mt-1 text-slate-500">
+
+  {usuario.puesto === "gac"
+    ? "🚓 G.A.C"
+    : usuario.puesto === "seguridad"
+    ? "🛡️ Seguridad"
+    : usuario.puesto === "sala"
+    ? "🖥️ Sala"
+    : "—"}
+
+</p>
 
 
             <Link

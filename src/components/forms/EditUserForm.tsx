@@ -7,6 +7,7 @@ type Usuario = {
   id: string;
   nombre: string;
   rol: string;
+  puesto: string;
 };
 
 export default function EditUserForm({
@@ -17,6 +18,7 @@ export default function EditUserForm({
 
   const [nombre, setNombre] = useState(usuario.nombre);
   const [rol, setRol] = useState(usuario.rol);
+  const [puesto, setPuesto] = useState(usuario.puesto);
   const [guardando, setGuardando] = useState(false);
 
   async function guardar() {
@@ -30,6 +32,7 @@ export default function EditUserForm({
         .update({
           nombre,
           rol,
+          puesto,
         })
         .eq("id", usuario.id);
 
@@ -68,25 +71,48 @@ export default function EditUserForm({
       />
 
       <label className="mt-6 block font-semibold">
-        Rol
-      </label>
+  Rol
+</label>
 
-      <select
-        value={rol}
-        onChange={(e) => setRol(e.target.value)}
-        className="mt-2 w-full rounded-xl border p-3"
-      >
-        <option value="admin">
-          Administrador
-        </option>
+<select
+  value={rol}
+  onChange={(e) => setRol(e.target.value)}
+  className="mt-2 w-full rounded-xl border p-3"
+>
+  <option value="admin">
+    Administrador
+  </option>
 
-        <option value="usuario">
-          Policía
-        </option>
+  <option value="usuario">
+    Policía
+  </option>
 
-      </select>
+</select>
 
-      <div className="mt-8 text-center">
+<label className="mt-6 block font-semibold">
+  Puesto
+</label>
+
+<select
+  value={puesto}
+  onChange={(e) => setPuesto(e.target.value)}
+  className="mt-2 w-full rounded-xl border p-3"
+>
+  <option value="gac">
+    G.A.C
+  </option>
+
+  <option value="seguridad">
+    Seguridad
+  </option>
+
+  <option value="sala">
+    Sala
+  </option>
+
+</select>
+
+<div className="mt-8 text-center">
 
         <button
           onClick={guardar}

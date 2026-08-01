@@ -39,6 +39,7 @@ type Solicitud = {
   id: string;
   usuario_id: string;
   nombre: string;
+  puesto: string;
   tipo: string;
   fecha_inicio: string;
   fecha_fin: string;
@@ -74,6 +75,7 @@ export default function DiaCalendario() {
 
     cargar();
   }, [fecha]);
+
 
   return (
     <main className="min-h-screen bg-slate-100 p-6 pb-24">
@@ -124,8 +126,20 @@ export default function DiaCalendario() {
               >
 
                 <p className="text-lg font-bold">
-                  👮 {solicitud.nombre}
-                </p>
+  👮 {solicitud.nombre}
+</p>
+
+<p className="text-sm text-slate-500">
+
+  {solicitud.puesto === "gac"
+    ? "🚓 G.A.C"
+    : solicitud.puesto === "seguridad"
+    ? "🛡️ Seguridad"
+    : solicitud.puesto === "sala"
+    ? "🖥️ Sala"
+    : "—"}
+
+</p>
 
                 <p className="mt-2">
                   {solicitud.tipo}

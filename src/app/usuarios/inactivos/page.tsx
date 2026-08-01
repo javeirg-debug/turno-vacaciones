@@ -42,10 +42,22 @@ export default async function UsuariosInactivos() {
             </h2>
 
             <p className="mt-2 text-slate-500">
-              {usuario.rol === "admin"
-                ? "👑 Administrador"
-                : "👮 Policía"}
-            </p>
+  {usuario.rol === "admin"
+    ? "👑 Administrador"
+    : "👮 Policía"}
+</p>
+
+<p className="mt-1 text-slate-500">
+
+  {usuario.puesto === "gac"
+    ? "🚓 G.A.C"
+    : usuario.puesto === "seguridad"
+    ? "🛡️ Seguridad"
+    : usuario.puesto === "sala"
+    ? "🖥️ Sala"
+    : "—"}
+
+</p>
 
             <Link
               href={`/usuarios/activar/${usuario.id}`}
