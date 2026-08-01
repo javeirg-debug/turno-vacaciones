@@ -659,76 +659,168 @@ fuera.length > 0 && (
 
 
 <div
-  className={`mt-6 rounded-3xl p-5 shadow ${
+  className={`mt-6 rounded-3xl p-4 shadow ${
     fechasConflictivas === null
       ? "border border-slate-200 bg-white"
       : fechasConflictivas.length > 0
-      ? "border border-red-300 bg-red-50"
-      : "border border-green-300 bg-green-50"
+      ? "border border-red-200 bg-red-50"
+      : "border border-green-200 bg-green-50"
   }`}
 >
 
-  <h2 className="text-xl font-bold">
+  <h2
+    className={`mb-3 text-lg font-bold ${
+      fechasConflictivas === null
+        ? "text-slate-800"
+        : fechasConflictivas.length > 0
+        ? "text-red-900"
+        : "text-green-900"
+    }`}
+  >
 
     {fechasConflictivas === null
       ? "⏳ Fechas conflictivas"
       : fechasConflictivas.length > 0
-      ? "⚠️ Fechas conflictivas"
+      ? "🚨 Fechas conflictivas"
       : "✅ Fechas conflictivas"}
 
   </h2>
 
+
+
   {fechasConflictivas === null ? (
 
-    <p className="mt-3 text-slate-500">
+    <p className="text-sm text-slate-500">
       Comprobando ocupación...
     </p>
 
-  ) : fechasConflictivas.length > 0 ? (
+
+) : fechasConflictivas.length > 0 ? (
 
     <>
-      <p className="mt-3 text-slate-700">
+
+      <p className="mb-3 text-sm text-slate-700">
         Este mes tiene días con alta ocupación:
       </p>
 
-      <ul className="mt-3 space-y-2">
+      <div className="space-y-2">
 
-{fechasConflictivas.map((f) => (
 
-  <li key={f.fecha}>
+      {fechasConflictivas.map((f) => (
 
-    <div className="font-medium">
-      • {new Date(f.fecha).toLocaleDateString("es-ES")}
+
+        <button
+          key={f.fecha}
+          className="
+            w-full
+            rounded-2xl
+            bg-red-100
+            p-3
+            shadow-sm
+            transition
+            active:scale-95
+          "
+        >
+
+
+          {/* FECHA */}
+
+          <div
+            className="
+              border-y
+              border-red-200
+              py-1
+              text-center
+            "
+          >
+
+            <p className="text-sm font-bold text-slate-800">
+
+              {new Date(f.fecha).toLocaleDateString("es-ES", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+
+            </p>
+
+          </div>
+
+
+
+          {/* OCUPACIÓN */}
+
+          <div
+            className="
+              mt-2
+              grid
+              grid-cols-3
+              text-center
+            "
+          >
+
+
+            <div>
+
+              <p className="text-xs text-slate-500">
+                🚓 GAC{" "}
+                <span className="font-bold text-slate-800">
+                  {f.gac}
+                </span>
+              </p>
+
+            </div>
+
+
+
+            <div className="border-x border-red-200">
+
+              <p className="text-xs text-slate-500">
+                🛡️ Seguridad{" "}
+                <span className="font-bold text-slate-800">
+                  {f.seguridad}
+                </span>
+              </p>
+
+            </div>
+
+
+
+            <div>
+
+              <p className="text-xs text-slate-500">
+                🖥️ Sala{" "}
+                <span className="font-bold text-slate-800">
+                  {f.sala}
+                </span>
+              </p>
+
+            </div>
+
+
+          </div>
+
+
+        </button>
+
+
+      ))}
+
+
     </div>
 
-    <div className="ml-5 text-sm text-slate-600">
-
-      🚓 G.A.C.: <strong>{f.gac}</strong>
-
-      {" · "}
-
-      🛡️ Seg.: <strong>{f.seguridad}</strong>
-
-      {" · "}
-
-      🖥️ Sala: <strong>{f.sala}</strong>
-
-    </div>
-
-  </li>
-
-))}
-
-      </ul>
     </>
 
   ) : (
 
-    <p className="mt-3 text-green-800">
+
+    <p className="text-sm text-green-800">
       Este mes no tiene días con alta ocupación.
     </p>
 
+
   )}
+
 
 </div>
 
