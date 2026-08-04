@@ -172,61 +172,12 @@ export default async function EditarUsuario({
 
           <div className="mt-6">
 
-            <EditUserForm usuario={usuario} />
+            <EditUserForm
+  usuario={usuario}
+  protegido={usuario.id === USUARIO_PROTEGIDO}
+/>
 
           </div>
-
-
-
-
-
-          {/* ACCIONES */}
-
-          <div className="mt-6 rounded-3xl bg-white p-6 shadow">
-
-
-            <h2 className="text-xl font-bold">
-              ⚙️ Acciones
-            </h2>
-
-
-
-            <div className="mt-5 space-y-4 text-center">
-
-
-
-              <Link
-                href={`/usuarios/password/${usuario.id}`}
-                className="inline-block rounded-2xl bg-amber-500 px-6 py-3 font-semibold text-white"
-              >
-                🔑 Restablecer contraseña
-              </Link>
-
-
-
-              <br />
-
-
-
-{usuario.id !== USUARIO_PROTEGIDO && (
-
-  <Link
-    href={`/usuarios/desactivar/${usuario.id}`}
-    className="inline-block rounded-2xl bg-red-500 px-6 py-3 font-semibold text-white"
-  >
-    🔒 Desactivar usuario
-  </Link>
-
-)}
-
-
-
-            </div>
-
-
-          </div>
-
-
 
 
 

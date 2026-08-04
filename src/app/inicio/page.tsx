@@ -509,6 +509,7 @@ const avisoActivo =
 
         <button
           key={f.fecha}
+          onClick={() => router.push(`/calendario/${f.fecha}`)}
           className="
             w-full
             rounded-2xl
@@ -533,14 +534,13 @@ const avisoActivo =
           >
 
             <p className="text-sm font-bold text-slate-800">
-
-              {new Date(f.fecha).toLocaleDateString("es-ES", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}
-
-            </p>
+  {new Date(f.fecha).toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  })}{" "}
+  · 👥 {f.gac + f.seguridad + f.sala}
+</p>
 
           </div>
 
@@ -560,7 +560,7 @@ const avisoActivo =
             <div>
 
               <p className="text-xs text-slate-500">
-                🚓 GAC{" "}
+                🚓 G.A.C.:{" "}
                 <span className="font-bold text-slate-800">
                   {f.gac}
                 </span>
@@ -573,7 +573,7 @@ const avisoActivo =
             <div className="border-x border-red-200">
 
               <p className="text-xs text-slate-500">
-                🛡️ Seguridad{" "}
+                🛡️ Seguridad:{" "}
                 <span className="font-bold text-slate-800">
                   {f.seguridad}
                 </span>
@@ -586,7 +586,7 @@ const avisoActivo =
             <div>
 
               <p className="text-xs text-slate-500">
-                🖥️ Sala{" "}
+                🖥️ Sala:{" "}
                 <span className="font-bold text-slate-800">
                   {f.sala}
                 </span>

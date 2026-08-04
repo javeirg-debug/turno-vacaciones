@@ -12,8 +12,10 @@ type Usuario = {
 
 export default function EditUserForm({
   usuario,
+  protegido,
 }: {
   usuario: Usuario;
+  protegido: boolean;
 }) {
 
   const [nombre, setNombre] = useState(usuario.nombre);
@@ -112,19 +114,33 @@ export default function EditUserForm({
 
 </select>
 
-<div className="mt-8 text-center">
+<div className="mt-8 flex flex-col items-center gap-4">
 
-        <button
-          onClick={guardar}
-          disabled={guardando}
-          className="inline-block rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white"
-        >
-          {guardando
-            ? "Guardando..."
-            : "💾 Guardar cambios"}
-        </button>
+  <button
+    onClick={guardar}
+    disabled={guardando}
+    className="w-72 rounded-2xl bg-blue-600 py-3 font-semibold text-white"
+  >
+    {guardando ? "Guardando..." : "💾 Guardar cambios"}
+  </button>
 
-      </div>
+  <a
+    href={`/usuarios/password/${usuario.id}`}
+    className="w-72 rounded-2xl bg-amber-500 py-3 text-center font-semibold text-white"
+  >
+    🔑 Restablecer contraseña
+  </a>
+
+  {!protegido && (
+    <a
+      href={`/usuarios/desactivar/${usuario.id}`}
+      className="w-72 rounded-2xl bg-red-500 py-3 text-center font-semibold text-white"
+    >
+      🔒 Desactivar usuario
+    </a>
+  )}
+
+</div>
 
     </div>
 

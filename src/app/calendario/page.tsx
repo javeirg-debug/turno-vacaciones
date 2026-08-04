@@ -711,6 +711,7 @@ fuera.length > 0 && (
 
         <button
           key={f.fecha}
+          onClick={() => router.push(`/calendario/${f.fecha}`)}
           className="
             w-full
             rounded-2xl
@@ -741,7 +742,7 @@ fuera.length > 0 && (
                 month: "long",
                 year: "numeric",
               })}
-
+· 👥 {f.gac + f.seguridad + f.sala}
             </p>
 
           </div>
@@ -763,7 +764,7 @@ fuera.length > 0 && (
             <div>
 
               <p className="text-xs text-slate-500">
-                🚓 GAC{" "}
+                🚓 G.A.C.:{" "}
                 <span className="font-bold text-slate-800">
                   {f.gac}
                 </span>
@@ -776,7 +777,7 @@ fuera.length > 0 && (
             <div className="border-x border-red-200">
 
               <p className="text-xs text-slate-500">
-                🛡️ Seguridad{" "}
+                🛡️ Seguridad:{" "}
                 <span className="font-bold text-slate-800">
                   {f.seguridad}
                 </span>
@@ -789,7 +790,7 @@ fuera.length > 0 && (
             <div>
 
               <p className="text-xs text-slate-500">
-                🖥️ Sala{" "}
+                🖥️ Sala:{" "}
                 <span className="font-bold text-slate-800">
                   {f.sala}
                 </span>
