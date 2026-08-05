@@ -604,13 +604,12 @@ className="rounded-xl bg-white px-4 py-2 shadow"
     📅 Días usados
   </h2>
 
-  <button
-    onClick={() => setMostrarInfoDias(true)}
-    className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-yellow-400 bg-yellow-100 text-yellow-700 shadow transition hover:bg-yellow-200"
-    title="Cómo se calcula"
-  >
-    <span className="text-lg font-extrabold">i</span>
-  </button>
+<button
+  onClick={() => setMostrarInfoDias(true)}
+  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 shadow hover:bg-slate-200"
+>
+  ℹ️
+</button>
 
 </div>
 
@@ -808,10 +807,9 @@ className="rounded-xl bg-white px-4 py-2 shadow"
 
 <button
   onClick={() => setMostrarInfo(true)}
-  className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-yellow-400 bg-yellow-100 text-yellow-700 shadow transition hover:bg-yellow-200"
-  title="Cómo se calcula"
+  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 shadow hover:bg-slate-200"
 >
-  <span className="text-lg font-extrabold">i</span>
+  ℹ️
 </button>
 
 </div>

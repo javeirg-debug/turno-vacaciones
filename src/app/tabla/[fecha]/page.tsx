@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import BottomNav from "@/components/navigation/BottomNav";
-import { obtenerSolicitudesDia } from "@/services/solicitudes";
+import {
+  obtenerSolicitudesDia,
+  eliminarSolicitud,
+} from "@/services/solicitudes";
+
+import { supabase } from "@/lib/supabase";
 
 const inicioTurno = new Date(2026, 6, 16);
 
@@ -49,7 +54,14 @@ type Solicitud = {
 };
 
 function formatearFecha(fecha: string) {
-  return new Date(fecha).toLocaleString("es-ES");
+  return new Date(fecha + "Z").toLocaleString("es-ES", {
+    timeZone: "Europe/Madrid",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function DiaCalendario() {
@@ -60,18 +72,35 @@ export default function DiaCalendario() {
 
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [cargando, setCargando] = useState(true);
+const [miUsuarioId, setMiUsuarioId] = useState("");
+
 
   useEffect(() => {
-    async function cargar() {
-      try {
-        const datos = await obtenerSolicitudesDia(fecha);
-        setSolicitudes(datos || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setCargando(false);
-      }
+async function cargar() {
+  try {
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      setMiUsuarioId(user.id);
     }
+
+    const datos = await obtenerSolicitudesDia(fecha);
+
+    setSolicitudes(datos || []);
+
+  } catch (error) {
+
+    console.error(error);
+
+  } finally {
+
+    setCargando(false);
+
+  }
+}
 
     cargar();
   }, [fecha]);
@@ -146,8 +175,20 @@ export default function DiaCalendario() {
                 </p>
 
                 <p className="mt-2">
-                  📅 {solicitud.fecha_inicio} → {solicitud.fecha_fin}
-                </p>
+  📅{" "}
+  {new Date(solicitud.fecha_inicio).toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  })}
+
+  {solicitud.fecha_inicio !== solicitud.fecha_fin &&
+    ` → ${new Date(solicitud.fecha_fin).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+    })}`}
+</p>
 
                 <p className="mt-2 text-sm text-slate-500">
                   Registrada:
@@ -160,6 +201,31 @@ export default function DiaCalendario() {
                     📝 {solicitud.motivo}
                   </p>
                 )}
+
+{solicitud.usuario_id === miUsuarioId && (
+
+  <button
+    onClick={async () => {
+      if (!confirm("¿Eliminar esta solicitud?")) return;
+
+      try {
+        await eliminarSolicitud(solicitud.id);
+
+        setSolicitudes((prev) =>
+          prev.filter((s) => s.id !== solicitud.id)
+        );
+
+      } catch {
+        alert("No se pudo eliminar la solicitud.");
+      }
+    }}
+    className="mt-4 w-full rounded-2xl bg-red-500 py-3 font-semibold text-white"
+  >
+    🗑️ Eliminar solicitud
+  </button>
+
+)}
+
 
               </div>
 

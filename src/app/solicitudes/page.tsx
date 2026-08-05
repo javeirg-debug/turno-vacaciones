@@ -24,7 +24,11 @@ type Solicitud = {
 };
 
 function formatearFecha(fecha: string) {
-  return new Date(fecha).toLocaleDateString("es-ES");
+  return new Date(fecha).toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
 }
 
 export default function Solicitudes() {

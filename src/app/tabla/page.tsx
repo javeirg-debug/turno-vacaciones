@@ -389,9 +389,20 @@ if (solicitudesError) {
   return (
       <main className="min-h-screen bg-slate-100 p-6 pb-24">
 
-   <h1 className="mb-6 text-3xl font-bold">
-      🧮 Excel
-    </h1>
+   <div className="mb-6 flex items-center justify-between">
+
+  <h1 className="text-3xl font-bold">
+    🧮 Excel
+  </h1>
+
+  <button
+    onClick={() => setMostrarLeyenda(true)}
+    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 shadow hover:bg-slate-200"
+  >
+    ℹ️
+  </button>
+
+</div>
 
       {/* CENTRAR TODO */}
 
@@ -427,12 +438,7 @@ if (solicitudesError) {
       ▶
     </button>
 
-    <button
-  onClick={() => setMostrarLeyenda(true)}
-  className="ml-2 h-8 w-8 rounded-full bg-blue-100 shadow hover:bg-blue-200"
->
-  ℹ️
-</button>
+    
 
   </div>
 

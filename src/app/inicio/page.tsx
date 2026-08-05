@@ -45,9 +45,11 @@ function obtenerTurnoHoy() {
 
 
 function formatearFecha(fecha: string) {
-
-  return new Date(fecha).toLocaleDateString("es-ES");
-
+  return new Date(fecha).toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
 }
 
 
@@ -656,11 +658,11 @@ const avisoActivo =
 
             {solicitudesVista.map((solicitud) => (
 
-
-              <div
-                key={solicitud.id}
-                className="rounded-2xl bg-slate-100 p-4"
-              >
+  <button
+    key={solicitud.id}
+    onClick={() => router.push("/solicitudes")}
+    className="w-full rounded-2xl bg-slate-100 p-4 text-left transition active:scale-95"
+  >
 
 
                 <p className="text-lg font-bold">
@@ -702,7 +704,7 @@ const avisoActivo =
 )}
 
 
-              </div>
+              </button>
 
 
             ))}
