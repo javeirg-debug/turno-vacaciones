@@ -317,52 +317,51 @@ setCalculando(false);
 
       <div className="mt-6 rounded-3xl bg-white p-6 shadow">
 
-        <div className="flex items-center justify-between gap-4">
+<div className="space-y-4">
 
-          {/* Año */}
+  {/* Año */}
 
-          <div className="flex items-center gap-3">
+  <div className="flex w-full items-center justify-between">
 
-            <button
-              onClick={() => setAnio(anio - 1)}
-              className="rounded-xl bg-slate-100 px-4 py-2 shadow"
-            >
-              ◀
-            </button>
+    <button
+      onClick={() => setAnio(anio - 1)}
+      className="rounded-xl bg-slate-100 px-4 py-2 shadow"
+    >
+      ◀
+    </button>
 
-            <span className="text-2xl font-bold">
-              {anio}
-            </span>
+    <span className="flex-1 text-center text-2xl font-bold">
+      {anio}
+    </span>
 
-            <button
-              onClick={() => setAnio(anio + 1)}
-              className="rounded-xl bg-slate-100 px-4 py-2 shadow"
-            >
-              ▶
-            </button>
+    <button
+      onClick={() => setAnio(anio + 1)}
+      className="rounded-xl bg-slate-100 px-4 py-2 shadow"
+    >
+      ▶
+    </button>
 
-          </div>
+  </div>
 
-          {/* Mes */}
+  {/* Mes */}
 
-          <select
-            value={mes}
-            onChange={(e) => setMes(Number(e.target.value))}
-            className="rounded-xl border bg-white px-4 py-2 shadow"
-          >
+  <div className="flex justify-center">
 
-            {meses.map((nombre, index) => (
-              <option
-                key={nombre}
-                value={index}
-              >
-                {nombre}
-              </option>
-            ))}
+    <select
+      value={mes}
+      onChange={(e) => setMes(Number(e.target.value))}
+      className="w-56 rounded-xl border bg-white px-4 py-3 text-center shadow"
+    >
+      {meses.map((nombre, index) => (
+        <option key={nombre} value={index}>
+          {nombre}
+        </option>
+      ))}
+    </select>
 
-          </select>
+  </div>
 
-        </div>
+</div>
 
 <div className="mt-8 rounded-2xl border p-6">
 

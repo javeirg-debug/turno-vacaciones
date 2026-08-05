@@ -116,7 +116,7 @@ const [fechasConflictivas, setFechasConflictivas] =
   const [cargando, setCargando] =
     useState(true);
 
-
+const [mostrarInfo, setMostrarInfo] = useState(false);
 
 
 
@@ -302,15 +302,6 @@ const avisoActivo =
 
 
 
-  function informacion() {
-
-    router.push("/informacion");
-
-  }
-
-
-
-
 
 
 
@@ -361,12 +352,12 @@ const avisoActivo =
 
 
 
-        <button
-          onClick={informacion}
-          className="rounded-full bg-amber-400 p-3 text-xl font-bold text-white shadow hover:bg-amber-500"
-        >
-          ⓘ
-        </button>
+<button
+  onClick={() => setMostrarInfo(true)}
+  className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 shadow transition hover:bg-blue-200"
+>
+  ℹ️
+</button>
 
 
       </div>
@@ -774,7 +765,72 @@ const avisoActivo =
 
 
 
+{mostrarInfo && (
 
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
+
+    <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-xl">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-xl font-bold text-blue-900">
+          ℹ️ Información de la aplicación
+        </h2>
+
+        <button
+          onClick={() => setMostrarInfo(false)}
+          className="text-xl text-slate-400"
+        >
+          ✕
+        </button>
+
+      </div>
+
+<div className="mt-6 max-h-[60vh] space-y-5 overflow-y-auto text-sm leading-7 text-slate-700">
+
+  <div>
+    <h3 className="mb-2 text-lg font-bold text-blue-900">
+      📱 Sobre la aplicación
+    </h3>
+
+    <p>
+      Esta aplicación ha sido desarrollada de manera completamente altruista,
+      con el único objetivo de facilitar la organización y coordinación de los
+      turnos de vacaciones entre los funcionarios.
+    </p>
+
+    <p className="mt-3">
+      Se trata de una herramienta de apoyo para mejorar la comunicación y la
+      planificación interna, <strong>sin sustituir en ningún caso los
+      procedimientos oficiales ni las autorizaciones correspondientes.</strong>
+    </p>
+
+    <p className="mt-3">
+      Cualquier permiso o incidencia deberá seguir tramitándose por los canales
+      oficiales establecidos.
+    </p>
+
+    <p className="mt-3">
+      Gracias a todos los compañeros por utilizarla y contribuir a una mejor
+      coordinación del servicio.
+    </p>
+
+  </div>
+
+</div>
+
+      <button
+        onClick={() => setMostrarInfo(false)}
+        className="mt-6 w-full rounded-xl bg-blue-900 py-3 font-bold text-white"
+      >
+        Entendido
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
 
 
