@@ -290,13 +290,44 @@ function personasFuera(fecha: Date) {
   ].join("-");
 
   return solicitudes.filter((s) =>
-
     fechaTexto >= s.fecha_inicio &&
     fechaTexto <= s.fecha_fin
-
   );
 
 }
+
+
+function usuarioDebeAparecer(usuario: Usuario) {
+
+  // Los usuarios activos aparecen siempre
+  if (usuario.activo) {
+    return true;
+  }
+
+  // Los inactivos solo aparecen si tienen
+  // algún permiso en uno de los 6 días del ciclo
+  return bloque.some((fecha) => {
+
+    const fechaTexto = [
+      fecha.getFullYear(),
+      String(fecha.getMonth() + 1).padStart(2, "0"),
+      String(fecha.getDate()).padStart(2, "0"),
+    ].join("-");
+
+    return solicitudes.some((solicitud) => {
+
+      return (
+        solicitud.usuario_id === usuario.id &&
+        fechaTexto >= solicitud.fecha_inicio &&
+        fechaTexto <= solicitud.fecha_fin
+      );
+
+    });
+
+  });
+
+}
+
 
 const [solicitudes, setSolicitudes] =
   useState<any[]>([]);
@@ -527,7 +558,9 @@ if (solicitudesError) {
 
             {/* USUARIOS */}
 
-            {usuarios.map((usuario) => (
+            {usuarios
+  .filter((usuario) => usuarioDebeAparecer(usuario))
+  .map((usuario) => (
 
 
 

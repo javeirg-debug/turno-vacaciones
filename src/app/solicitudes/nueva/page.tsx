@@ -191,7 +191,7 @@ await guardarSolicitud({
 <select
   value={tipo}
   onChange={(e) => setTipo(e.target.value)}
-  className="mt-2 w-full rounded-xl border p-3"
+  className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
 >
 
 <option>🌴 Vacaciones</option>
@@ -227,7 +227,7 @@ await guardarSolicitud({
 
             onChange={(e) => setFechaInicio(e.target.value)}
 
-            className="mt-2 w-full rounded-xl border p-3"
+            className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
 
           />
 
@@ -249,7 +249,7 @@ await guardarSolicitud({
 
         onChange={(e)=>setDia2(e.target.value)}
 
-        className="mt-2 w-full rounded-xl border p-3"
+        className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
 
       />
 
@@ -270,7 +270,7 @@ await guardarSolicitud({
 
         onChange={(e)=>setDia3(e.target.value)}
 
-        className="mt-2 w-full rounded-xl border p-3"
+       className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
 
       />
 
@@ -294,7 +294,7 @@ await guardarSolicitud({
       type="date"
       value={fechaFin}
       onChange={(e) => setFechaFin(e.target.value)}
-      className="mt-2 w-full rounded-xl border p-3"
+      className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
     />
 
   </div>
@@ -353,7 +353,7 @@ await guardarSolicitud({
           value={fechaFin}
           min={fechaInicio}
           onChange={(e) => setFechaFin(e.target.value)}
-          className="mt-2 w-full rounded-xl border p-3"
+          className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
         />
 
 <button
@@ -409,7 +409,7 @@ await guardarSolicitud({
 
             onChange={(e) => setObservaciones(e.target.value)}
 
-            className="mt-2 w-full rounded-xl border p-3"
+            className="mt-2 block w-full min-w-0 max-w-full box-border appearance-none rounded-xl border border-slate-200 p-3"
 
           />
 
