@@ -32,7 +32,7 @@ useState<number[]>([]);
 
   const [cargando, setCargando] =
     useState(true);
-
+const [sexo, setSexo] = useState("");
 
 const [anioPermisos,setAnioPermisos] =
   useState(new Date().getFullYear());
@@ -46,14 +46,19 @@ const [mostrarInfo, setMostrarInfo] =
 const [mostrarInfoDias, setMostrarInfoDias] =
   useState(false);
 
-  const tipos = [
-    "Vacaciones",
-    "AP",
-    "Compensación horaria",
-    "Navidad",
-    "Semana Santa",
-    "Otros",
-  ];
+const tipos = [
+  "Vacaciones",
+  "AP",
+  "Compensación horaria",
+  "Indisposición",
+  "Navidad",
+  "Semana Santa",
+  ...(sexo === "hombre" ? ["Paternidad"] : []),
+  ...(sexo === "mujer" ? ["Maternidad"] : []),
+  "Lactancia",
+  "Otros",
+  "Permiso urgente",
+];
 
 const meses = [
   "Enero",
@@ -73,47 +78,65 @@ const meses = [
 
 function buscarTipoBD(tipo:string): string[]{
 
-  const equivalencias: Record<string, string[]> = {
+const equivalencias: Record<string, string[]> = {
 
+  "Vacaciones": [
+    "Vacaciones",
+    "🌴 Vacaciones"
+  ],
 
-      "Vacaciones":[
-        "Vacaciones",
-        "🌴 Vacaciones"
-      ],
+  "AP": [
+    "AP",
+    "🟢 AP"
+  ],
 
+  "Compensación horaria": [
+    "Compensación horaria",
+    "⏰ Compensación horaria"
+  ],
 
-      "AP":[
-        "AP",
-        "🟢 AP"
-      ],
+  "Indisposición": [
+    "Indisposición",
+    "🤒 Indisposición"
+  ],
 
+  "Navidad": [
+    "Navidad",
+    "🎄 Navidad"
+  ],
 
-      "Compensación horaria":[
-        "Compensación horaria",
-        "⏰ Compensación horaria"
-      ],
+  "Semana Santa": [
+    "Semana Santa",
+    "✝️ Semana Santa"
+  ],
 
+  "Paternidad": [
+    "Paternidad",
+    "👶 Paternidad"
+  ],
 
-      "Navidad":[
-        "Navidad",
-        "🎄 Navidad"
-      ],
+  "Maternidad": [
+    "Maternidad",
+    "🤰 Maternidad"
+  ],
 
+  "Lactancia": [
+    "Lactancia",
+    "🍼 Lactancia"
+  ],
 
-      "Semana Santa":[
-        "Semana Santa",
-        "✝️ Semana Santa"
-      ],
+  "Otros": [
+    "Otros",
+    "📄 Otros permisos",
+    "Otros permisos"
+  ],
 
+  "Permiso urgente": [
+    "Permiso urgente",
+    "🚨 Permiso urgente"
+  ]
 
-      "Otros":[
-        "Otros",
-        "📄 Otros permisos",
-        "Otros permisos"
-      ]
-
-
-    };
+};
 
 
     return equivalencias[tipo];
@@ -213,9 +236,21 @@ useEffect(()=>{
     try {
 
 
-      const {
-        data:{user}
-      } = await supabase.auth.getUser();
+const {
+  data: { user }
+} = await supabase.auth.getUser();
+
+if (!user) return;
+
+const { data: usuario } = await supabase
+  .from("usuarios")
+  .select("sexo")
+  .eq("id", user.id)
+  .single();
+
+if (usuario) {
+  setSexo(usuario.sexo);
+}
 
 
 
@@ -656,9 +691,14 @@ className="border-t"
 {tipo==="Vacaciones"&&"🌴 "}
 {tipo==="AP"&&"🟢 "}
 {tipo==="Compensación horaria"&&"⏰ "}
+{tipo==="Indisposición"&&"🤒 "}
 {tipo==="Navidad"&&"🎄 "}
 {tipo==="Semana Santa"&&"✝️ "}
+{tipo==="Paternidad"&&"👶 "}
+{tipo==="Maternidad"&&"🤰 "}
+{tipo==="Lactancia"&&"🍼 "}
 {tipo==="Otros"&&"📄 "}
+{tipo==="Permiso urgente"&&"🚨 "}
 
 
 {tipo}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BottomNav from "@/components/navigation/BottomNav";
 import { guardarSolicitud } from "@/services/solicitudes";
+import { supabase } from "@/lib/supabase";
 
 export default function NuevaSolicitud() {
 
@@ -23,17 +24,38 @@ const [dia3, setDia3] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
+const [sexo, setSexo] = useState("");
 
 useEffect(() => {
 
-  const fecha = searchParams.get("fecha");
+  async function cargarDatos() {
 
-  if (fecha) {
+    const fecha = searchParams.get("fecha");
 
-    setFechaInicio(fecha);
-    setFechaFin(fecha);
+    if (fecha) {
+      setFechaInicio(fecha);
+      setFechaFin(fecha);
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data: usuario } = await supabase
+      .from("usuarios")
+      .select("sexo")
+      .eq("id", user.id)
+      .single();
+
+    if (usuario) {
+      setSexo(usuario.sexo);
+    }
 
   }
+
+  cargarDatos();
 
 }, [searchParams]);
 
@@ -112,7 +134,7 @@ await guardarSolicitud({
       }
 
 
-  } else {
+} else {
 
   await guardarSolicitud({
 
@@ -121,11 +143,11 @@ await guardarSolicitud({
 
     fechaFin:
       tipo === "🌴 Vacaciones" ||
-      tipo === "🟢 AP" ||
-      tipo === "⏰ Compensación horaria" ||
-      tipo === "📄 Otros permisos"
+      tipo === "👶 Paternidad" ||
+      tipo === "🤰 Maternidad" ||
+      tipo === "🍼 Lactancia"
         ? fechaFin
-        : fechaInicio,
+        : fechaFin || fechaInicio,
 
     observaciones,
 
@@ -195,11 +217,21 @@ await guardarSolicitud({
 >
 
 <option>🌴 Vacaciones</option>
-
-  <option>🟢 AP</option>
-  <option>⏰ Compensación horaria</option>
-  <option>🎄 Navidad</option>
+<option>🟢 AP</option>
+<option>⏰ Compensación horaria</option>
+<option>🤒 Indisposición</option>
+<option>🚨 Permiso urgente</option>
+<option>🎄 Navidad</option>
 <option>✝️ Semana Santa</option>
+{sexo === "hombre" && (
+  <option>👶 Paternidad</option>
+)}
+
+{sexo === "mujer" && (
+  <option>🤰 Maternidad</option>
+)}
+
+<option>🍼 Lactancia</option>
 <option>📄 Otros permisos</option>
 </select>
 
@@ -282,7 +314,12 @@ await guardarSolicitud({
 
         </div>
 
-{tipo === "🌴 Vacaciones" && (
+{(
+  tipo === "🌴 Vacaciones" ||
+  tipo === "👶 Paternidad" ||
+  tipo === "🤰 Maternidad" ||
+  tipo === "🍼 Lactancia"
+) && (
 
   <div>
 
@@ -304,7 +341,9 @@ await guardarSolicitud({
 {(
   tipo === "🟢 AP" ||
   tipo === "⏰ Compensación horaria" ||
-  tipo === "📄 Otros permisos"
+  tipo === "🤒 Indisposición" ||
+  tipo === "📄 Otros permisos" ||
+  tipo === "🚨 Permiso urgente"
 ) && (
 
   <div>

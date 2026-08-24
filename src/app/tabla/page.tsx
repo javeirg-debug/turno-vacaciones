@@ -237,8 +237,23 @@ switch (solicitud.tipo) {
   case "⏰ Compensación horaria":
     return "CH";
 
-  case "📄 Otros permisos":
-    return "OT";
+  case "🤒 Indisposición":
+    return "IND";
+
+  case "👶 Paternidad":
+    return "PAT";
+
+  case "🤰 Maternidad":
+    return "MAT";
+
+case "🍼 Lactancia":
+  return "LAC";
+
+case "🚨 Permiso urgente":
+  return "URG";
+
+case "📄 Otros permisos":
+  return "OT";
 
   default:
     return turno;
@@ -606,12 +621,32 @@ switch (incidencia) {
     break;
 
   case "CH":
-   color = "bg-slate-600";
+    color = "bg-slate-600";
     break;
 
-  case "OT":
-    color = "bg-fuchsia-500";
+  case "IND":
+    color = "bg-orange-500";
     break;
+
+  case "PAT":
+    color = "bg-pink-500";
+    break;
+
+  case "MAT":
+    color = "bg-rose-500";
+    break;
+
+case "LAC":
+  color = "bg-cyan-500";
+  break;
+
+case "URG":
+  color = "bg-red-500";
+  break;
+
+case "OT":
+  color = "bg-fuchsia-500";
+  break;
 
 }
 
@@ -754,9 +789,34 @@ return (
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-5 w-5 rounded bg-fuchsia-500"></div>
-              Otros permisos
+              <div className="h-5 w-5 rounded bg-orange-500"></div>
+              Indisposición
             </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-pink-500"></div>
+              Paternidad
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded bg-rose-500"></div>
+              Maternidad
+            </div>
+
+<div className="flex items-center gap-3">
+  <div className="h-5 w-5 rounded bg-cyan-500"></div>
+  Lactancia
+</div>
+
+<div className="flex items-center gap-3">
+  <div className="h-5 w-5 rounded bg-red-500"></div>
+  Permiso urgente
+</div>
+
+<div className="flex items-center gap-3">
+  <div className="h-5 w-5 rounded bg-fuchsia-500"></div>
+  Otros permisos
+</div>
 
           </div>
 
