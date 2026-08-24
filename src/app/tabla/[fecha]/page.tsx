@@ -44,6 +44,7 @@ type Solicitud = {
   id: string;
   usuario_id: string;
   nombre: string;
+  sexo: string;
   puesto: string;
   tipo: string;
   fecha_inicio: string;
@@ -154,8 +155,11 @@ async function cargar() {
                 className="rounded-2xl border bg-slate-50 p-4"
               >
 
-                <p className="text-lg font-bold">
-  👮 {solicitud.nombre}
+<p className="text-lg font-bold">
+  {solicitud.sexo === "mujer"
+    ? "👮‍♀️"
+    : "👮‍♂️"}{" "}
+  {solicitud.nombre}
 </p>
 
 <p className="text-sm text-slate-500">

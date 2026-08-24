@@ -16,6 +16,7 @@ const [tipo, setTipo] = useState(
   vieneDelCalendario ? "🟢 AP" : "🌴 Vacaciones"
 );  const [fechaInicio, setFechaInicio] = useState("");
 const [fechaFin, setFechaFin] = useState("");
+const [mostrarFechaFin, setMostrarFechaFin] = useState(false);
 
 const [dia2, setDia2] = useState("");
 const [dia3, setDia3] = useState("");
@@ -100,37 +101,37 @@ useEffect(() => {
       for (const dia of dias) {
 
 
-        await guardarSolicitud({
-
-          tipo,
-          fechaInicio: dia,
-          fechaFin: dia,
-          observaciones,
-
-        });
+await guardarSolicitud({
+  tipo,
+  fechaInicio: dia,
+  fechaFin: dia,
+  observaciones,
+});
 
 
       }
 
 
-    } else {
+  } else {
 
+  await guardarSolicitud({
 
-      await guardarSolicitud({
+    tipo,
+    fechaInicio,
 
-        tipo,
-        fechaInicio,
-        fechaFin:
-          tipo === "🌴 Vacaciones"
-            ? fechaFin
-            : fechaInicio,
-        observaciones,
+    fechaFin:
+      tipo === "🌴 Vacaciones" ||
+      tipo === "🟢 AP" ||
+      tipo === "⏰ Compensación horaria" ||
+      tipo === "📄 Otros permisos"
+        ? fechaFin
+        : fechaInicio,
 
-      });
+    observaciones,
 
+  });
 
-    }
-
+}
 
     setMensaje(
       "✅ Solicitud guardada correctamente"
@@ -283,27 +284,112 @@ useEffect(() => {
 
 {tipo === "🌴 Vacaciones" && (
 
-<div>
+  <div>
 
-  <label className="font-semibold">
+    <label className="font-semibold">
+      Hasta
+    </label>
 
-    Hasta
+    <input
+      type="date"
+      value={fechaFin}
+      onChange={(e) => setFechaFin(e.target.value)}
+      className="mt-2 w-full rounded-xl border p-3"
+    />
 
-  </label>
+  </div>
 
-  <input
+)}
 
-    type="date"
+{(
+  tipo === "🟢 AP" ||
+  tipo === "⏰ Compensación horaria" ||
+  tipo === "📄 Otros permisos"
+) && (
 
-    value={fechaFin}
+  <div>
 
-    onChange={(e) => setFechaFin(e.target.value)}
+    {!mostrarFechaFin ? (
 
-    className="mt-2 w-full rounded-xl border p-3"
+<button
+  type="button"
+  onClick={() => {
+    setMostrarFechaFin(true);
+    setFechaFin(fechaInicio);
+  }}
+  className="
+    mt-3
+    inline-flex
+    items-center
+    gap-2
+    rounded-xl
+    border
+    border-blue-200
+    bg-blue-50
+    px-4
+    py-2
+    text-sm
+    font-semibold
+    text-blue-600
+    transition
+    hover:bg-blue-100
+    active:scale-95
+  "
+>
+  <span className="text-lg leading-none">＋</span>
+  Ampliar fecha
+</button>
 
-  />
+    ) : (
 
-</div>
+      <>
+
+        <label className="font-semibold">
+          Hasta
+        </label>
+
+        <input
+          type="date"
+          value={fechaFin}
+          min={fechaInicio}
+          onChange={(e) => setFechaFin(e.target.value)}
+          className="mt-2 w-full rounded-xl border p-3"
+        />
+
+<button
+  type="button"
+  onClick={() => {
+    setMostrarFechaFin(false);
+    setFechaFin(fechaInicio);
+  }}
+  className="
+    mt-3
+    inline-flex
+    items-center
+    gap-2
+    rounded-xl
+    border
+    border-slate-200
+    bg-slate-50
+    px-4
+    py-2
+    text-sm
+    font-semibold
+    text-slate-600
+    transition
+    hover:bg-slate-100
+    active:scale-95
+  "
+>
+  <span className="text-lg leading-none">−</span>
+  Quitar fecha fin
+</button>
+
+      </>
+
+    )}
+
+  </div>
 
 )}
 

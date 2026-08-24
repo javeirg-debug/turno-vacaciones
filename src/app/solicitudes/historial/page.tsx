@@ -15,7 +15,9 @@ type Solicitud = {
   fecha_fin: string;
   motivo: string | null;
   estado: string;
+  dias?: string[];
 };
+
 function formatearFecha(fecha: string) {
   return new Date(fecha).toLocaleDateString("es-ES", {
     day: "2-digit",
@@ -50,16 +52,112 @@ export default function HistorialSolicitudes() {
 
 
 
-      const antiguas = (datos || []).filter(
+const antiguas = (datos || []).filter(
+  (solicitud) =>
+    solicitud.fecha_fin < hoy
+);
 
-        (solicitud) =>
-          solicitud.fecha_fin < hoy
+const agrupadas: Solicitud[] = [];
 
-      );
+const especiales = antiguas.filter(
+  (s) =>
+    s.tipo === "🎄 Navidad" ||
+    s.tipo === "✝️ Semana Santa"
+);
 
+const normales = antiguas.filter(
+  (s) =>
+    s.tipo !== "🎄 Navidad" &&
+    s.tipo !== "✝️ Semana Santa"
+);
 
+// Las solicitudes normales siguen siendo individuales
+agrupadas.push(...normales);
 
-      setHistorial(antiguas);
+// Copia de las especiales que todavía no hemos agrupado
+const pendientes = [...especiales];
+
+while (pendientes.length > 0) {
+
+  // Ordenamos por fecha
+  pendientes.sort(
+    (a, b) =>
+      new Date(a.fecha_inicio).getTime() -
+      new Date(b.fecha_inicio).getTime()
+  );
+
+  // La primera fecha pendiente inicia el bloque
+  const primera = pendientes[0];
+
+  const fechaInicial = new Date(
+    primera.fecha_inicio
+  );
+
+  // 30 días desde la primera fecha
+  const fechaLimite = new Date(
+    fechaInicial
+  );
+
+  fechaLimite.setDate(
+    fechaLimite.getDate() + 30
+  );
+
+  // Buscamos todos los registros del mismo tipo
+  // que estén dentro de esos 30 días
+  const bloque = pendientes.filter((s) => {
+
+    if (s.tipo !== primera.tipo) {
+      return false;
+    }
+
+    const fecha = new Date(
+      s.fecha_inicio
+    );
+
+    return (
+      fecha >= fechaInicial &&
+      fecha <= fechaLimite
+    );
+
+  });
+
+  // Creamos una tarjeta con ese bloque
+  agrupadas.push({
+    ...primera,
+    dias: bloque
+      .sort(
+        (a, b) =>
+          new Date(a.fecha_inicio).getTime() -
+          new Date(b.fecha_inicio).getTime()
+      )
+      .map((s) => s.fecha_inicio)
+  });
+
+  // Quitamos del listado todos los registros
+  // que ya pertenecen a este bloque
+  bloque.forEach((s) => {
+
+    const indice = pendientes.findIndex(
+      (p) => p.id === s.id
+    );
+
+    if (indice !== -1) {
+      pendientes.splice(indice, 1);
+    }
+
+  });
+
+}
+
+// Ordenamos finalmente las tarjetas:
+// más reciente → más antigua
+agrupadas.sort(
+  (a, b) =>
+    new Date(b.fecha_inicio).getTime() -
+    new Date(a.fecha_inicio).getTime()
+);
+
+setHistorial(agrupadas);
 
 
 
@@ -209,16 +307,33 @@ export default function HistorialSolicitudes() {
 
 
 
-{solicitud.tipo === "🌴 Vacaciones" ? (
+{solicitud.dias ? (
 
-  <p>
-    📅 {formatearFecha(solicitud.fecha_inicio)} → {formatearFecha(solicitud.fecha_fin)}
-  </p>
+  <div>
+
+    {solicitud.dias.map(
+      (dia: string, index: number) => (
+
+        <p key={dia}>
+          📅 Día {index + 1}: {formatearFecha(dia)}
+        </p>
+
+      )
+    )}
+
+  </div>
 
 ) : (
 
   <p>
     📅 {formatearFecha(solicitud.fecha_inicio)}
+
+    {solicitud.fecha_inicio !== solicitud.fecha_fin && (
+      <>
+        {" → "}
+        {formatearFecha(solicitud.fecha_fin)}
+      </>
+    )}
   </p>
 
 )}

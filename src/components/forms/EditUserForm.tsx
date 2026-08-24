@@ -8,6 +8,7 @@ type Usuario = {
   nombre: string;
   rol: string;
   puesto: string;
+  sexo: string;
 };
 
 export default function EditUserForm({
@@ -21,6 +22,7 @@ export default function EditUserForm({
   const [nombre, setNombre] = useState(usuario.nombre);
   const [rol, setRol] = useState(usuario.rol);
   const [puesto, setPuesto] = useState(usuario.puesto);
+  const [sexo, setSexo] = useState(usuario.sexo || "hombre");
   const [guardando, setGuardando] = useState(false);
 
   async function guardar() {
@@ -33,8 +35,9 @@ export default function EditUserForm({
         .from("usuarios")
         .update({
           nombre,
-          rol,
+          rol,    
           puesto,
+          sexo,
         })
         .eq("id", usuario.id);
 
@@ -111,8 +114,27 @@ export default function EditUserForm({
   <option value="sala">
     Sala
   </option>
-
 </select>
+
+
+<label className="mt-6 block font-semibold">
+  Sexo
+</label>
+
+<select
+  value={sexo}
+  onChange={(e) => setSexo(e.target.value)}
+  className="mt-2 w-full rounded-xl border p-3"
+>
+  <option value="hombre">
+    Hombre
+  </option>
+
+  <option value="mujer">
+    Mujer
+  </option>
+</select>
+
 
 <div className="mt-8 flex flex-col items-center gap-4">
 

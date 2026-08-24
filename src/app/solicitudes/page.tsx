@@ -315,36 +315,47 @@ onClick={() => {
 
 
 
-                {solicitud.dias ? (
+{solicitud.dias ? (
 
-<div>
+  <div>
 
-{
-solicitud.dias.map(
-(dia:string,index:number)=>(
+    {solicitud.dias.map(
+      (dia: string, index: number) => (
 
-<p key={dia}>
-📅 Día {index+1}: {formatearFecha(dia)}
-</p>
+        <p key={dia}>
+          📅 Día {index + 1}: {formatearFecha(dia)}
+        </p>
 
-))
-}
+      )
+    )}
 
-</div>
+  </div>
 
-) : solicitud.tipo === "🌴 Vacaciones" ? (
+) : (
+  
+  solicitud.tipo === "🌴 Vacaciones" ||
+  solicitud.tipo === "🟢 AP" ||
+  solicitud.tipo === "⏰ Compensación horaria" ||
+  solicitud.tipo === "📄 Otros permisos"
 
-<p>
-📅 {formatearFecha(solicitud.fecha_inicio)}
-→
-{formatearFecha(solicitud.fecha_fin)}
-</p>
+) ? (
+
+  <p>
+    📅 {formatearFecha(solicitud.fecha_inicio)}
+
+    {solicitud.fecha_inicio !== solicitud.fecha_fin && (
+      <>
+        {" → "}
+        {formatearFecha(solicitud.fecha_fin)}
+      </>
+    )}
+  </p>
 
 ) : (
 
-<p>
-📅 {formatearFecha(solicitud.fecha_inicio)}
-</p>
+  <p>
+    📅 {formatearFecha(solicitud.fecha_inicio)}
+  </p>
 
 )}
 

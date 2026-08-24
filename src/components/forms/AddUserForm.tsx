@@ -11,9 +11,13 @@ export default function AddUserForm() {
 
   const [email, setEmail] = useState("");
 
-  const [rol, setRol] = useState("usuario");
+const [rol, setRol] = useState("usuario");
 
-  const [mensaje, setMensaje] = useState("");
+const [puesto, setPuesto] = useState("gac");
+
+const [sexo, setSexo] = useState("hombre");
+
+const [mensaje, setMensaje] = useState("");
 
 
 
@@ -46,11 +50,13 @@ const respuesta = await fetch(
       "Content-Type": "application/json",
     },
 
-    body: JSON.stringify({
-      nombre,
-      email,
-      rol,
-    }),
+body: JSON.stringify({
+  nombre,
+  email,
+  rol,
+  puesto,
+  sexo,
+}),
   }
 );
 
@@ -85,7 +91,8 @@ if(!resultado.ok){
       setEmail("");
 
       setRol("usuario");
-
+setPuesto("gac");
+setSexo("hombre");
 
 
 
@@ -112,137 +119,131 @@ if(!resultado.ok){
 
 
 
-  return (
+return (
+  <div className="rounded-2xl bg-white p-6 shadow">
 
-    <div className="rounded-2xl bg-white p-5 shadow">
+    <h2 className="text-xl font-bold">
+      ➕ Nuevo Usuario
+    </h2>
 
-
-
-      <h2 className="text-xl font-bold">
-
-        ➕ Nuevo Usuario
-
-      </h2>
-
-
-
-
-
-
+    {/* NOMBRE */}
+    <div className="mt-6">
+      <label className="block font-semibold text-slate-700">
+        Nombre
+      </label>
 
       <input
-
-        className="mt-4 w-full rounded-xl border p-3"
-
+        className="mt-2 w-full rounded-xl border border-slate-200 p-3"
         placeholder="Nombre"
-
         value={nombre}
-
-        onChange={(e) =>
-          setNombre(e.target.value)
-        }
-
+        onChange={(e) => setNombre(e.target.value)}
       />
-
-
-
-
-
-
-
-      <input
-
-        className="mt-3 w-full rounded-xl border p-3"
-
-        placeholder="Email"
-
-        type="email"
-
-        value={email}
-
-        onChange={(e) =>
-          setEmail(e.target.value)
-        }
-
-      />
-
-
-
-
-
-
-
-      <select
-
-        className="mt-3 w-full rounded-xl border p-3"
-
-        value={rol}
-
-        onChange={(e) =>
-          setRol(e.target.value)
-        }
-
-      >
-
-        <option value="usuario">
-
-          Policía
-
-        </option>
-
-
-
-        <option value="admin">
-
-          Administrador
-
-        </option>
-
-
-      </select>
-
-
-
-
-
-
-
-      <button
-
-        onClick={crearUsuario}
-
-        className="mt-4 w-full rounded-xl bg-black p-3 text-white"
-
-      >
-
-        Crear usuario
-
-      </button>
-
-
-
-
-
-
-
-      {
-        mensaje && (
-
-          <p className="mt-3">
-
-            {mensaje}
-
-          </p>
-
-        )
-      }
-
-
-
-
-
     </div>
 
-  );
+
+    {/* EMAIL */}
+    <div className="mt-5">
+      <label className="block font-semibold text-slate-700">
+        Email
+      </label>
+
+      <input
+        className="mt-2 w-full rounded-xl border border-slate-200 p-3"
+        placeholder="Email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+    </div>
+
+
+    {/* ROL */}
+    <div className="mt-5">
+      <label className="block font-semibold text-slate-700">
+        Rol
+      </label>
+
+      <select
+        className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3"
+        value={rol}
+        onChange={(e) => setRol(e.target.value)}
+      >
+        <option value="usuario">
+          Policía
+        </option>
+
+        <option value="admin">
+          Administrador
+        </option>
+      </select>
+    </div>
+
+
+    {/* PUESTO */}
+    <div className="mt-5">
+      <label className="block font-semibold text-slate-700">
+        Puesto
+      </label>
+
+      <select
+        className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3"
+        value={puesto}
+        onChange={(e) => setPuesto(e.target.value)}
+      >
+        <option value="gac">
+          🚓 G.A.C
+        </option>
+
+        <option value="seguridad">
+          🛡️ Seguridad
+        </option>
+
+        <option value="sala">
+          🖥️ Sala
+        </option>
+      </select>
+    </div>
+
+
+    {/* SEXO */}
+    <div className="mt-5">
+      <label className="block font-semibold text-slate-700">
+        Sexo
+      </label>
+
+      <select
+        className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3"
+        value={sexo}
+        onChange={(e) => setSexo(e.target.value)}
+      >
+        <option value="hombre">
+          Hombre
+        </option>
+
+        <option value="mujer">
+          Mujer
+        </option>
+      </select>
+    </div>
+
+
+    {/* CREAR */}
+    <button
+      onClick={crearUsuario}
+      className="mt-7 w-full rounded-xl bg-black p-3 font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
+    >
+      Crear usuario
+    </button>
+
+
+    {/* MENSAJE */}
+    {mensaje && (
+      <p className="mt-4 rounded-xl bg-slate-100 p-3 text-center text-sm">
+        {mensaje}
+      </p>
+    )}
+
+  </div>
+);
 
 }

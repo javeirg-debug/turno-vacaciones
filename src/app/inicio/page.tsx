@@ -59,6 +59,7 @@ type Usuario = {
   nombre: string;
   rol: string;
   puesto: string;
+  sexo: string;
 };
 
 
@@ -148,7 +149,7 @@ const [mostrarInfo, setMostrarInfo] = useState(false);
       const { data: perfil } =
         await supabase
           .from("usuarios")
-          .select("id,nombre,rol,puesto")
+          .select("id,nombre,rol,puesto,sexo")
           .eq("id", user.id)
           .single();
 
@@ -328,9 +329,11 @@ const avisoActivo =
 
           <p className="mt-2 text-slate-500">
 
-  {usuario?.rol === "admin"
-    ? "👑 Administrador"
-    : "👮 Policía"}
+{usuario?.rol === "admin"
+  ? "👑 Administrador"
+  : usuario?.sexo === "mujer"
+  ? "👮‍♀️ Policía"
+  : "👮‍♂️ Policía"}
 
 </p>
 

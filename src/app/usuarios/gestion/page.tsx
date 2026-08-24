@@ -125,7 +125,7 @@ const usuariosNormales =
 
 
         <h2 className="mt-8 text-xl font-bold">
-          👮 Usuarios
+          🪪 Policías
         </h2>
 
 
@@ -146,8 +146,10 @@ const usuariosNormales =
             </h3>
 
 
-            <p className="mt-2 text-slate-500">
-  👮 Policía
+<p className="mt-2 text-slate-500">
+  {usuario.sexo === "mujer"
+    ? "👮‍♀️ Policía"
+    : "👮‍♂️ Policía"}
 </p>
 
 <p className="mt-1 text-slate-500">

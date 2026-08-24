@@ -10,11 +10,13 @@ export async function POST(request: Request) {
     const body = await request.json();
 
 
-    const {
-      nombre,
-      email,
-      rol
-    } = body;
+const {
+  nombre,
+  email,
+  rol,
+  puesto,
+  sexo
+} = body;
 
 
 
@@ -57,19 +59,15 @@ export async function POST(request: Request) {
 
         .from("usuarios")
 
-        .insert({
-
-          id:data.user.id,
-
-          nombre,
-
-          rol,
-
-          activo:true,
-
-          debe_cambiar_clave:true,
-
-        });
+.insert({
+  id: data.user.id,
+  nombre,
+  rol,
+  puesto,
+  sexo,
+  activo: true,
+  debe_cambiar_clave: true,
+});
 
 
 

@@ -115,7 +115,7 @@ export default async function EditarUsuario({
 
                   {usuario.rol === "admin"
                     ? "👑 Administrador"
-                    : "👮 Policía"}
+                    : "🪪 Policía"}
 
                 </p>
 
@@ -140,6 +140,24 @@ export default async function EditarUsuario({
   </p>
 
 </div>
+
+
+<div>
+
+  <p className="text-sm text-slate-500">
+    Sexo
+  </p>
+
+  <p className="text-lg font-semibold">
+
+    {usuario.sexo === "mujer"
+      ? "👮‍♀️ Mujer"
+      : "👮‍♂️ Hombre"}
+
+  </p>
+
+</div>
+
 
 
               <div>
