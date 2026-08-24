@@ -202,12 +202,12 @@ export default async function EditarUsuario({
           <div className="mt-8 text-center">
 
 
-            <Link
-              href="/usuarios/gestion"
-              className="inline-block rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white"
-            >
-              ⬅️ Volver a gestión de usuarios
-            </Link>
+<Link
+  href="/usuarios/gestion"
+  className="mt-8 inline-block text-sm font-semibold text-[#007AFF] transition hover:opacity-70"
+>
+  ⬅️ Volver a gestión de usuarios
+</Link>
 
 
           </div>

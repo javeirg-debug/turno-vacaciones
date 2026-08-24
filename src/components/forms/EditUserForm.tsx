@@ -18,7 +18,6 @@ export default function EditUserForm({
   usuario: Usuario;
   protegido: boolean;
 }) {
-
   const [nombre, setNombre] = useState(usuario.nombre);
   const [rol, setRol] = useState(usuario.rol);
   const [puesto, setPuesto] = useState(usuario.puesto);
@@ -26,16 +25,14 @@ export default function EditUserForm({
   const [guardando, setGuardando] = useState(false);
 
   async function guardar() {
-
     try {
-
       setGuardando(true);
 
       const { error } = await supabase
         .from("usuarios")
         .update({
           nombre,
-          rol,    
+          rol,
           puesto,
           sexo,
         })
@@ -46,126 +43,149 @@ export default function EditUserForm({
       }
 
       alert("✅ Usuario actualizado correctamente.");
-
     } catch (e) {
-
       console.error(e);
-
       alert("No se pudieron guardar los cambios.");
-
     } finally {
-
       setGuardando(false);
-
     }
-
   }
 
   return (
+    <div className="rounded-3xl bg-white p-6 shadow">
 
-    <div className="rounded-2xl bg-white p-6 shadow">
+      {/* NOMBRE */}
 
-      <label className="block font-semibold">
+      <label className="block text-sm font-semibold text-slate-700">
         Nombre
       </label>
 
       <input
         value={nombre}
         onChange={(e) => setNombre(e.target.value)}
-        className="mt-2 w-full rounded-xl border p-3"
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
       />
 
-      <label className="mt-6 block font-semibold">
-  Rol
-</label>
 
-<select
-  value={rol}
-  onChange={(e) => setRol(e.target.value)}
-  className="mt-2 w-full rounded-xl border p-3"
->
-  <option value="admin">
-    Administrador
-  </option>
+      {/* ROL */}
 
-  <option value="usuario">
-    Policía
-  </option>
+      <label className="mt-6 block text-sm font-semibold text-slate-700">
+        Rol
+      </label>
 
-</select>
+      <select
+        value={rol}
+        onChange={(e) => setRol(e.target.value)}
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+      >
+        <option value="admin">
+          Administrador
+        </option>
 
-<label className="mt-6 block font-semibold">
-  Puesto
-</label>
-
-<select
-  value={puesto}
-  onChange={(e) => setPuesto(e.target.value)}
-  className="mt-2 w-full rounded-xl border p-3"
->
-  <option value="gac">
-    G.A.C
-  </option>
-
-  <option value="seguridad">
-    Seguridad
-  </option>
-
-  <option value="sala">
-    Sala
-  </option>
-</select>
+        <option value="usuario">
+          Policía
+        </option>
+      </select>
 
 
-<label className="mt-6 block font-semibold">
-  Sexo
-</label>
+      {/* PUESTO */}
 
-<select
-  value={sexo}
-  onChange={(e) => setSexo(e.target.value)}
-  className="mt-2 w-full rounded-xl border p-3"
->
-  <option value="hombre">
-    Hombre
-  </option>
+      <label className="mt-6 block text-sm font-semibold text-slate-700">
+        Puesto
+      </label>
 
-  <option value="mujer">
-    Mujer
-  </option>
-</select>
+      <select
+        value={puesto}
+        onChange={(e) => setPuesto(e.target.value)}
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+      >
+        <option value="gac">
+          G.A.C
+        </option>
+
+        <option value="seguridad">
+          Seguridad
+        </option>
+
+        <option value="sala">
+          Sala
+        </option>
+      </select>
 
 
-<div className="mt-8 flex flex-col items-center gap-4">
+      {/* SEXO */}
 
-  <button
-    onClick={guardar}
-    disabled={guardando}
-    className="w-72 rounded-2xl bg-blue-600 py-3 font-semibold text-white"
-  >
-    {guardando ? "Guardando..." : "💾 Guardar cambios"}
-  </button>
+      <label className="mt-6 block text-sm font-semibold text-slate-700">
+        Sexo
+      </label>
 
-  <a
-    href={`/usuarios/password/${usuario.id}`}
-    className="w-72 rounded-2xl bg-amber-500 py-3 text-center font-semibold text-white"
-  >
-    🔑 Restablecer contraseña
-  </a>
+      <select
+        value={sexo}
+        onChange={(e) => setSexo(e.target.value)}
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+      >
+        <option value="hombre">
+          Hombre
+        </option>
 
-  {!protegido && (
-    <a
-      href={`/usuarios/desactivar/${usuario.id}`}
-      className="w-72 rounded-2xl bg-red-500 py-3 text-center font-semibold text-white"
-    >
-      🔒 Desactivar usuario
-    </a>
-  )}
+        <option value="mujer">
+          Mujer
+        </option>
+      </select>
 
-</div>
+
+      {/* ACCIONES */}
+
+      <div className="mt-8 flex flex-col gap-3">
+
+        {/* GUARDAR */}
+
+        <button
+          onClick={guardar}
+          disabled={guardando}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#007AFF] py-3.5 font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <span className="text-lg">
+            ✓
+          </span>
+
+          {guardando
+            ? "Guardando..."
+            : "Guardar cambios"}
+        </button>
+
+
+        {/* RESTABLECER CONTRASEÑA */}
+
+        <a
+          href={`/usuarios/password/${usuario.id}`}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-orange-400 bg-white py-3.5 font-semibold text-orange-500 transition hover:bg-orange-50"
+        >
+          <span className="text-lg">
+            🔒
+          </span>
+
+          Restablecer contraseña
+        </a>
+
+
+        {/* DESACTIVAR */}
+
+        {!protegido && (
+          <a
+            href={`/usuarios/desactivar/${usuario.id}`}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3.5 font-semibold text-red-600 transition hover:bg-red-100"
+          >
+            <span className="text-lg">
+              🔒
+            </span>
+
+            Desactivar usuario
+          </a>
+        )}
+
+      </div>
 
     </div>
-
   );
-
 }

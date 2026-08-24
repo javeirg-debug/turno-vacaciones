@@ -48,9 +48,9 @@ export default function DeleteUserButton({
   return (
     <button
       onClick={eliminar}
-      className="mt-3 inline-block rounded-xl bg-red-600 px-5 py-2 font-semibold text-white"
+      className="flex h-full w-full items-center justify-center gap-1 bg-red-500 px-2 text-sm font-bold text-white transition hover:bg-red-600"
     >
-      🗑️ Eliminar definitivamente
+      🗑️ Eliminar
     </button>
   );
 }
