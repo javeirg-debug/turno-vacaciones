@@ -44,6 +44,7 @@ type Solicitud = {
   usuario_id: string;
   nombre: string;
   sexo: string;
+  categoria: string | null;
   puesto: string;
   tipo: string;
   fecha_inicio: string;
@@ -152,6 +153,25 @@ function obtenerVisual(tipo: string) {
   }
 }
 
+function obtenerCategoria(
+  categoria: string | null,
+  sexo: string
+) {
+  if (categoria === "oficial") {
+    return sexo === "mujer"
+      ? "👮‍♀️ Oficial de Policía"
+      : "👮‍♂️ Oficial de Policía";
+  }
+
+  if (categoria === "policia") {
+    return sexo === "mujer"
+      ? "👮‍♀️ Policía"
+      : "👮‍♂️ Policía";
+  }
+
+  return "--";
+}
+
 export default function DiaCalendario() {
   const params = useParams();
   const router = useRouter();
@@ -216,78 +236,99 @@ export default function DiaCalendario() {
   }
 
   return (
-    <main className="
-      min-h-screen
-      bg-slate-100
-      px-4
-      pb-28
-      pt-5
-    ">
-
-      {/* =========================
-          CABECERA
-      ========================= */}
-
-      <div className="text-center">
-
-
-
-<p className="
-  mt-2
-  text-lg
-  font-semibold
-  capitalize
-  text-slate-600
-">
-  {formatearFechaGrande(fecha)}
-</p>
-
-      </div>
-
+    <main
+      className="
+        min-h-screen
+        bg-slate-100
+        px-4
+        pb-28
+        pt-5
+      "
+    >
 
       {/* =========================
           TURNO
       ========================= */}
 
-      <div className="
-        mt-5
-        overflow-hidden
-        rounded-3xl
-        bg-white
-        shadow-md
-      ">
+      <div
+        className="
+          mt-1
+          overflow-hidden
+          rounded-3xl
+          bg-white
+          shadow-md
+        "
+      >
 
-        <div className="
-          flex
-          flex-col
-          items-center
-          justify-center
-          px-5
-          py-5
-          text-center
-        ">
+        {/* FECHA */}
+
+        <div
+          className="
+            bg-violet-100
+            px-5
+            py-3
+            text-center
+          "
+        >
+
+          <p
+            className="
+              text-base
+              font-bold
+              capitalize
+              text-slate-700
+            "
+          >
+            {formatearFechaGrande(fecha)}
+          </p>
+
+        </div>
+
+
+        {/* LÍNEA DIVISORIA */}
+
+        <div className="border-t border-slate-200" />
+
+
+        {/* INFORMACIÓN TURNO */}
+
+        <div
+          className="
+            flex
+            flex-col
+            items-center
+            justify-center
+            px-5
+            py-5
+            text-center
+          "
+        >
 
           <p className="text-3xl">
             {obtenerTurno(fecha).split(" ")[0]}
           </p>
 
-          <p className="
-            mt-2
-            text-xs
-            font-semibold
-            uppercase
-            tracking-wider
-            text-slate-400
-          ">
+          <p
+            className="
+              mt-2
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-slate-400
+            "
+          >
             Turno
           </p>
 
-          <p className="
-            mt-1
-            text-2xl
-            font-bold
-            text-slate-800
-          ">
+          <p
+            className="
+              mt-1
+              text-2xl
+              font-bold
+              text-slate-800
+            "
+          >
             {obtenerTurno(fecha)
               .split(" ")
               .slice(1)
@@ -299,384 +340,448 @@ export default function DiaCalendario() {
       </div>
 
 
-{/* =========================
-    PERSONAL DE PERMISO
-========================= */}
+      {/* =========================
+          PERSONAL DE PERMISO
+      ========================= */}
 
-<div className="
-  mt-7
-  rounded-3xl
-  bg-white
-  px-3
-  py-3
-  shadow-md
-">
+      <div
+        className="
+          mt-7
+          overflow-hidden
+          rounded-3xl
+          bg-white
+          shadow-md
+        "
+      >
 
-  {/* CABECERA PERSONAL */}
+        {/* CABECERA PERSONAL */}
 
-  <div className="
-    flex
-    items-center
-    justify-between
-    px-1
-    pb-3
-  ">
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            bg-violet-100
+            px-4
+            py-3
+          "
+        >
 
-    <h2 className="
-      text-lg
-      font-bold
-      text-slate-800
-    ">
-      Personal de permiso
-    </h2>
+          <h2
+            className="
+              text-lg
+              font-bold
+              text-slate-800
+            "
+          >
+            Personal de permiso
+          </h2>
 
-    {!cargando &&
-      solicitudes.length > 0 && (
-
-        <div className="
-          flex
-          h-9
-          w-9
-          items-center
-          justify-center
-          rounded-full
-          bg-violet-500
-          text-sm
-          font-bold
-          text-white
-          shadow-sm
-        ">
-          {solicitudes.length}
-        </div>
-
-      )}
-
-  </div>
-
-
-  {/* LÍNEA DIVISORIA */}
-
-  <div className="
-    border-t
-    border-slate-200
-  " />
-
-
-  {/* CONTENIDO */}
-
-  {cargando && (
-
-    <div className="
-      px-1
-      py-4
-      text-sm
-      text-slate-500
-    ">
-      Cargando personal...
-    </div>
-
-  )}
-
-
-  {!cargando &&
-    solicitudes.length === 0 && (
-
-      <div className="
-        px-2
-        py-7
-        text-center
-      ">
-
-        <p className="text-2xl">
-          📭
-        </p>
-
-        <p className="
-          mt-2
-          text-sm
-          font-semibold
-          text-slate-600
-        ">
-          No hay solicitudes
-        </p>
-
-        <p className="
-          mt-1
-          text-xs
-          text-slate-400
-        ">
-          Nadie tiene un permiso registrado
-          para este día.
-        </p>
-
-      </div>
-
-    )}
-
-
-  {/* TARJETAS */}
-
-  {!cargando &&
-    solicitudes.length > 0 && (
-
-      <div className="pt-3 space-y-4">
-
-        {solicitudes.map(
-          (solicitud) => {
-
-            const visual =
-              obtenerVisual(
-                solicitud.tipo
-              );
-
-            return (
+          {!cargando &&
+            solicitudes.length > 0 && (
 
               <div
-                key={solicitud.id}
                 className="
-                  overflow-hidden
-                  rounded-3xl
-                  border
-                  border-slate-200
-                  bg-white
-                  shadow-md
+                  flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-violet-500
+                  text-sm
+                  font-bold
+                  text-white
+                  shadow-sm
+                "
+              >
+                {solicitudes.length}
+              </div>
+
+            )}
+
+        </div>
+
+
+        {/* LÍNEA DIVISORIA COMPLETA */}
+
+        <div className="border-t-2 border-slate-200" />
+
+
+        {/* CONTENIDO */}
+
+        <div className="px-3 py-3">
+
+          {cargando && (
+
+            <div
+              className="
+                px-1
+                py-4
+                text-sm
+                text-slate-500
+              "
+            >
+              Cargando personal...
+            </div>
+
+          )}
+
+
+          {!cargando &&
+            solicitudes.length === 0 && (
+
+              <div
+                className="
+                  px-2
+                  py-7
+                  text-center
                 "
               >
 
-                {/* =====================
-                    PARTE SUPERIOR
-                ====================== */}
+                <p className="text-2xl">
+                  📭
+                </p>
 
-                <div
-                  className={`
-                    px-4
-                    py-4
-                    ${
-                      solicitud.sexo ===
-                      "mujer"
-                        ? "bg-pink-50"
-                        : "bg-blue-50"
-                    }
-                  `}
+                <p
+                  className="
+                    mt-2
+                    text-sm
+                    font-semibold
+                    text-slate-600
+                  "
                 >
+                  No hay solicitudes
+                </p>
 
-                  <div className="
-                    flex
-                    items-center
-                    justify-between
-                    gap-3
-                  ">
-
-                    <p className="
-                      min-w-0
-                      flex-1
-                      text-base
-                      font-bold
-                      text-slate-800
-                    ">
-                      {solicitud.nombre}
-                    </p>
-
-                    <p className="
-                      shrink-0
-                      text-xs
-                      font-semibold
-                      text-slate-500
-                    ">
-                      {solicitud.puesto ===
-                      "gac"
-                        ? "🚓 G.A.C"
-                        : solicitud.puesto ===
-                          "seguridad"
-                        ? "🛡️ Seguridad"
-                        : solicitud.puesto ===
-                          "sala"
-                        ? "🖥️ Sala"
-                        : "—"}
-                    </p>
-
-                  </div>
-
-                </div>
-
-
-                {/* =====================
-                    PARTE INFERIOR
-                ====================== */}
-
-                <div className="
-                  relative
-                  px-4
-                  py-4
-                ">
-
-                  <div className="
-                    ml-[68px]
-                    mr-[52px]
-                  ">
-
-                    <p className="
-                      text-base
-                      font-bold
-                      leading-tight
-                      text-slate-800
-                    ">
-                      {solicitud.tipo}
-                    </p>
-
-
-                    {/* FECHA */}
-
-                    <p className="
-                      mt-3
-                      text-sm
-                      font-bold
-                      text-slate-700
-                    ">
-
-                      📅{" "}
-
-                      {new Date(
-                        solicitud.fecha_inicio
-                      ).toLocaleDateString(
-                        "es-ES",
-                        {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "2-digit",
-                        }
-                      )}
-
-                      {solicitud.fecha_inicio !==
-                        solicitud.fecha_fin && (
-                        <>
-                          {" → "}
-
-                          {new Date(
-                            solicitud.fecha_fin
-                          ).toLocaleDateString(
-                            "es-ES",
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "2-digit",
-                            }
-                          )}
-                        </>
-                      )}
-
-                    </p>
-
-
-                    {/* OBSERVACIÓN */}
-
-                    {solicitud.motivo && (
-
-                      <p className="
-                        mt-2
-                        text-xs
-                        italic
-                        leading-5
-                        text-slate-500
-                      ">
-                        Observaciones:{" "}
-                        {solicitud.motivo}
-                      </p>
-
-                    )}
-
-
-                    {/* REGISTRO */}
-
-                    <p className="
-                      mt-3
-                      text-xs
-                      text-slate-400
-                    ">
-                      🕐 Registrada el{" "}
-                      {formatearFecha(
-                        solicitud.created_at
-                      )}
-                    </p>
-
-                  </div>
-
-
-                  {/* CÍRCULO */}
-
-                  <div
-                    className={`
-                      absolute
-                      left-4
-                      top-1/2
-                      flex
-                      h-14
-                      w-14
-                      -translate-y-1/2
-                      items-center
-                      justify-center
-                      rounded-full
-                      ${visual.color}
-                      text-[11px]
-                      font-extrabold
-                      text-white
-                      shadow-sm
-                    `}
-                  >
-                    {visual.abreviatura}
-                  </div>
-
-
-                  {/* PAPELERA */}
-
-                  {solicitud.usuario_id ===
-                    miUsuarioId && (
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        borrar(
-                          solicitud.id
-                        )
-                      }
-                      className="
-                        absolute
-                        bottom-4
-                        right-4
-                        flex
-                        h-9
-                        w-9
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-red-100
-                        text-sm
-                        transition
-                        hover:bg-red-200
-                        active:scale-95
-                      "
-                      aria-label="
-                        Eliminar solicitud
-                      "
-                    >
-                      🗑️
-                    </button>
-
-                  )}
-
-                </div>
+                <p
+                  className="
+                    mt-1
+                    text-xs
+                    text-slate-400
+                  "
+                >
+                  Nadie tiene un permiso registrado
+                  para este día.
+                </p>
 
               </div>
 
-            );
-          }
-        )}
+            )}
+
+
+          {/* TARJETAS */}
+
+          {!cargando &&
+            solicitudes.length > 0 && (
+
+              <div className="space-y-4">
+
+                {solicitudes.map(
+                  (solicitud) => {
+
+                    const visual =
+                      obtenerVisual(
+                        solicitud.tipo
+                      );
+
+                    return (
+
+                      <div
+                        key={solicitud.id}
+                        className="
+                          overflow-hidden
+                          rounded-3xl
+                          border
+                          border-slate-200
+                          bg-white
+                          shadow-md
+                        "
+                      >
+
+                        {/* =====================
+                            PARTE SUPERIOR
+                        ====================== */}
+
+                        <div
+                          className={`
+                            px-4
+                            py-4
+                            ${
+                              solicitud.sexo ===
+                              "mujer"
+                                ? "bg-pink-50"
+                                : "bg-blue-50"
+                            }
+                          `}
+                        >
+
+                          <div
+                            className="
+                              flex
+                              items-center
+                              justify-between
+                              gap-3
+                            "
+                          >
+
+                            {/* NOMBRE */}
+
+                            <p
+                              className="
+                                min-w-0
+                                flex-1
+                                text-base
+                                font-bold
+                                text-slate-800
+                              "
+                            >
+                              {solicitud.nombre}
+                            </p>
+
+
+                            {/* CATEGORÍA + PUESTO */}
+
+                            <div
+                              className="
+                                shrink-0
+                                text-right
+                              "
+                            >
+
+                              <p
+                                className="
+                                  text-xs
+                                  font-semibold
+                                  text-slate-500
+                                "
+                              >
+                                {obtenerCategoria(
+                                  solicitud.categoria,
+                                  solicitud.sexo
+                                )}
+                              </p>
+
+                              <p
+                                className="
+                                  mt-1
+                                  text-xs
+                                  font-semibold
+                                  text-slate-500
+                                "
+                              >
+                                {solicitud.puesto ===
+                                "gac"
+                                  ? "🚓 G.A.C"
+                                  : solicitud.puesto ===
+                                    "seguridad"
+                                  ? "🛡️ Seguridad"
+                                  : solicitud.puesto ===
+                                    "sala"
+                                  ? "🖥️ Sala"
+                                  : "—"}
+                              </p>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+
+                        {/* =====================
+                            PARTE INFERIOR
+                        ====================== */}
+
+                        <div
+                          className="
+                            relative
+                            px-4
+                            py-4
+                          "
+                        >
+
+                          <div
+                            className="
+                              ml-[68px]
+                              mr-[52px]
+                            "
+                          >
+
+                            <p
+                              className="
+                                text-base
+                                font-bold
+                                leading-tight
+                                text-slate-800
+                              "
+                            >
+                              {solicitud.tipo}
+                            </p>
+
+
+                            {/* FECHA */}
+
+                            <p
+                              className="
+                                mt-3
+                                text-sm
+                                font-bold
+                                text-slate-700
+                              "
+                            >
+
+                              📅{" "}
+
+                              {new Date(
+                                solicitud.fecha_inicio
+                              ).toLocaleDateString(
+                                "es-ES",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "2-digit",
+                                }
+                              )}
+
+                              {solicitud.fecha_inicio !==
+                                solicitud.fecha_fin && (
+                                <>
+                                  {" → "}
+
+                                  {new Date(
+                                    solicitud.fecha_fin
+                                  ).toLocaleDateString(
+                                    "es-ES",
+                                    {
+                                      day: "2-digit",
+                                      month: "2-digit",
+                                      year: "2-digit",
+                                    }
+                                  )}
+                                </>
+                              )}
+
+                            </p>
+
+
+                            {/* OBSERVACIÓN */}
+
+                            {solicitud.motivo && (
+
+                              <p
+                                className="
+                                  mt-2
+                                  text-xs
+                                  italic
+                                  leading-5
+                                  text-slate-500
+                                "
+                              >
+                                Observaciones:{" "}
+                                {solicitud.motivo}
+                              </p>
+
+                            )}
+
+
+                            {/* REGISTRO */}
+
+                            <p
+                              className="
+                                mt-3
+                                text-xs
+                                text-slate-400
+                              "
+                            >
+                              🕐{" "}
+                              {formatearFecha(
+                                solicitud.created_at
+                              )}
+                            </p>
+
+                          </div>
+
+
+                          {/* CÍRCULO */}
+
+                          <div
+                            className={`
+                              absolute
+                              left-4
+                              top-1/2
+                              flex
+                              h-14
+                              w-14
+                              -translate-y-1/2
+                              items-center
+                              justify-center
+                              rounded-full
+                              ${visual.color}
+                              text-[11px]
+                              font-extrabold
+                              text-white
+                              shadow-sm
+                            `}
+                          >
+                            {visual.abreviatura}
+                          </div>
+
+
+                          {/* PAPELERA */}
+
+                          {solicitud.usuario_id ===
+                            miUsuarioId && (
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                borrar(
+                                  solicitud.id
+                                )
+                              }
+                              className="
+                                absolute
+                                bottom-4
+                                right-4
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-red-100
+                                text-sm
+                                transition
+                                hover:bg-red-200
+                                active:scale-95
+                              "
+                              aria-label="
+                                Eliminar solicitud
+                              "
+                            >
+                              🗑️
+                            </button>
+
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    );
+                  }
+                )}
+
+              </div>
+
+            )}
+
+        </div>
 
       </div>
 
-    )}
 
-</div>
       {/* =========================
           SOLICITAR PERMISO
       ========================= */}

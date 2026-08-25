@@ -7,6 +7,7 @@ type Usuario = {
   id: string;
   nombre: string;
   rol: string;
+  categoria: string | null;
   puesto: string;
   sexo: string;
   activo: boolean;
@@ -44,23 +45,67 @@ export default function GestionUsuariosCliente({
       : "—";
   }
 
+  function obtenerCategoria(categoria: string | null) {
+    return categoria === "oficial"
+      ? "Oficial de Policía"
+      : categoria === "policia"
+      ? "Policía"
+      : "—";
+  }
+
   const usuariosFiltrados = usuarios.filter((usuario) =>
     (usuario.nombre || "")
       .toLowerCase()
       .includes(busqueda.toLowerCase())
   );
 
-  const administradores = usuariosFiltrados.filter(
-    (usuario) =>
-      usuario.rol === "admin" &&
-      usuario.activo === true
-  );
+  const administradores = usuariosFiltrados
+    .filter(
+      (usuario) =>
+        usuario.rol === "admin" &&
+        usuario.activo === true
+    )
+    .sort((a, b) => {
+      if (
+        a.categoria === "oficial" &&
+        b.categoria !== "oficial"
+      ) {
+        return -1;
+      }
 
-  const usuariosNormales = usuariosFiltrados.filter(
-    (usuario) =>
-      usuario.rol !== "admin" &&
-      usuario.activo === true
-  );
+      if (
+        a.categoria !== "oficial" &&
+        b.categoria === "oficial"
+      ) {
+        return 1;
+      }
+
+      return a.nombre.localeCompare(b.nombre);
+    });
+
+  const usuariosNormales = usuariosFiltrados
+    .filter(
+      (usuario) =>
+        usuario.rol !== "admin" &&
+        usuario.activo === true
+    )
+    .sort((a, b) => {
+      if (
+        a.categoria === "oficial" &&
+        b.categoria !== "oficial"
+      ) {
+        return -1;
+      }
+
+      if (
+        a.categoria !== "oficial" &&
+        b.categoria === "oficial"
+      ) {
+        return 1;
+      }
+
+      return a.nombre.localeCompare(b.nombre);
+    });
 
   return (
     <>
@@ -74,37 +119,103 @@ export default function GestionUsuariosCliente({
             setBusqueda(e.target.value)
           }
           placeholder="🔎 Buscar usuario..."
-          className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3 text-slate-800 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+          className="
+            w-full
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-5
+            py-3
+            text-slate-800
+            shadow-sm
+            outline-none
+            transition
+            focus:border-blue-400
+            focus:ring-2
+            focus:ring-blue-100
+          "
         />
       </div>
 
 
       <div className="mt-8 space-y-4">
 
-        {/* ADMINISTRADORES */}
+        {/* =========================
+            ADMINISTRADORES
+        ========================= */}
 
         {administradores.length > 0 && (
           <>
-            <h2 className="text-xl font-bold">
-              👑 Administradores
-            </h2>
+            <div className="flex items-center justify-between">
+
+              <h2 className="text-xl font-bold">
+                👑 Administradores
+              </h2>
+
+              <div
+                className="
+                  flex
+                  h-8
+                  w-8
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-slate-800
+                  text-sm
+                  font-bold
+                  text-white
+                "
+              >
+                {administradores.length}
+              </div>
+
+            </div>
+
 
             {administradores.map((usuario) => (
+
               <div
                 key={usuario.id}
-                className="flex min-h-[88px] overflow-hidden rounded-2xl bg-white shadow"
+                className="
+                  flex
+                  min-h-[88px]
+                  overflow-hidden
+                  rounded-2xl
+                  bg-white
+                  shadow
+                "
               >
 
                 {/* INICIALES */}
 
-                <div className="flex w-[76px] shrink-0 items-center justify-center">
+                <div
+                  className="
+                    flex
+                    w-[76px]
+                    shrink-0
+                    items-center
+                    justify-center
+                  "
+                >
 
                   <div
-                    className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold ${
-                      usuario.sexo === "mujer"
-                        ? "bg-pink-100 text-pink-600"
-                        : "bg-blue-100 text-blue-600"
-                    }`}
+                    className={`
+                      flex
+                      h-14
+                      w-14
+                      items-center
+                      justify-center
+                      rounded-full
+                      text-lg
+                      font-bold
+                      ${
+                        usuario.sexo === "mujer"
+                          ? "bg-pink-100 text-pink-600"
+                          : "bg-blue-100 text-blue-600"
+                      }
+                    `}
                   >
                     {obtenerIniciales(
                       usuario.nombre || "Usuario"
@@ -116,20 +227,48 @@ export default function GestionUsuariosCliente({
 
                 {/* INFORMACIÓN */}
 
-                <div className="min-w-0 flex-1 py-3">
+                <div
+                  className="
+                    min-w-0
+                    flex-1
+                    py-3
+                  "
+                >
 
-                  <h3 className="truncate text-lg font-bold text-slate-800">
+                  <h3
+                    className="
+                      truncate
+                      text-lg
+                      font-bold
+                      text-slate-800
+                    "
+                  >
                     {usuario.nombre || "Sin nombre"}
                   </h3>
 
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+
+                  <div
+                    className="
+                      mt-1
+                      flex
+                      flex-wrap
+                      gap-x-3
+                      gap-y-1
+                      text-sm
+                      text-slate-500
+                    "
+                  >
 
                     <span>
-                      👑 Administrador
+                      {obtenerCategoria(
+                        usuario.categoria
+                      )}
                     </span>
 
                     <span>
-                      {obtenerPuesto(usuario.puesto)}
+                      {obtenerPuesto(
+                        usuario.puesto
+                      )}
                     </span>
 
                   </div>
@@ -141,41 +280,117 @@ export default function GestionUsuariosCliente({
 
                 <Link
                   href={`/usuarios/editar/${usuario.id}`}
-                  className="mr-3 flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-full bg-slate-100 text-lg shadow-sm transition hover:bg-slate-200"
+                  className="
+                    mr-3
+                    flex
+                    h-10
+                    w-10
+                    shrink-0
+                    items-center
+                    justify-center
+                    self-center
+                    rounded-full
+                    bg-slate-100
+                    text-lg
+                    shadow-sm
+                    transition
+                    hover:bg-slate-200
+                  "
                 >
                   ✏️
                 </Link>
 
               </div>
+
             ))}
+
           </>
         )}
 
 
-        {/* POLICÍAS */}
+        {/* =========================
+            USUARIOS
+        ========================= */}
 
         {usuariosNormales.length > 0 && (
           <>
-            <h2 className="mt-8 text-xl font-bold">
-              🪪 Policías
-            </h2>
+
+            <div
+              className="
+                mt-8
+                flex
+                items-center
+                justify-between
+              "
+            >
+
+              <h2 className="text-xl font-bold">
+                Usuarios
+              </h2>
+
+              <div
+                className="
+                  flex
+                  h-8
+                  w-8
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-slate-800
+                  text-sm
+                  font-bold
+                  text-white
+                "
+              >
+                {usuariosNormales.length}
+              </div>
+
+            </div>
+
 
             {usuariosNormales.map((usuario) => (
+
               <div
                 key={usuario.id}
-                className="flex min-h-[88px] overflow-hidden rounded-2xl bg-white shadow"
+                className="
+                  flex
+                  min-h-[88px]
+                  overflow-hidden
+                  rounded-2xl
+                  bg-white
+                  shadow
+                "
               >
 
                 {/* INICIALES */}
 
-                <div className="flex w-[76px] shrink-0 items-center justify-center">
+                <div
+                  className="
+                    flex
+                    w-[76px]
+                    shrink-0
+                    items-center
+                    justify-center
+                  "
+                >
 
                   <div
-                    className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold ${
-                      usuario.sexo === "mujer"
-                        ? "bg-pink-100 text-pink-600"
-                        : "bg-blue-100 text-blue-600"
-                    }`}
+                    className={`
+                      flex
+                      h-14
+                      w-14
+                      items-center
+                      justify-center
+                      rounded-full
+                      text-lg
+                      font-bold
+                      ${
+                        usuario.sexo === "mujer"
+                          ? "bg-pink-100 text-pink-600"
+                          : "bg-blue-100 text-blue-600"
+                      }
+                    `}
                   >
                     {obtenerIniciales(
                       usuario.nombre || "Usuario"
@@ -187,22 +402,48 @@ export default function GestionUsuariosCliente({
 
                 {/* INFORMACIÓN */}
 
-                <div className="min-w-0 flex-1 py-3">
+                <div
+                  className="
+                    min-w-0
+                    flex-1
+                    py-3
+                  "
+                >
 
-                  <h3 className="truncate text-lg font-bold text-slate-800">
+                  <h3
+                    className="
+                      truncate
+                      text-lg
+                      font-bold
+                      text-slate-800
+                    "
+                  >
                     {usuario.nombre || "Sin nombre"}
                   </h3>
 
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+
+                  <div
+                    className="
+                      mt-1
+                      flex
+                      flex-wrap
+                      gap-x-3
+                      gap-y-1
+                      text-sm
+                      text-slate-500
+                    "
+                  >
 
                     <span>
-                      {usuario.sexo === "mujer"
-                        ? "👮‍♀️ Policía"
-                        : "👮‍♂️ Policía"}
+                      {obtenerCategoria(
+                        usuario.categoria
+                      )}
                     </span>
 
                     <span>
-                      {obtenerPuesto(usuario.puesto)}
+                      {obtenerPuesto(
+                        usuario.puesto
+                      )}
                     </span>
 
                   </div>
@@ -214,13 +455,30 @@ export default function GestionUsuariosCliente({
 
                 <Link
                   href={`/usuarios/editar/${usuario.id}`}
-                  className="mr-3 flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-full bg-slate-100 text-lg shadow-sm transition hover:bg-slate-200"
+                  className="
+                    mr-3
+                    flex
+                    h-10
+                    w-10
+                    shrink-0
+                    items-center
+                    justify-center
+                    self-center
+                    rounded-full
+                    bg-slate-100
+                    text-lg
+                    shadow-sm
+                    transition
+                    hover:bg-slate-200
+                  "
                 >
                   ✏️
                 </Link>
 
               </div>
+
             ))}
+
           </>
         )}
 
@@ -230,9 +488,20 @@ export default function GestionUsuariosCliente({
         {busqueda.trim() !== "" &&
           administradores.length === 0 &&
           usuariosNormales.length === 0 && (
-            <div className="rounded-2xl bg-white p-5 text-center text-slate-500 shadow">
+
+            <div
+              className="
+                rounded-2xl
+                bg-white
+                p-5
+                text-center
+                text-slate-500
+                shadow
+              "
+            >
               No se ha encontrado ningún usuario.
             </div>
+
           )}
 
       </div>

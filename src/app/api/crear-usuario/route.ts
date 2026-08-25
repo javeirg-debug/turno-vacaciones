@@ -2,111 +2,66 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(request: Request) {
-
-
   try {
-
-
     const body = await request.json();
 
-
-const {
-  nombre,
-  email,
-  rol,
-  puesto,
-  sexo
-} = body;
-
-
+    const {
+      nombre,
+      email,
+      rol,
+      categoria,
+      puesto,
+      sexo,
+    } = body;
 
     const { data, error } =
       await supabaseAdmin.auth.admin.createUser({
-
         email,
-
         password: "123456",
-
         email_confirm: true,
-
       });
 
-
-
-    if(error){
-
+    if (error) {
       throw error;
-
     }
 
-
-
-    if(!data.user){
-
+    if (!data.user) {
       throw new Error(
         "No se pudo crear el usuario"
       );
-
     }
-
-
-
-
 
     const { error: perfilError } =
-
       await supabaseAdmin
-
         .from("usuarios")
+        .insert({
+          id: data.user.id,
+          nombre,
+          rol,
+          categoria,
+          puesto,
+          sexo,
+          activo: true,
+          debe_cambiar_clave: true,
+        });
 
-.insert({
-  id: data.user.id,
-  nombre,
-  rol,
-  puesto,
-  sexo,
-  activo: true,
-  debe_cambiar_clave: true,
-});
-
-
-
-    if(perfilError){
-
+    if (perfilError) {
       throw perfilError;
-
     }
 
-
-
-
-
     return NextResponse.json({
-
-      ok:true
-
+      ok: true,
     });
 
-
-
-  } catch(error:any){
-
-
+  } catch (error: any) {
     return NextResponse.json(
-
       {
-        ok:false,
-        error:error.message
+        ok: false,
+        error: error.message,
       },
-
       {
-        status:400
+        status: 400,
       }
-
     );
-
-
   }
-
-
 }

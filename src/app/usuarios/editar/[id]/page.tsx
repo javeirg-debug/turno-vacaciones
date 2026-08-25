@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase-server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import BottomNav from "@/components/navigation/BottomNav";
 import EditUserForm from "@/components/forms/EditUserForm";
+
 const USUARIO_PROTEGIDO = "2350c111-c7bb-40c2-9bb1-b2cc172684fa";
 
 export default async function EditarUsuario({
@@ -12,7 +13,6 @@ export default async function EditarUsuario({
     id: string;
   }>;
 }) {
-
   const { id } = await params;
 
   const supabase = await supabaseServer();
@@ -23,57 +23,50 @@ export default async function EditarUsuario({
     .eq("id", id)
     .single();
 
-
   let email = "No disponible";
 
-
   if (usuario) {
-
     const { data } =
       await supabaseAdmin.auth.admin.getUserById(
         usuario.id
       );
 
     email = data.user?.email ?? "No disponible";
-
   }
 
-
-
   return (
-
     <main className="min-h-screen bg-slate-100 p-6 pb-24">
 
+      {/* =========================
+          CABECERA
+      ========================= */}
 
       <h1 className="text-3xl font-bold text-slate-800">
         ✏️ Editar usuario
       </h1>
-
 
       <p className="mt-2 text-slate-500">
         Modifica la información del usuario.
       </p>
 
 
-
       {usuario && (
-
         <>
 
-          {/* INFORMACIÓN DE CUENTA */}
+          {/* =========================
+              INFORMACIÓN DE CUENTA
+          ========================= */}
 
           <div className="mt-8 rounded-3xl bg-white p-6 shadow">
-
 
             <h2 className="text-xl font-bold">
               👤 Información de cuenta
             </h2>
 
 
-
             <div className="mt-5 space-y-4">
 
-
+              {/* NOMBRE */}
 
               <div>
 
@@ -88,7 +81,7 @@ export default async function EditarUsuario({
               </div>
 
 
-
+              {/* EMAIL */}
 
               <div>
 
@@ -103,7 +96,7 @@ export default async function EditarUsuario({
               </div>
 
 
-
+              {/* ROL */}
 
               <div>
 
@@ -115,50 +108,81 @@ export default async function EditarUsuario({
 
                   {usuario.rol === "admin"
                     ? "👑 Administrador"
-                    : "🪪 Policía"}
+                    : "👤 Usuario"}
 
                 </p>
 
               </div>
 
-<div>
 
-  <p className="text-sm text-slate-500">
-    Puesto
-  </p>
+              {/* CATEGORÍA */}
 
-  <p className="text-lg font-semibold">
+              <div>
 
-    {usuario.puesto === "gac"
-      ? "🚓 G.A.C"
-      : usuario.puesto === "seguridad"
-      ? "🛡️ Seguridad"
-      : usuario.puesto === "sala"
-      ? "🖥️ Sala"
-      : "—"}
+                <p className="text-sm text-slate-500">
+                  Categoría
+                </p>
 
-  </p>
+                <p className="text-lg font-semibold">
 
-</div>
+                  {usuario.sexo === "mujer"
+                    ? "👮‍♀️"
+                    : "👮‍♂️"}{" "}
 
+                  {usuario.categoria === "oficial"
+                    ? "Oficial de Policía"
+                    : usuario.categoria === "policia"
+                    ? "Policía"
+                    : "—"}
 
-<div>
+                </p>
 
-  <p className="text-sm text-slate-500">
-    Sexo
-  </p>
-
-  <p className="text-lg font-semibold">
-
-    {usuario.sexo === "mujer"
-      ? "👮‍♀️ Mujer"
-      : "👮‍♂️ Hombre"}
-
-  </p>
-
-</div>
+              </div>
 
 
+              {/* PUESTO */}
+
+              <div>
+
+                <p className="text-sm text-slate-500">
+                  Puesto
+                </p>
+
+                <p className="text-lg font-semibold">
+
+                  {usuario.puesto === "gac"
+                    ? "🚓 G.A.C"
+                    : usuario.puesto === "seguridad"
+                    ? "🛡️ Seguridad"
+                    : usuario.puesto === "sala"
+                    ? "🖥️ Sala"
+                    : "—"}
+
+                </p>
+
+              </div>
+
+
+              {/* SEXO */}
+
+              <div>
+
+                <p className="text-sm text-slate-500">
+                  Sexo
+                </p>
+
+                <p className="text-lg font-semibold">
+
+                  {usuario.sexo === "mujer"
+                    ? "👩 Mujer"
+                    : "👨 Hombre"}
+
+                </p>
+
+              </div>
+
+
+              {/* ESTADO */}
 
               <div>
 
@@ -176,48 +200,33 @@ export default async function EditarUsuario({
 
               </div>
 
-
-
             </div>
-
 
           </div>
 
 
-
-
-          {/* EDITAR DATOS */}
+          {/* =========================
+              EDITAR DATOS
+          ========================= */}
 
           <div className="mt-6">
 
             <EditUserForm
-  usuario={usuario}
-  protegido={usuario.id === USUARIO_PROTEGIDO}
-/>
+              usuario={usuario}
+              protegido={
+                usuario.id === USUARIO_PROTEGIDO
+              }
+            />
 
           </div>
-
-
-
-          <div className="mt-8 text-center">
-
-
-
-          </div>
-
 
 
         </>
-
       )}
-
 
 
       <BottomNav />
 
-
     </main>
-
   );
-
 }

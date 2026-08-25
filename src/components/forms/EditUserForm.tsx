@@ -7,6 +7,7 @@ type Usuario = {
   id: string;
   nombre: string;
   rol: string;
+  categoria: string;
   puesto: string;
   sexo: string;
 };
@@ -20,8 +21,13 @@ export default function EditUserForm({
 }) {
   const [nombre, setNombre] = useState(usuario.nombre);
   const [rol, setRol] = useState(usuario.rol);
+  const [categoria, setCategoria] = useState(
+    usuario.categoria || "policia"
+  );
   const [puesto, setPuesto] = useState(usuario.puesto);
-  const [sexo, setSexo] = useState(usuario.sexo || "hombre");
+  const [sexo, setSexo] = useState(
+    usuario.sexo || "hombre"
+  );
   const [guardando, setGuardando] = useState(false);
 
   async function guardar() {
@@ -33,6 +39,7 @@ export default function EditUserForm({
         .update({
           nombre,
           rol,
+          categoria,
           puesto,
           sexo,
         })
@@ -83,7 +90,30 @@ export default function EditUserForm({
         </option>
 
         <option value="usuario">
+          Usuario
+        </option>
+      </select>
+
+
+      {/* CATEGORÍA */}
+
+      <label className="mt-6 block text-sm font-semibold text-slate-700">
+        Categoría
+      </label>
+
+      <select
+        value={categoria}
+        onChange={(e) =>
+          setCategoria(e.target.value)
+        }
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+      >
+        <option value="policia">
           Policía
+        </option>
+
+        <option value="oficial">
+          Oficial de Policía
         </option>
       </select>
 
@@ -143,7 +173,7 @@ export default function EditUserForm({
         <button
           onClick={guardar}
           disabled={guardando}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#007AFF] py-3.5 font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-800 py-3.5 font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <span className="text-lg">
             ✓

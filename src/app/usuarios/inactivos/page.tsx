@@ -38,14 +38,66 @@ export default async function UsuariosInactivos() {
       : "—";
   }
 
+  function obtenerCategoria(categoria: string | null) {
+    return categoria === "oficial"
+      ? "Oficial de Policía"
+      : categoria === "policia"
+      ? "Policía"
+      : "--";
+  }
+
+  const usuariosOrdenados = [...(usuarios || [])].sort(
+    (a, b) => {
+      if (
+        a.categoria === "oficial" &&
+        b.categoria !== "oficial"
+      ) {
+        return -1;
+      }
+
+      if (
+        a.categoria !== "oficial" &&
+        b.categoria === "oficial"
+      ) {
+        return 1;
+      }
+
+      return (a.nombre || "").localeCompare(
+        b.nombre || ""
+      );
+    }
+  );
+
   return (
     <main className="min-h-screen bg-slate-100 p-6 pb-24">
 
       {/* CABECERA */}
 
-      <h1 className="text-3xl font-bold text-slate-800">
-        🔒 Usuarios inactivos
-      </h1>
+      <div className="flex items-center justify-between">
+
+        <h1 className="text-3xl font-bold text-slate-800">
+          🔒 Usuarios inactivos
+        </h1>
+
+        <div
+          className="
+            flex
+            h-9
+            w-9
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            bg-slate-800
+            text-sm
+            font-bold
+            text-white
+          "
+        >
+          {usuariosOrdenados.length}
+        </div>
+
+      </div>
 
       <p className="mt-2 text-slate-500">
         Usuarios bloqueados temporalmente.
@@ -56,23 +108,48 @@ export default async function UsuariosInactivos() {
 
       <div className="mt-8 space-y-4">
 
-        {usuarios?.map((usuario) => (
+        {usuariosOrdenados.map((usuario) => (
 
           <div
             key={usuario.id}
-            className="flex min-h-[88px] overflow-hidden rounded-2xl bg-white shadow"
+            className="
+              flex
+              min-h-[88px]
+              overflow-hidden
+              rounded-2xl
+              bg-white
+              shadow
+            "
           >
 
             {/* INICIALES */}
 
-            <div className="flex w-[76px] shrink-0 items-center justify-center">
+            <div
+              className="
+                flex
+                w-[76px]
+                shrink-0
+                items-center
+                justify-center
+              "
+            >
 
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold ${
-                  usuario.sexo === "mujer"
-                    ? "bg-pink-100 text-pink-600"
-                    : "bg-blue-100 text-blue-600"
-                }`}
+                className={`
+                  flex
+                  h-14
+                  w-14
+                  items-center
+                  justify-center
+                  rounded-full
+                  text-lg
+                  font-bold
+                  ${
+                    usuario.sexo === "mujer"
+                      ? "bg-pink-100 text-pink-600"
+                      : "bg-blue-100 text-blue-600"
+                  }
+                `}
               >
                 {obtenerIniciales(
                   usuario.nombre || "Usuario"
@@ -84,24 +161,49 @@ export default async function UsuariosInactivos() {
 
             {/* INFORMACIÓN */}
 
-            <div className="min-w-0 flex-1 py-3 pr-3">
+            <div
+              className="
+                min-w-0
+                flex-1
+                py-3
+                pr-3
+              "
+            >
 
-              <h3 className="truncate text-lg font-bold text-slate-800">
+              <h3
+                className="
+                  truncate
+                  text-lg
+                  font-bold
+                  text-slate-800
+                "
+              >
                 {usuario.nombre || "Sin nombre"}
               </h3>
 
-              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+
+              <div
+                className="
+                  mt-1
+                  flex
+                  flex-wrap
+                  gap-x-3
+                  gap-y-1
+                  text-sm
+                  text-slate-500
+                "
+              >
 
                 <span>
-                  {usuario.rol === "admin"
-                    ? "👑 Administrador"
-                    : usuario.sexo === "mujer"
-                    ? "👮‍♀️ Policía"
-                    : "👮‍♂️ Policía"}
+                  {obtenerCategoria(
+                    usuario.categoria
+                  )}
                 </span>
 
                 <span>
-                  {obtenerPuesto(usuario.puesto)}
+                  {obtenerPuesto(
+                    usuario.puesto
+                  )}
                 </span>
 
               </div>
@@ -111,7 +213,14 @@ export default async function UsuariosInactivos() {
 
             {/* ACCIONES */}
 
-            <div className="flex w-[100px] shrink-0 flex-col">
+            <div
+              className="
+                flex
+                w-[100px]
+                shrink-0
+                flex-col
+              "
+            >
 
               {/* ACTIVAR */}
 
@@ -137,7 +246,15 @@ export default async function UsuariosInactivos() {
 
               {/* ELIMINAR */}
 
-              <div className="flex flex-1 items-center justify-center bg-red-500">
+              <div
+                className="
+                  flex
+                  flex-1
+                  items-center
+                  justify-center
+                  bg-red-500
+                "
+              >
 
                 <DeleteUserButton
                   id={usuario.id}
@@ -155,16 +272,18 @@ export default async function UsuariosInactivos() {
 
         {/* SIN USUARIOS */}
 
-        {(!usuarios || usuarios.length === 0) && (
+        {usuariosOrdenados.length === 0 && (
 
-          <div className="
-            rounded-2xl
-            bg-white
-            p-5
-            text-center
-            text-slate-500
-            shadow
-          ">
+          <div
+            className="
+              rounded-2xl
+              bg-white
+              p-5
+              text-center
+              text-slate-500
+              shadow
+            "
+          >
             No hay usuarios inactivos.
           </div>
 
@@ -175,29 +294,29 @@ export default async function UsuariosInactivos() {
 
       {/* VOLVER */}
 
-<div className="mt-8">
+      <div className="mt-8">
 
-  <Link
-    href="/usuarios/gestion"
-    className="
-      block
-      w-full
-      rounded-2xl
-      bg-slate-800
-      py-3
-      text-center
-      font-semibold
-      text-white
-      shadow-md
-      transition
-      hover:bg-slate-700
-      active:scale-[0.98]
-    "
-  >
-    ⬅️ Volver a usuarios
-  </Link>
+        <Link
+          href="/usuarios/gestion"
+          className="
+            block
+            w-full
+            rounded-2xl
+            bg-slate-800
+            py-3
+            text-center
+            font-semibold
+            text-white
+            shadow-md
+            transition
+            hover:bg-slate-700
+            active:scale-[0.98]
+          "
+        >
+          ⬅️ Volver a usuarios
+        </Link>
 
-</div>
+      </div>
 
 
       <BottomNav />

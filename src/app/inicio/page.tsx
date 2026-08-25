@@ -50,8 +50,9 @@ type Usuario = {
   id: string;
   nombre: string;
   rol: string;
-  puesto: string;
   sexo: string;
+  categoria: string | null;
+  puesto: string;
 };
 
 type Solicitud = {
@@ -117,7 +118,7 @@ export default function Inicio() {
       const { data: perfil } =
         await supabase
           .from("usuarios")
-          .select("id,nombre,rol,puesto,sexo")
+          .select("id,nombre,rol,sexo,categoria,puesto")
           .eq("id", user.id)
           .single();
 
@@ -222,23 +223,31 @@ export default function Inicio() {
             {usuario?.nombre || "Usuario"}
           </h1>
 
-          <p className="mt-2 text-slate-500">
-            {usuario?.rol === "admin"
-              ? "👑 Administrador"
-              : usuario?.sexo === "mujer"
-              ? "👮‍♀️ Policía"
-              : "👮‍♂️ Policía"}
-          </p>
+          {usuario?.rol === "admin" && (
+  <p className="mt-2 text-slate-500">
+    👑 Administrador
+  </p>
+)}
 
-          <p className="mt-1 text-slate-500">
-            {usuario?.puesto === "gac"
-              ? "🚓 G.A.C"
-              : usuario?.puesto === "seguridad"
-              ? "🛡️ Seguridad"
-              : usuario?.puesto === "sala"
-              ? "🖥️ Sala"
-              : "—"}
-          </p>
+<p className="mt-1 text-slate-500">
+  {usuario?.categoria === "oficial"
+    ? "👮‍♂️ Oficial de Policía"
+    : usuario?.categoria === "policia"
+    ? usuario?.sexo === "mujer"
+      ? "👮‍♀️ Policía"
+      : "👮‍♂️ Policía"
+    : "—"}
+</p>
+
+<p className="mt-1 text-slate-500">
+  {usuario?.puesto === "gac"
+    ? "🚓 G.A.C"
+    : usuario?.puesto === "seguridad"
+    ? "🛡️ Seguridad"
+    : usuario?.puesto === "sala"
+    ? "🖥️ Sala"
+    : "—"}
+</p>
 
         </div>
 
