@@ -264,7 +264,7 @@ export default function DiaCalendario() {
 
         <div
           className="
-            bg-violet-100
+            bg-blue-200
             px-5
             py-3
             text-center
@@ -273,7 +273,7 @@ export default function DiaCalendario() {
 
           <p
             className="
-              text-base
+              text-lg
               font-bold
               capitalize
               text-slate-700
@@ -356,54 +356,59 @@ export default function DiaCalendario() {
 
         {/* CABECERA PERSONAL */}
 
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-            bg-violet-100
-            px-4
-            py-3
-          "
-        >
+<div 
+  className="
+    relative
+    flex
+    items-center
+    justify-between
+    bg-blue-200
+    px-4
+    py-3
+  "
+>
 
-          <h2
-            className="
-              text-lg
-              font-bold
-              text-slate-800
-            "
-          >
-            Personal de permiso
-          </h2>
+  <h2 
+    className="
+      absolute
+      left-1/2
+      -translate-x-1/2
+      text-lg
+      font-bold
+      text-slate-800
+    "
+  >
+    Personal de permiso
+  </h2>
 
-          {!cargando &&
-            solicitudes.length > 0 && (
+  {!cargando &&
+    solicitudes.length > 0 && (
 
-              <div
-                className="
-                  flex
-                  h-9
-                  w-9
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-violet-500
-                  text-sm
-                  font-bold
-                  text-white
-                  shadow-sm
-                "
-              >
-                {solicitudes.length}
-              </div>
+      <div 
+        className="
+          ml-auto
+          flex
+          h-9
+          w-9
+          items-center
+          justify-center
+          rounded-full
+          bg-blue-500
+          text-sm
+          font-bold
+          text-white
+          shadow-sm
+        "
+      >
+        {solicitudes.length}
+      </div>
 
-            )}
+    )}
 
-        </div>
+</div>
 
 
-        {/* LÍNEA DIVISORIA COMPLETA */}
+{/* LÍNEA DIVISORIA COMPLETA */}
 
         <div className="border-t-2 border-slate-200" />
 

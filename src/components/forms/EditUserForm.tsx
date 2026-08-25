@@ -192,7 +192,7 @@ export default function EditUserForm({
           className="flex w-full items-center justify-center gap-2 rounded-2xl border border-orange-400 bg-white py-3.5 font-semibold text-orange-500 transition hover:bg-orange-50"
         >
           <span className="text-lg">
-            🔒
+            🔑
           </span>
 
           Restablecer contraseña
