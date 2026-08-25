@@ -416,15 +416,18 @@ setSolicitudesVista(agrupadas);
             "/solicitudes/nueva";
         }}
         className="
-          mt-6
-          w-full
-          rounded-2xl
-          bg-blue-600
-          py-3
-          text-lg
-          font-semibold
-          text-white
-        "
+  mt-6
+  w-full
+  rounded-2xl
+  bg-slate-800
+  py-3
+  text-lg
+  font-semibold
+  text-white
+  transition
+  hover:bg-slate-700
+  active:scale-[0.98]
+"
       >
         ➕ Nueva solicitud
       </button>
@@ -842,7 +845,7 @@ setSolicitudesVista(agrupadas);
           mt-4
           w-full
           rounded-2xl
-          bg-slate-700
+          bg-slate-800
           py-3
           text-lg
           font-semibold

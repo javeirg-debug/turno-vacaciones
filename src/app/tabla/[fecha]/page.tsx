@@ -7,7 +7,6 @@ import {
   obtenerSolicitudesDia,
   eliminarSolicitud,
 } from "@/services/solicitudes";
-
 import { supabase } from "@/lib/supabase";
 
 const inicioTurno = new Date(2026, 6, 16);
@@ -65,190 +64,651 @@ function formatearFecha(fecha: string) {
   });
 }
 
+function formatearFechaGrande(fecha: string) {
+  return new Date(fecha + "T00:00:00").toLocaleDateString(
+    "es-ES",
+    {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }
+  );
+}
+
+function obtenerVisual(tipo: string) {
+  switch (tipo) {
+    case "🌴 Vacaciones":
+      return {
+        abreviatura: "VAC",
+        color: "bg-teal-500",
+      };
+
+    case "🟢 AP":
+      return {
+        abreviatura: "AP",
+        color: "bg-sky-500",
+      };
+
+    case "⏰ Compensación horaria":
+      return {
+        abreviatura: "CH",
+        color: "bg-slate-600",
+      };
+
+    case "🤒 Indisposición":
+      return {
+        abreviatura: "IND",
+        color: "bg-red-500",
+      };
+
+    case "🎄 Navidad":
+      return {
+        abreviatura: "NAV",
+        color: "bg-indigo-500",
+      };
+
+    case "✝️ Semana Santa":
+      return {
+        abreviatura: "SS",
+        color: "bg-violet-500",
+      };
+
+    case "👶 Paternidad":
+      return {
+        abreviatura: "PAT",
+        color: "bg-blue-500",
+      };
+
+    case "🤰 Maternidad":
+      return {
+        abreviatura: "MAT",
+        color: "bg-pink-500",
+      };
+
+    case "🍼 Lactancia":
+      return {
+        abreviatura: "LAC",
+        color: "bg-amber-500",
+      };
+
+    case "📄 Otros permisos":
+      return {
+        abreviatura: "OT",
+        color: "bg-fuchsia-500",
+      };
+
+    case "🚨 Permiso urgente":
+      return {
+        abreviatura: "URG",
+        color: "bg-orange-500",
+      };
+
+    default:
+      return {
+        abreviatura: "OT",
+        color: "bg-slate-500",
+      };
+  }
+}
+
 export default function DiaCalendario() {
   const params = useParams();
   const router = useRouter();
 
   const fecha = params.fecha as string;
 
-  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
-  const [cargando, setCargando] = useState(true);
-const [miUsuarioId, setMiUsuarioId] = useState("");
+  const [solicitudes, setSolicitudes] =
+    useState<Solicitud[]>([]);
 
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [miUsuarioId, setMiUsuarioId] =
+    useState("");
 
   useEffect(() => {
-async function cargar() {
-  try {
+    async function cargar() {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+        if (user) {
+          setMiUsuarioId(user.id);
+        }
 
-    if (user) {
-      setMiUsuarioId(user.id);
+        const datos =
+          await obtenerSolicitudesDia(fecha);
+
+        setSolicitudes(datos || []);
+
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setCargando(false);
+      }
     }
-
-    const datos = await obtenerSolicitudesDia(fecha);
-
-    setSolicitudes(datos || []);
-
-  } catch (error) {
-
-    console.error(error);
-
-  } finally {
-
-    setCargando(false);
-
-  }
-}
 
     cargar();
   }, [fecha]);
 
+  async function borrar(id: string) {
+    if (!confirm("¿Eliminar esta solicitud?")) {
+      return;
+    }
+
+    try {
+      await eliminarSolicitud(id);
+
+      setSolicitudes((prev) =>
+        prev.filter(
+          (solicitud) =>
+            solicitud.id !== id
+        )
+      );
+
+    } catch {
+      alert(
+        "No se pudo eliminar la solicitud."
+      );
+    }
+  }
 
   return (
-    <main className="min-h-screen bg-slate-100 p-6 pb-24">
+    <main className="
+      min-h-screen
+      bg-slate-100
+      px-4
+      pb-28
+      pt-5
+    ">
 
-      <h1 className="text-3xl font-bold">
-        📅 Día
-      </h1>
+      {/* =========================
+          CABECERA
+      ========================= */}
 
-      <div className="mt-6 rounded-3xl bg-white p-5 shadow">
+      <div className="text-center">
 
-        <h2 className="text-xl font-bold">
-          {fecha}
-        </h2>
 
-        <p className="mt-4 text-lg">
-          Turno
-        </p>
 
-        <p className="mt-2 text-2xl font-bold">
-          {obtenerTurno(fecha)}
-        </p>
-
-        <div className="mt-8">
-
-          <h3 className="text-xl font-bold">
-            Personal de permiso
-          </h3>
-
-          {cargando && (
-            <p className="mt-3">
-              Cargando...
-            </p>
-          )}
-
-          {!cargando && solicitudes.length === 0 && (
-            <p className="mt-3 text-slate-500">
-              No hay solicitudes para este día.
-            </p>
-          )}
-
-          <div className="mt-4 space-y-4">
-
-            {solicitudes.map((solicitud) => (
-
-              <div
-                key={solicitud.id}
-                className="rounded-2xl border bg-slate-50 p-4"
-              >
-
-<p className="text-lg font-bold">
-  {solicitud.sexo === "mujer"
-    ? "👮‍♀️"
-    : "👮‍♂️"}{" "}
-  {solicitud.nombre}
+<p className="
+  mt-2
+  text-lg
+  font-semibold
+  capitalize
+  text-slate-600
+">
+  {formatearFechaGrande(fecha)}
 </p>
 
-<p className="text-sm text-slate-500">
-
-  {solicitud.puesto === "gac"
-    ? "🚓 G.A.C"
-    : solicitud.puesto === "seguridad"
-    ? "🛡️ Seguridad"
-    : solicitud.puesto === "sala"
-    ? "🖥️ Sala"
-    : "—"}
-
-</p>
-
-                <p className="mt-2">
-                  {solicitud.tipo}
-                </p>
-
-                <p className="mt-2">
-  📅{" "}
-  {new Date(solicitud.fecha_inicio).toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  })}
-
-  {solicitud.fecha_inicio !== solicitud.fecha_fin &&
-    ` → ${new Date(solicitud.fecha_fin).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
-    })}`}
-</p>
-
-                <p className="mt-2 text-sm text-slate-500">
-                  Registrada:
-                  {" "}
-                  {formatearFecha(solicitud.created_at)}
-                </p>
-
-                {solicitud.motivo && (
-                  <p className="mt-2">
-                    📝 {solicitud.motivo}
-                  </p>
-                )}
-
-{solicitud.usuario_id === miUsuarioId && (
-
-  <button
-    onClick={async () => {
-      if (!confirm("¿Eliminar esta solicitud?")) return;
-
-      try {
-        await eliminarSolicitud(solicitud.id);
-
-        setSolicitudes((prev) =>
-          prev.filter((s) => s.id !== solicitud.id)
-        );
-
-      } catch {
-        alert("No se pudo eliminar la solicitud.");
-      }
-    }}
-    className="mt-4 w-full rounded-2xl bg-red-500 py-3 font-semibold text-white"
-  >
-    🗑️ Eliminar solicitud
-  </button>
-
-)}
+      </div>
 
 
-              </div>
+      {/* =========================
+          TURNO
+      ========================= */}
 
-            ))}
+      <div className="
+        mt-5
+        overflow-hidden
+        rounded-3xl
+        bg-white
+        shadow-md
+      ">
 
-          </div>
+        <div className="
+          flex
+          flex-col
+          items-center
+          justify-center
+          px-5
+          py-5
+          text-center
+        ">
+
+          <p className="text-3xl">
+            {obtenerTurno(fecha).split(" ")[0]}
+          </p>
+
+          <p className="
+            mt-2
+            text-xs
+            font-semibold
+            uppercase
+            tracking-wider
+            text-slate-400
+          ">
+            Turno
+          </p>
+
+          <p className="
+            mt-1
+            text-2xl
+            font-bold
+            text-slate-800
+          ">
+            {obtenerTurno(fecha)
+              .split(" ")
+              .slice(1)
+              .join(" ")}
+          </p>
 
         </div>
 
-<button
-onClick={() =>
-  router.push(`/solicitudes/nueva?fecha=${fecha}`)
-}
-  className="mt-8 w-full rounded-2xl bg-blue-600 py-3 font-semibold text-white"
->
-  📝 Solicitar permiso
-</button>
+      </div>
+
+
+{/* =========================
+    PERSONAL DE PERMISO
+========================= */}
+
+<div className="
+  mt-7
+  rounded-3xl
+  bg-white
+  px-3
+  py-3
+  shadow-md
+">
+
+  {/* CABECERA PERSONAL */}
+
+  <div className="
+    flex
+    items-center
+    justify-between
+    px-1
+    pb-3
+  ">
+
+    <h2 className="
+      text-lg
+      font-bold
+      text-slate-800
+    ">
+      Personal de permiso
+    </h2>
+
+    {!cargando &&
+      solicitudes.length > 0 && (
+
+        <div className="
+          flex
+          h-9
+          w-9
+          items-center
+          justify-center
+          rounded-full
+          bg-violet-500
+          text-sm
+          font-bold
+          text-white
+          shadow-sm
+        ">
+          {solicitudes.length}
+        </div>
+
+      )}
+
+  </div>
+
+
+  {/* LÍNEA DIVISORIA */}
+
+  <div className="
+    border-t
+    border-slate-200
+  " />
+
+
+  {/* CONTENIDO */}
+
+  {cargando && (
+
+    <div className="
+      px-1
+      py-4
+      text-sm
+      text-slate-500
+    ">
+      Cargando personal...
+    </div>
+
+  )}
+
+
+  {!cargando &&
+    solicitudes.length === 0 && (
+
+      <div className="
+        px-2
+        py-7
+        text-center
+      ">
+
+        <p className="text-2xl">
+          📭
+        </p>
+
+        <p className="
+          mt-2
+          text-sm
+          font-semibold
+          text-slate-600
+        ">
+          No hay solicitudes
+        </p>
+
+        <p className="
+          mt-1
+          text-xs
+          text-slate-400
+        ">
+          Nadie tiene un permiso registrado
+          para este día.
+        </p>
 
       </div>
+
+    )}
+
+
+  {/* TARJETAS */}
+
+  {!cargando &&
+    solicitudes.length > 0 && (
+
+      <div className="pt-3 space-y-4">
+
+        {solicitudes.map(
+          (solicitud) => {
+
+            const visual =
+              obtenerVisual(
+                solicitud.tipo
+              );
+
+            return (
+
+              <div
+                key={solicitud.id}
+                className="
+                  overflow-hidden
+                  rounded-3xl
+                  border
+                  border-slate-200
+                  bg-white
+                  shadow-md
+                "
+              >
+
+                {/* =====================
+                    PARTE SUPERIOR
+                ====================== */}
+
+                <div
+                  className={`
+                    px-4
+                    py-4
+                    ${
+                      solicitud.sexo ===
+                      "mujer"
+                        ? "bg-pink-50"
+                        : "bg-blue-50"
+                    }
+                  `}
+                >
+
+                  <div className="
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
+                  ">
+
+                    <p className="
+                      min-w-0
+                      flex-1
+                      text-base
+                      font-bold
+                      text-slate-800
+                    ">
+                      {solicitud.nombre}
+                    </p>
+
+                    <p className="
+                      shrink-0
+                      text-xs
+                      font-semibold
+                      text-slate-500
+                    ">
+                      {solicitud.puesto ===
+                      "gac"
+                        ? "🚓 G.A.C"
+                        : solicitud.puesto ===
+                          "seguridad"
+                        ? "🛡️ Seguridad"
+                        : solicitud.puesto ===
+                          "sala"
+                        ? "🖥️ Sala"
+                        : "—"}
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                {/* =====================
+                    PARTE INFERIOR
+                ====================== */}
+
+                <div className="
+                  relative
+                  px-4
+                  py-4
+                ">
+
+                  <div className="
+                    ml-[68px]
+                    mr-[52px]
+                  ">
+
+                    <p className="
+                      text-base
+                      font-bold
+                      leading-tight
+                      text-slate-800
+                    ">
+                      {solicitud.tipo}
+                    </p>
+
+
+                    {/* FECHA */}
+
+                    <p className="
+                      mt-3
+                      text-sm
+                      font-bold
+                      text-slate-700
+                    ">
+
+                      📅{" "}
+
+                      {new Date(
+                        solicitud.fecha_inicio
+                      ).toLocaleDateString(
+                        "es-ES",
+                        {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "2-digit",
+                        }
+                      )}
+
+                      {solicitud.fecha_inicio !==
+                        solicitud.fecha_fin && (
+                        <>
+                          {" → "}
+
+                          {new Date(
+                            solicitud.fecha_fin
+                          ).toLocaleDateString(
+                            "es-ES",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "2-digit",
+                            }
+                          )}
+                        </>
+                      )}
+
+                    </p>
+
+
+                    {/* OBSERVACIÓN */}
+
+                    {solicitud.motivo && (
+
+                      <p className="
+                        mt-2
+                        text-xs
+                        italic
+                        leading-5
+                        text-slate-500
+                      ">
+                        Observaciones:{" "}
+                        {solicitud.motivo}
+                      </p>
+
+                    )}
+
+
+                    {/* REGISTRO */}
+
+                    <p className="
+                      mt-3
+                      text-xs
+                      text-slate-400
+                    ">
+                      🕐 Registrada el{" "}
+                      {formatearFecha(
+                        solicitud.created_at
+                      )}
+                    </p>
+
+                  </div>
+
+
+                  {/* CÍRCULO */}
+
+                  <div
+                    className={`
+                      absolute
+                      left-4
+                      top-1/2
+                      flex
+                      h-14
+                      w-14
+                      -translate-y-1/2
+                      items-center
+                      justify-center
+                      rounded-full
+                      ${visual.color}
+                      text-[11px]
+                      font-extrabold
+                      text-white
+                      shadow-sm
+                    `}
+                  >
+                    {visual.abreviatura}
+                  </div>
+
+
+                  {/* PAPELERA */}
+
+                  {solicitud.usuario_id ===
+                    miUsuarioId && (
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        borrar(
+                          solicitud.id
+                        )
+                      }
+                      className="
+                        absolute
+                        bottom-4
+                        right-4
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-red-100
+                        text-sm
+                        transition
+                        hover:bg-red-200
+                        active:scale-95
+                      "
+                      aria-label="
+                        Eliminar solicitud
+                      "
+                    >
+                      🗑️
+                    </button>
+
+                  )}
+
+                </div>
+
+              </div>
+
+            );
+          }
+        )}
+
+      </div>
+
+    )}
+
+</div>
+      {/* =========================
+          SOLICITAR PERMISO
+      ========================= */}
+
+      <button
+        type="button"
+        onClick={() =>
+          router.push(
+            `/solicitudes/nueva?fecha=${fecha}`
+          )
+        }
+        className="
+          mt-7
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-2xl
+          bg-slate-800
+          py-3.5
+          font-bold
+          text-white
+          shadow-md
+          transition
+          hover:bg-slate-700
+          active:scale-[0.98]
+        "
+      >
+        📝 Solicitar permiso
+      </button>
+
 
       <BottomNav />
 

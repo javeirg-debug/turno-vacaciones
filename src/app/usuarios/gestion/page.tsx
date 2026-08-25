@@ -32,7 +32,20 @@ export default async function GestionUsuarios() {
 
       <Link
         href="/usuarios/alta"
-        className="mt-6 block rounded-2xl bg-blue-600 py-3 text-center font-semibold text-white"
+        className="
+          mt-6
+          block
+          rounded-2xl
+          bg-slate-800
+          py-3
+          text-center
+          font-semibold
+          text-white
+          shadow-md
+          transition
+          hover:bg-slate-700
+          active:scale-[0.98]
+        "
       >
         ➕ Alta de usuarios
       </Link>
@@ -49,7 +62,20 @@ export default async function GestionUsuarios() {
 
       <Link
         href="/usuarios/inactivos"
-        className="mt-8 block rounded-2xl bg-slate-700 py-3 text-center font-semibold text-white"
+        className="
+          mt-8
+          block
+          rounded-2xl
+          bg-slate-700
+          py-3
+          text-center
+          font-semibold
+          text-white
+          shadow-md
+          transition
+          hover:bg-slate-600
+          active:scale-[0.98]
+        "
       >
         🔒 Usuarios inactivos
       </Link>

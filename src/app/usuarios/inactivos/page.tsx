@@ -109,32 +109,44 @@ export default async function UsuariosInactivos() {
             </div>
 
 
-           {/* ACCIONES */}
+            {/* ACCIONES */}
 
-<div className="flex w-[100px] shrink-0 flex-col">
+            <div className="flex w-[100px] shrink-0 flex-col">
 
-  {/* ACTIVAR */}
+              {/* ACTIVAR */}
 
-  <Link
-    href={`/usuarios/activar/${usuario.id}`}
-    className="flex flex-1 items-center justify-center bg-green-500 px-2 text-sm font-bold text-white transition hover:bg-green-600"
-  >
-    Activar
-  </Link>
+              <Link
+                href={`/usuarios/activar/${usuario.id}`}
+                className="
+                  flex
+                  flex-1
+                  items-center
+                  justify-center
+                  bg-green-500
+                  px-2
+                  text-sm
+                  font-bold
+                  text-white
+                  transition
+                  hover:bg-green-600
+                "
+              >
+                Activar
+              </Link>
 
 
-  {/* ELIMINAR */}
+              {/* ELIMINAR */}
 
-  <div className="flex flex-1 items-center justify-center bg-red-500">
+              <div className="flex flex-1 items-center justify-center bg-red-500">
 
-    <DeleteUserButton
-      id={usuario.id}
-      currentUserId={user?.id || ""}
-    />
+                <DeleteUserButton
+                  id={usuario.id}
+                  currentUserId={user?.id || ""}
+                />
 
-  </div>
+              </div>
 
-</div>
+            </div>
 
           </div>
 
@@ -145,7 +157,14 @@ export default async function UsuariosInactivos() {
 
         {(!usuarios || usuarios.length === 0) && (
 
-          <div className="rounded-2xl bg-white p-5 text-center text-slate-500 shadow">
+          <div className="
+            rounded-2xl
+            bg-white
+            p-5
+            text-center
+            text-slate-500
+            shadow
+          ">
             No hay usuarios inactivos.
           </div>
 
@@ -156,16 +175,29 @@ export default async function UsuariosInactivos() {
 
       {/* VOLVER */}
 
-      <div className="mt-8 text-center">
+<div className="mt-8">
 
-        <Link
-          href="/usuarios/gestion"
-          className="inline-block rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white"
-        >
-          ⬅️ Volver a usuarios
-        </Link>
+  <Link
+    href="/usuarios/gestion"
+    className="
+      block
+      w-full
+      rounded-2xl
+      bg-slate-800
+      py-3
+      text-center
+      font-semibold
+      text-white
+      shadow-md
+      transition
+      hover:bg-slate-700
+      active:scale-[0.98]
+    "
+  >
+    ⬅️ Volver a usuarios
+  </Link>
 
-      </div>
+</div>
 
 
       <BottomNav />
