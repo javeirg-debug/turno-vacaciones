@@ -433,7 +433,7 @@ if (solicitudesError) {
 }
 
   return (
-      <main className="min-h-screen bg-slate-100 p-6 pb-24">
+      <main className="min-h-screen bg-slate-100 px-3 pt-6 pb-24">
 
    <div className="mb-6 flex items-center justify-between">
 
@@ -659,7 +659,7 @@ case "OT":
 return (
   <button
     key={usuario.id + fecha.toISOString()}
-    onClick={() => router.push(`/tabla/${fechaTexto}`)}
+        onClick={() => router.push(`/calendario/${fechaTexto}`)}
     className={`
       h-[42px]
       w-[42px]

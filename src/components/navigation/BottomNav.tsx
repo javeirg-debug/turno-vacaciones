@@ -63,20 +63,6 @@ export default function BottomNav() {
         </button>
 
 
-        {/* EXCEL */}
-
-        <Link href="/tabla" className="flex-1">
-          <div
-            className={`flex flex-col items-center justify-center rounded-xl py-2 transition ${
-              pathname.startsWith("/tabla")
-                ? "bg-slate-200 font-semibold text-slate-900"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
-          >
-            <span className="text-xl">🧮</span>
-            <span className="text-[10px]">Excel</span>
-          </div>
-        </Link>
 
 
         {/* SOLICITUDES */}
@@ -251,6 +237,96 @@ export default function BottomNav() {
                 </div>
 
               </Link>
+
+
+{/* EXCEL GRUPAL */}
+
+<Link
+  href="/calendario/excel"
+  onClick={() => setMostrarCalendarios(false)}
+  className="
+    group
+    flex
+    items-center
+    gap-4
+    rounded-[18px]
+    bg-slate-100
+    p-5
+    text-slate-900
+    shadow-md
+    transition-all
+    duration-200
+    hover:-translate-y-0.5
+    hover:bg-slate-200
+    hover:shadow-lg
+    active:translate-y-0
+    active:scale-[0.98]
+  "
+>
+
+  {/* AQUÍ VA EL ICONO */}
+
+  <div
+    className="
+      flex
+      h-12
+      w-12
+      shrink-0
+      items-center
+      justify-center
+      rounded-2xl
+      bg-white
+      shadow-sm
+    "
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-7 w-7"
+    >
+      <rect
+        x="3"
+        y="4"
+        width="18"
+        height="16"
+        rx="2"
+      />
+
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 9h18"
+      />
+
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8 9v11"
+      />
+
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13 9v11"
+      />
+    </svg>
+  </div>
+
+  <div className="min-w-0">
+
+    <p className="text-base font-bold text-slate-900">
+      Excel Grupal
+    </p>
+
+    <p className="mt-1 text-sm text-slate-500">
+      Antiguo Excel de trabajo
+    </p>
+
+  </div>
+
+</Link>
 
 
               {/* CALENDARIO PERSONAL */}
