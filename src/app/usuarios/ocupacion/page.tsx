@@ -193,64 +193,6 @@ export default function Ocupacion() {
       </div>
 
 
-      {/* ESCALA */}
-
-      <div
-        className="
-          mt-3
-          rounded-2xl
-          bg-white
-          px-4
-          py-3
-          shadow-sm
-        "
-      >
-
-        <div className="flex items-center justify-between">
-
-          <div className="text-center">
-            <span className="text-lg">🟢</span>
-
-            <p className="text-[10px] font-semibold text-slate-500">
-              Bajo
-            </p>
-          </div>
-
-          <div className="h-0.5 flex-1 bg-slate-200" />
-
-          <div className="text-center">
-            <span className="text-lg">🟡</span>
-
-            <p className="text-[10px] font-semibold text-slate-500">
-              Medio
-            </p>
-          </div>
-
-          <div className="h-0.5 flex-1 bg-slate-200" />
-
-          <div className="text-center">
-            <span className="text-lg">🟠</span>
-
-            <p className="text-[10px] font-semibold text-slate-500">
-              Alto
-            </p>
-          </div>
-
-          <div className="h-0.5 flex-1 bg-slate-200" />
-
-          <div className="text-center">
-            <span className="text-lg">🔴</span>
-
-            <p className="text-[10px] font-semibold text-slate-500">
-              Muy alto
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-
-
       {/* TARJETAS */}
 
       <div className="mt-3 space-y-2">
@@ -264,14 +206,11 @@ export default function Ocupacion() {
             <div
               key={item.id}
               className={`
-                flex
-                items-center
-                justify-between
                 rounded-2xl
                 border
                 bg-white
                 px-4
-                py-2.5
+                py-3
                 shadow-sm
                 ${estilo.borde}
               `}
@@ -282,14 +221,14 @@ export default function Ocupacion() {
               <div
                 className={`
                   flex
-                  min-w-[105px]
                   items-center
+                  justify-center
                   gap-2
                   ${estilo.texto}
                 `}
               >
 
-                <span className="text-lg">
+                <span className="text-xl">
                   {iconoColor(item.color)}
                 </span>
 
@@ -310,8 +249,10 @@ export default function Ocupacion() {
 
               <div
                 className="
+                  mt-2
                   flex
                   items-center
+                  justify-center
                   gap-2
                 "
               >

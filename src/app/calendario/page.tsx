@@ -839,15 +839,12 @@ export default function Calendario() {
                         }
 
                         ${
-                          dia ===
-                            hoy.getDate() &&
-                          mes ===
-                            hoy.getMonth() &&
-                          anio ===
-                            hoy.getFullYear()
-                            ? "shadow-lg scale-105 rounded-lg z-10 relative"
-                            : ""
-                        }
+  dia === hoy.getDate() &&
+  mes === hoy.getMonth() &&
+  anio === hoy.getFullYear()
+    ? "relative z-10 rounded-lg ring-2 ring-blue-500 ring-inset"
+    : ""
+}
                       `}
                     >
 
@@ -1388,16 +1385,16 @@ export default function Calendario() {
                                 }
 
                                 ${
-                                  trabajo
-                                    ? "shadow-sm ring-1 ring-slate-200"
-                                    : ""
-                                }
+  trabajo
+    ? colorDia(personas)
+    : "bg-white text-slate-400"
+}
 
-                                ${
-                                  esHoy
-                                    ? "ring-2 ring-blue-500"
-                                    : ""
-                                }
+${
+  esHoy
+    ? "ring-2 ring-blue-500"
+    : ""
+}
                               `}
                             >
 
