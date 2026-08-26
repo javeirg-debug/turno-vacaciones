@@ -357,17 +357,43 @@ useEffect(() => {
   setMes(hoy.getMonth());
 
   const bloquesHoy = obtenerBloquesTrabajo(
-    hoy.getFullYear(),
-    hoy.getMonth()
-  );
+  hoy.getFullYear(),
+  hoy.getMonth()
+);
 
-  const indice = bloquesHoy.findIndex((bloque) =>
-    bloque.some((dia) => dia >= hoy)
-  );
+// Ponemos hoy a las 00:00 para comparar solo la fecha
+const hoySinHora = new Date(
+  hoy.getFullYear(),
+  hoy.getMonth(),
+  hoy.getDate()
+);
 
-  if (indice !== -1) {
-    setCiclo(indice + 1);
-  }
+// 1. Si hoy estamos trabajando, buscamos el bloque que contiene hoy
+let indice = bloquesHoy.findIndex((bloque) =>
+  bloque.some(
+    (dia) =>
+      dia.getFullYear() === hoySinHora.getFullYear() &&
+      dia.getMonth() === hoySinHora.getMonth() &&
+      dia.getDate() === hoySinHora.getDate()
+  )
+);
+
+// 2. Si hoy es día libre, buscamos el siguiente bloque de trabajo
+if (indice === -1) {
+  indice = bloquesHoy.findIndex((bloque) => {
+    const primerDia = new Date(
+      bloque[0].getFullYear(),
+      bloque[0].getMonth(),
+      bloque[0].getDate()
+    );
+
+    return primerDia > hoySinHora;
+  });
+}
+
+if (indice !== -1) {
+  setCiclo(indice + 1);
+}
 }, []);
 
 
