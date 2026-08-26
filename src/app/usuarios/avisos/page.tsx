@@ -433,9 +433,8 @@ const { error } = await supabase
 
               disabled={guardando}
 
-              className="mt-5 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white"
-
-            >
+              
+className="mt-5 w-full rounded-xl bg-slate-700 py-3 font-semibold text-white shadow-sm transition hover:bg-slate-500 disabled:cursor-not-allowed disabled:opacity-60"            >
 
               {guardando
                 ? "Guardando..."

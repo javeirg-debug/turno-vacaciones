@@ -629,7 +629,7 @@ export default function Calendario() {
             }
           `}
         >
-          📅 Mensual
+           Mensual
         </button>
 
         <button
@@ -652,7 +652,7 @@ export default function Calendario() {
             }
           `}
         >
-          🗓️ Anual
+           Anual
         </button>
 
       </div>

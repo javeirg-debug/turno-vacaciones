@@ -7,6 +7,10 @@ import { supabase } from "@/lib/supabase";
 import {
   obtenerTodasLasSolicitudes,
 } from "@/services/solicitudes";
+import {
+  obtenerConflictosMes,
+  type FechaConflictiva,
+} from "@/services/conflictos";
 
 const meses = [
   "Enero",
@@ -258,6 +262,16 @@ export default function MiCalendario() {
   const [cargando, setCargando] =
     useState(true);
 
+  /* =========================
+     FECHAS CONFLICTIVAS
+  ========================= */
+
+  const [
+    fechasConflictivas,
+    setFechasConflictivas,
+  ] =
+    useState<FechaConflictiva[] | null>(null);
+
 
   /* =========================
      CARGAR SOLO MIS PERMISOS
@@ -311,6 +325,44 @@ export default function MiCalendario() {
     cargar();
 
   }, []);
+
+
+  /* =========================
+     CARGAR CONFLICTOS DEL MES
+  ========================= */
+
+  useEffect(() => {
+    cargarConflictosMes();
+  }, [mes, anio]);
+
+
+  /* =========================
+     CONFLICTOS
+  ========================= */
+
+  async function cargarConflictosMes() {
+
+    setFechasConflictivas(null);
+
+    const conflictos =
+      await obtenerConflictosMes(
+        mes,
+        anio
+      );
+
+    console.log(
+      JSON.stringify(
+        conflictos,
+        null,
+        2
+      )
+    );
+
+    setFechasConflictivas(
+      conflictos
+    );
+
+  }
 
 
   /* =========================
@@ -622,6 +674,8 @@ export default function MiCalendario() {
       ===================================================== */}
 
       {vista === "mensual" && (
+
+        <>
 
         <div
           className="
@@ -954,6 +1008,232 @@ export default function MiCalendario() {
 
         </div>
 
+
+        {/* =================================================
+            FECHAS CONFLICTIVAS
+            SOLO EN VISTA MENSUAL
+        ================================================= */}
+
+        <div
+          className={`
+            mt-6
+            rounded-3xl
+            p-4
+            shadow
+
+            ${
+              fechasConflictivas === null
+                ? "border border-slate-200 bg-white"
+                : fechasConflictivas.length >
+                  0
+                ? "border border-red-200 bg-red-50"
+                : "border border-green-200 bg-green-50"
+            }
+          `}
+        >
+
+          <h2
+            className={`
+              mb-3
+              text-lg
+              font-bold
+
+              ${
+                fechasConflictivas === null
+                  ? "text-slate-800"
+                  : fechasConflictivas.length >
+                    0
+                  ? "text-red-900"
+                  : "text-green-900"
+              }
+            `}
+          >
+
+            {fechasConflictivas ===
+            null
+              ? "⏳ Fechas conflictivas"
+              : fechasConflictivas.length >
+                0
+              ? "🚨 Fechas conflictivas"
+              : "✅ Fechas conflictivas"}
+
+          </h2>
+
+          {fechasConflictivas ===
+          null ? (
+
+            <p className="
+              text-sm
+              text-slate-500
+            ">
+              Comprobando ocupación...
+            </p>
+
+          ) : fechasConflictivas.length >
+            0 ? (
+
+            <>
+
+              <p className="
+                mb-3
+                text-sm
+                text-slate-700
+              ">
+                Este mes tiene días con alta ocupación:
+              </p>
+
+              <div className="
+                space-y-2
+              ">
+
+                {fechasConflictivas.map(
+                  (f) => (
+
+                    <button
+                      key={f.fecha}
+                      type="button"
+                      onClick={() =>
+                        router.push(
+                          `/calendario/${f.fecha}`
+                        )
+                      }
+                      className="
+                        w-full
+                        rounded-2xl
+                        bg-red-100
+                        p-3
+                        shadow-sm
+                        transition
+                        active:scale-95
+                      "
+                    >
+
+                      {/* FECHA */}
+
+                      <div className="
+                        border-y
+                        border-red-200
+                        py-1
+                        text-center
+                      ">
+
+                        <p className="
+                          text-sm
+                          font-bold
+                          text-slate-800
+                        ">
+
+                          {new Date(
+                            f.fecha
+                          ).toLocaleDateString(
+                            "es-ES",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
+
+                          · 👥{" "}
+                          {
+                            f.gac +
+                            f.seguridad +
+                            f.sala
+                          }
+
+                        </p>
+
+                      </div>
+
+                      {/* OCUPACION */}
+
+                      <div className="
+                        mt-2
+                        grid
+                        grid-cols-3
+                        text-center
+                      ">
+
+                        <div>
+
+                          <p className="
+                            text-xs
+                            text-slate-500
+                          ">
+                            🚓 G.A.C.:{" "}
+                            <span className="
+                              font-bold
+                              text-slate-800
+                            ">
+                              {f.gac}
+                            </span>
+                          </p>
+
+                        </div>
+
+                        <div className="
+                          border-x
+                          border-red-200
+                        ">
+
+                          <p className="
+                            text-xs
+                            text-slate-500
+                          ">
+                            🛡️ Seguridad:{" "}
+                            <span className="
+                              font-bold
+                              text-slate-800
+                            ">
+                              {f.seguridad}
+                            </span>
+                          </p>
+
+                        </div>
+
+                        <div>
+
+                          <p className="
+                            text-xs
+                            text-slate-500
+                          ">
+                            🖥️ Sala:{" "}
+                            <span className="
+                              font-bold
+                              text-slate-800
+                            ">
+                              {f.sala}
+                            </span>
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            </>
+
+          ) : (
+
+            <p className="
+              text-sm
+              text-green-800
+            ">
+              Este mes no tiene días con alta ocupación.
+            </p>
+
+          )}
+
+        </div>
+
+        </>
+
       )}
 
 
@@ -1062,22 +1342,22 @@ export default function MiCalendario() {
                 return (
 
                   <div
-  key={nombreMes}
-  onClick={() => {
-    setMes(indiceMes);
-    setVista("mensual");
-  }}
-  className="
-    cursor-pointer
-    rounded-2xl
-    bg-slate-100
-    p-3
-    shadow-sm
-    transition
-    hover:bg-slate-200
-    active:scale-[0.98]
-  "
->
+                    key={nombreMes}
+                    onClick={() => {
+                      setMes(indiceMes);
+                      setVista("mensual");
+                    }}
+                    className="
+                      cursor-pointer
+                      rounded-2xl
+                      bg-slate-100
+                      p-3
+                      shadow-sm
+                      transition
+                      hover:bg-slate-200
+                      active:scale-[0.98]
+                    "
+                  >
 
                     {/* NOMBRE MES */}
 
@@ -1240,27 +1520,6 @@ export default function MiCalendario() {
                                 {dia}
                               </span>
 
-
-
-
-
-                              {/* PERMISO */}
-
-                              {visual && (
-
-                                <span
-                                  className="
-                                    text-[6px]
-                                    font-extrabold
-                                    leading-none
-                                  "
-                                >
-                                  {
-                                    visual.abreviatura
-                                  }
-                                </span>
-
-                              )}
 
                             </div>
 
