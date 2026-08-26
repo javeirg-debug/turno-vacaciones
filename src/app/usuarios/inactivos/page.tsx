@@ -16,17 +16,33 @@ export default async function UsuariosInactivos() {
     .eq("activo", false);
 
   function obtenerIniciales(nombre: string) {
-    const partes = nombre.trim().split(" ");
+  const partes = nombre
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 
-    if (partes.length >= 2) {
-      return (
-        partes[0][0] +
-        partes[partes.length - 1][0]
-      ).toUpperCase();
-    }
+  const quitarTildes = (texto: string) =>
+    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    return nombre.substring(0, 2).toUpperCase();
+  if (partes.length >= 3) {
+    return (
+      quitarTildes(partes[0][0]) +
+      quitarTildes(partes[1][0]) +
+      quitarTildes(partes[2][0])
+    ).toUpperCase();
   }
+
+  if (partes.length === 2) {
+    return (
+      quitarTildes(partes[0][0]) +
+      quitarTildes(partes[1][0])
+    ).toUpperCase();
+  }
+
+  return quitarTildes(
+    partes[0]?.substring(0, 2) || "US"
+  ).toUpperCase();
+}
 
   function obtenerPuesto(puesto: string) {
     return puesto === "gac"

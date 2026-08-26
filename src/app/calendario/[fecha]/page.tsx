@@ -246,6 +246,17 @@ export default function DiaCalendario() {
       "
     >
 
+      {/* CABECERA */}
+
+      <h1 className="text-3xl font-bold text-slate-800">
+        📅 Calendario
+      </h1>
+
+      <p className="mt-2 text-slate-500">
+        Consulta los turnos y permisos del personal.
+      </p>
+
+
       {/* =========================
           TURNO
       ========================= */}
