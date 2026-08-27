@@ -186,7 +186,20 @@ export default async function UsuariosInactivos() {
     if (categoria === "oficial") {
       return (
         <span className="inline-flex items-center gap-1.5">
-          <IconEstrella className="h-4 w-4 text-amber-400" />
+          <svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.8"
+  className="h-4 w-4 shrink-0 text-amber-500"
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="m12 3 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L12 3Z"
+  />
+</svg>
           Oficial de Policía
         </span>
       );

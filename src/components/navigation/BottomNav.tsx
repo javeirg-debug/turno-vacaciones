@@ -563,33 +563,41 @@ export default function BottomNav() {
 
                 {/* INFORMACIÓN */}
                 <button
-                  type="button"
-                  onClick={() => setMostrarInfoUsuarios(true)}
-                  className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 shadow-sm transition hover:bg-blue-200 active:scale-95"
-                  aria-label="Información sobre gestión de usuarios"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="h-4 w-4"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="12" r="9" />
-                    <path
-                      strokeLinecap="round"
-                      d="M12 10.5v6"
-                    />
-                    <circle
-                      cx="12"
-                      cy="7"
-                      r=".8"
-                      fill="currentColor"
-                      stroke="none"
-                    />
-                  </svg>
-                </button>
+  type="button"
+  onClick={() => setMostrarInfoUsuarios(true)}
+  className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 shadow-sm transition hover:bg-slate-200 active:scale-95"
+  aria-label="Información sobre gestión de usuarios"
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-4 w-4"
+    aria-hidden="true"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke="#94A3B8"
+    />
+
+    <path
+      stroke="#64748B"
+      strokeLinecap="round"
+      d="M12 10.5v6"
+    />
+
+    <circle
+      cx="12"
+      cy="7"
+      r=".8"
+      fill="#64748B"
+      stroke="none"
+    />
+  </svg>
+</button>
               </div>
 
               {/* CONFIGURACIÓN OCUPACIÓN */}

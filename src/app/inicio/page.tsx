@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/navigation/BottomNav";
@@ -8,31 +10,322 @@ import { obtenerAvisoActivo } from "@/services/avisos";
 import { obtenerConflictosUsuario } from "@/services/conflictos";
 import { eliminarSolicitud } from "@/services/solicitudes";
 
-import {
-  IconUser,
-  IconPencil,
-  IconInfo,
-  IconCrown,
-  IconPolice,
-  IconCar,
-  IconClock,
-  IconAlert,
-  IconAlertTriangle,
-  IconUsers,
-  IconCalendar,
-  IconTrash,
-  IconKey,
-  IconLogout,
-  IconSunrise,
-  IconSun,
-  IconMoon,
-  IconFree,
-  IconApp,
-  IconShield,
-  IconMonitor,
-  IconX,
-  IconSmartphone,
-} from "@/components/icons/Icons";
+type IconProps = {
+  className?: string;
+};
+
+function SvgIcon({
+  className,
+  children,
+}: IconProps & { children: React.ReactNode }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+
+function IconUser({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M20 21a8 8 0 0 0-16 0" />
+      <circle cx="12" cy="7" r="4" />
+    </SvgIcon>
+  );
+}
+
+function IconPencil({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+    </SvgIcon>
+  );
+}
+
+function IconInfo({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5" />
+      <path d="M12 8h.01" />
+    </SvgIcon>
+  );
+}
+
+function IconCrown({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="m3 7 4 4 5-7 5 7 4-4-2 12H5Z" />
+      <path d="M5 19h14" />
+    </SvgIcon>
+  );
+}
+
+function IconPolice({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6Z" />
+      <path d="M9 11h6" />
+      <path d="M12 8v6" />
+    </SvgIcon>
+  );
+}
+
+function IconCar({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M5 17h14l-1-7H6Z" />
+      <path d="M7 10 9 5h6l2 5" />
+      <circle cx="8" cy="17" r="1.5" />
+      <circle cx="16" cy="17" r="1.5" />
+    </SvgIcon>
+  );
+}
+
+function IconClock({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </SvgIcon>
+  );
+}
+
+function IconAlert({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M10.3 4.2 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </SvgIcon>
+  );
+}
+
+function IconAlertTriangle({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M10.3 4.2 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0-1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </SvgIcon>
+  );
+}
+
+function IconUsers({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </SvgIcon>
+  );
+}
+
+function IconCalendar({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+    </SvgIcon>
+  );
+}
+
+function IconTrash({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 15H6L5 6" />
+      <path d="M10 11v6M14 11v6" />
+    </SvgIcon>
+  );
+}
+
+function IconKey({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <circle cx="8" cy="15" r="4" />
+      <path d="m11 12 9-9" />
+      <path d="m17 6 2 2" />
+      <path d="m14 9 2 2" />
+    </SvgIcon>
+  );
+}
+
+function IconLogout({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M10 17l5-5-5-5" />
+      <path d="M15 12H3" />
+      <path d="M21 3v18" />
+    </SvgIcon>
+  );
+}
+
+function IconSunrise({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Sol amarillo completo */}
+      <circle
+        cx="12"
+        cy="12"
+        r="4.5"
+        fill="#FACC15"
+      />
+
+      {/* Rayos */}
+      <path
+        d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"
+        stroke="#FACC15"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconSun({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Sol naciendo naranja */}
+      <path
+        d="M7 15a5 5 0 0 1 10 0"
+        fill="#F97316"
+      />
+
+      {/* Rayos del atardecer */}
+      <path
+        d="M12 3v4M5.64 5.64l2.83 2.83M18.36 5.64l-2.83 2.83"
+        stroke="#F97316"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      {/* Horizonte */}
+      <path
+        d="M3 17h18"
+        stroke="#64748B"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      {/* Línea inferior */}
+      <path
+        d="M6 20h12"
+        stroke="#64748B"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconMoon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Luna azul oscuro */}
+      <path
+        d="M20 15.5A8.5 8.5 0 0 1 8.5 4.2
+           A8.5 8.5 0 1 0 20 15.5Z"
+        fill="#1E3A8A"
+        stroke="#172554"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      {/* Pequeño brillo */}
+      <circle
+        cx="7"
+        cy="8"
+        r="0.8"
+        fill="#93C5FD"
+      />
+    </svg>
+  );
+}
+
+function IconFree({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Día libre */}
+      <circle
+        cx="12"
+        cy="12"
+        r="7"
+        fill="white"
+        stroke="#CBD5E1"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function IconShield({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6Z" />
+    </SvgIcon>
+  );
+}
+
+function IconMonitor({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <rect x="3" y="4" width="18" height="13" rx="2" />
+      <path d="M8 21h8M12 17v4" />
+    </SvgIcon>
+  );
+}
+
+function IconX({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <path d="m6 6 12 12M18 6 6 18" />
+    </SvgIcon>
+  );
+}
+
+function IconSmartphone({ className }: IconProps) {
+  return (
+    <SvgIcon className={className}>
+      <rect x="6" y="2" width="12" height="20" rx="2" />
+      <path d="M10 18h4" />
+    </SvgIcon>
+  );
+}
 
 const inicioTurno = new Date(2026, 6, 16);
 
@@ -345,60 +638,94 @@ export default function Inicio() {
 
             </div>
 
-            {/* ADMINISTRADOR */}
+           {/* ADMINISTRADOR */}
 
-            {usuario?.rol === "admin" && (
-              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
+{usuario?.rol === "admin" && (
+  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
 
-                <IconCrown className="h-4 w-4 shrink-0" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4 shrink-0 text-amber-500"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 7l4 4 4-7 4 7 4-4-2 11H6L4 7Z"
+      />
 
-                <span>
-                  Administrador
-                </span>
+      <path
+        strokeLinecap="round"
+        d="M6 21h12"
+      />
+    </svg>
 
-              </div>
-            )}
+    <span>
+      Administrador
+    </span>
 
-            {/* POLICÍA + PUESTO */}
+  </div>
+)}
 
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
+{/* POLICÍA + PUESTO */}
 
-              {/* CATEGORÍA */}
+<div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
 
-              <div className="flex items-center gap-2">
+  {/* CATEGORÍA */}
 
-                <IconPolice className="h-4 w-4 shrink-0" />
+  <div className="flex items-center gap-2">
 
-                <span className="font-medium">
-                  {usuario?.categoria === "oficial"
-                    ? "Oficial de Policía"
-                    : usuario?.categoria === "policia"
-                    ? "Policía"
-                    : "—"}
-                </span>
+    {usuario?.categoria === "oficial" ? (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        className="h-4 w-4 shrink-0 text-amber-500"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m12 3 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L12 3Z"
+        />
+      </svg>
+    ) : (
+      <IconPolice className="h-4 w-4 shrink-0" />
+    )}
 
-              </div>
+    <span className="font-medium">
+      {usuario?.categoria === "oficial"
+        ? "Oficial de Policía"
+        : usuario?.categoria === "policia"
+        ? "Policía"
+        : "—"}
+    </span>
 
-              {/* PUESTO */}
+  </div>
 
-              <div className="flex items-center gap-2">
+  {/* PUESTO */}
 
-                <IconCar className="h-4 w-4 shrink-0" />
+  <div className="flex items-center gap-2">
 
-                <span className="font-medium">
-                  {usuario?.puesto === "gac"
-                    ? "G.A.C"
-                    : usuario?.puesto === "seguridad"
-                    ? "Seguridad"
-                    : usuario?.puesto === "sala"
-                    ? "Sala"
-                    : "—"}
-                </span>
+    <IconCar className="h-4 w-4 shrink-0" />
 
-              </div>
+    <span className="font-medium">
+      {usuario?.puesto === "gac"
+        ? "G.A.C"
+        : usuario?.puesto === "seguridad"
+        ? "Seguridad"
+        : usuario?.puesto === "sala"
+        ? "Sala"
+        : "—"}
+    </span>
 
-            </div>
+  </div>
 
+</div>
           </div>
 
         </div>
@@ -474,165 +801,322 @@ export default function Inicio() {
       </div>
 
       {/* =========================
-          FECHAS CONFLICTIVAS
-      ========================= */}
+    FECHAS CONFLICTIVAS
+========================= */}
 
-      <div
-        className={`mt-4 rounded-3xl p-4 shadow ${
-          fechasConflictivas === null
-            ? "border border-slate-200 bg-white"
-            : fechasConflictivas.length > 0
-            ? "border border-red-200 bg-red-50"
-            : "border border-green-200 bg-green-50"
-        }`}
-      >
+<div
+  className={`
+    mt-4
+    rounded-3xl
+    p-4
+    shadow
 
-        <h2
-          className={`mb-3 flex items-center gap-2 text-lg font-bold ${
-            fechasConflictivas === null
-              ? "text-slate-800"
-              : fechasConflictivas.length > 0
-              ? "text-red-900"
-              : "text-green-900"
-          }`}
+    ${
+      fechasConflictivas === null
+        ? "border border-slate-200 bg-white"
+        : fechasConflictivas.length > 0
+        ? "border border-red-200 bg-red-50"
+        : "border border-green-200 bg-green-50"
+    }
+  `}
+>
+  <h2
+    className={`
+      mb-3
+      text-lg
+      font-bold
+
+      ${
+        fechasConflictivas === null
+          ? "text-slate-800"
+          : fechasConflictivas.length > 0
+          ? "text-red-900"
+          : "text-green-900"
+      }
+    `}
+  >
+    {fechasConflictivas === null ? (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mr-2 inline-block h-5 w-5 align-[-3px]"
+          aria-hidden="true"
         >
-          <IconAlertTriangle className="h-5 w-5" />
-          Fechas conflictivas
-        </h2>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+        Fechas conflictivas
+      </>
+    ) : fechasConflictivas.length > 0 ? (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mr-2 inline-block h-5 w-5 align-[-3px]"
+          aria-hidden="true"
+        >
+          <path d="m10.3 3.9-8 14a2 2 0 0 0 1.7 3h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0Z" />
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+        </svg>
+        Fechas conflictivas
+      </>
+    ) : (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mr-2 inline-block h-5 w-5 align-[-3px]"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="m8 12 2.5 2.5L16 9" />
+        </svg>
+        Fechas conflictivas
+      </>
+    )}
+  </h2>
 
-        {fechasConflictivas === null ? (
+  {fechasConflictivas === null ? (
+    <p className="text-sm text-slate-500">
+      Comprobando ocupación...
+    </p>
+  ) : fechasConflictivas.length > 0 ? (
+    <>
+      <p className="mb-3 text-sm text-slate-700">
+        Tienes coincidencias en fechas de alta ocupación:
+      </p>
 
-          <p className="text-sm text-slate-500">
-            Comprobando ocupación...
-          </p>
+      <div className="space-y-2">
+        {fechasConflictivas.map((f) => (
+          <button
+            key={f.fecha}
+            type="button"
+            onClick={() =>
+              router.push(`/calendario/${f.fecha}`)
+            }
+            className="
+              w-full
+              rounded-2xl
+              bg-red-100
+              p-3
+              shadow-sm
+              transition
+              active:scale-95
+            "
+          >
+            {/* FECHA */}
 
-        ) : fechasConflictivas.length > 0 ? (
+            <div
+              className="
+                border-y
+                border-red-200
+                py-2
+                text-center
+              "
+            >
+              <p
+                className="
+                  flex
+                  flex-wrap
+                  items-center
+                  justify-center
+                  gap-1
+                  text-sm
+                  font-bold
+                  leading-relaxed
+                  text-slate-800
+                "
+              >
+                <span>
+                  {new Date(f.fecha).toLocaleDateString(
+                    "es-ES",
+                    {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}
+                </span>
 
-          <>
-            <p className="mb-2 text-sm text-slate-700">
-              Tienes coincidencias en fechas de alta ocupación:
-            </p>
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  ·
 
-            <div className="space-y-2">
+                  {/* ICONO PERSONAS */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-4 w-4 shrink-0 text-slate-600"
+                    aria-hidden="true"
+                  >
+                    <circle cx="9" cy="8" r="4" />
+                    <path d="M2 21a7 7 0 0 1 14 0H2Z" />
+                    <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+                    <path d="M17 14a6 6 0 0 1 5 7h-4a7 7 0 0 0-3-5.8" />
+                  </svg>
 
-              {fechasConflictivas.map((f) => (
+                  {f.gac + f.seguridad + f.sala}
+                </span>
+              </p>
+            </div>
 
-                <button
-                  key={f.fecha}
-                  onClick={() =>
-                    router.push(
-                      `/calendario/${f.fecha}`
-                    )
-                  }
+            {/* OCUPACIÓN */}
+
+            <div
+              className="
+                mt-2
+                grid
+                grid-cols-3
+                text-center
+              "
+            >
+              {/* G.A.C. */}
+
+              <div className="min-w-0">
+                <p
                   className="
-                    w-full
-                    rounded-2xl
-                    bg-red-100
-                    p-3
-                    shadow-sm
-                    transition
-                    active:scale-95
+                    flex
+                    items-center
+                    justify-center
+                    gap-1
+                    text-xs
+                    text-slate-500
                   "
                 >
+                  {/* ICONO COCHE */}
+                  <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  className="h-3.5 w-3.5 shrink-0 text-slate-600"
+  aria-hidden="true"
+>
+  <path d="M5 17h14l-1-7H6Z" />
+  <path d="M7 10 9 5h6l2 5" />
+  <circle cx="8" cy="17" r="1.5" />
+  <circle cx="16" cy="17" r="1.5" />
+</svg>
 
-                  <div
-                    className="
-                      border-y
-                      border-red-200
-                      py-1
-                      text-center
-                    "
+                  <span>G.A.C.:</span>
+
+                  <span className="font-bold text-slate-800">
+                    {f.gac}
+                  </span>
+                </p>
+              </div>
+
+              {/* SEGURIDAD */}
+
+              <div className="min-w-0 border-x border-red-200">
+                <p
+                  className="
+                    flex
+                    items-center
+                    justify-center
+                    gap-1
+                    text-xs
+                    text-slate-500
+                  "
+                >
+                  {/* ICONO ESCUDO */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3.5 w-3.5 shrink-0 text-slate-600"
+                    aria-hidden="true"
                   >
+                    <path d="M12 3 5 6v5c0 4.5 2.8 8.2 7 10 4.2-1.8 7-5.5 7-10V6l-7-3Z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
 
-                    <div className="flex items-center justify-center gap-2">
+                  <span>Seguridad:</span>
 
-                      <p className="text-sm font-bold text-slate-800">
-                        {new Date(f.fecha).toLocaleDateString(
-                          "es-ES",
-                          {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          }
-                        )}
-                      </p>
+                  <span className="font-bold text-slate-800">
+                    {f.seguridad}
+                  </span>
+                </p>
+              </div>
 
-                      <IconUsers className="h-4 w-4 text-slate-700" />
+              {/* SALA */}
 
-                      <p className="text-sm font-bold text-slate-800">
-                        {f.gac +
-                          f.seguridad +
-                          f.sala}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div
-                    className="
-                      mt-2
-                      grid
-                      grid-cols-3
-                      text-center
-                    "
+              <div className="min-w-0">
+                <p
+                  className="
+                    flex
+                    items-center
+                    justify-center
+                    gap-1
+                    text-xs
+                    text-slate-500
+                  "
+                >
+                  {/* ICONO MONITOR */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3.5 w-3.5 shrink-0 text-slate-600"
+                    aria-hidden="true"
                   >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="13"
+                      rx="2"
+                    />
+                    <path d="M8 21h8" />
+                    <path d="M12 17v4" />
+                  </svg>
 
-                    <div>
-                      <p className="text-xs text-slate-500">
-                        <span className="inline-flex items-center gap-1">
-                          <IconCar className="h-3.5 w-3.5" />
-                          G.A.C.:
-                        </span>{" "}
-                        <span className="font-bold text-slate-800">
-                          {f.gac}
-                        </span>
-                      </p>
-                    </div>
+                  <span>Sala:</span>
 
-                    <div className="border-x border-red-200">
-                      <p className="text-xs text-slate-500">
-                        <span className="inline-flex items-center gap-1">
-                          <IconShield className="h-3.5 w-3.5" />
-                          Seguridad:
-                        </span>{" "}
-                        <span className="font-bold text-slate-800">
-                          {f.seguridad}
-                        </span>
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-500">
-                        <span className="inline-flex items-center gap-1">
-                          <IconMonitor className="h-3.5 w-3.5" />
-                          Sala:
-                        </span>{" "}
-                        <span className="font-bold text-slate-800">
-                          {f.sala}
-                        </span>
-                      </p>
-                    </div>
-
-                  </div>
-
-                </button>
-
-              ))}
-
+                  <span className="font-bold text-slate-800">
+                    {f.sala}
+                  </span>
+                </p>
+              </div>
             </div>
-          </>
-
-        ) : (
-
-          <p className="text-sm text-green-800">
-            No tienes coincidencias en días de alta ocupación.
-          </p>
-
-        )}
-
+          </button>
+        ))}
       </div>
-
+    </>
+  ) : (
+    <p className="text-sm text-green-800">
+      No tienes coincidencias en días de alta ocupación.
+    </p>
+  )}
+</div>
       {/* =========================
           PRÓXIMOS PERMISOS
       ========================= */}
