@@ -295,8 +295,8 @@ export default function Inicio() {
 
         {/* CONTENIDO */}
 
-        <div className="flex items-center justify-start gap-7 px-2">
-
+        
+<div className="flex items-center justify-start gap-0.5">
           {/* =========================
               AVATAR
           ========================= */}

@@ -353,47 +353,58 @@ useEffect(() => {
 
   const hoy = new Date();
 
-  setAnio(hoy.getFullYear());
-  setMes(hoy.getMonth());
+  const hoySinHora = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth(),
+    hoy.getDate()
+  );
 
-  const bloquesHoy = obtenerBloquesTrabajo(
-  hoy.getFullYear(),
-  hoy.getMonth()
-);
+  // Buscamos el día que debemos mostrar:
+  // - si hoy estamos de turno → hoy
+  // - si estamos libres → avanzamos hasta el próximo turno
+  const fechaObjetivo = new Date(hoySinHora);
 
-// Ponemos hoy a las 00:00 para comparar solo la fecha
-const hoySinHora = new Date(
-  hoy.getFullYear(),
-  hoy.getMonth(),
-  hoy.getDate()
-);
+  while (!esDiaTrabajo(fechaObjetivo)) {
+    fechaObjetivo.setDate(fechaObjetivo.getDate() + 1);
+  }
 
-// 1. Si hoy estamos trabajando, buscamos el bloque que contiene hoy
-let indice = bloquesHoy.findIndex((bloque) =>
-  bloque.some(
-    (dia) =>
-      dia.getFullYear() === hoySinHora.getFullYear() &&
-      dia.getMonth() === hoySinHora.getMonth() &&
-      dia.getDate() === hoySinHora.getDate()
-  )
-);
+  // Si hoy estamos de turno, buscamos el primer día
+  // de ese bloque de 6 días.
+  while (
+    esDiaTrabajo(
+      new Date(
+        fechaObjetivo.getFullYear(),
+        fechaObjetivo.getMonth(),
+        fechaObjetivo.getDate() - 1
+      )
+    )
+  ) {
+    fechaObjetivo.setDate(fechaObjetivo.getDate() - 1);
+  }
 
-// 2. Si hoy es día libre, buscamos el siguiente bloque de trabajo
-if (indice === -1) {
-  indice = bloquesHoy.findIndex((bloque) => {
-    const primerDia = new Date(
-      bloque[0].getFullYear(),
-      bloque[0].getMonth(),
-      bloque[0].getDate()
-    );
+  const anioObjetivo = fechaObjetivo.getFullYear();
+  const mesObjetivo = fechaObjetivo.getMonth();
 
-    return primerDia > hoySinHora;
-  });
-}
+  setAnio(anioObjetivo);
+  setMes(mesObjetivo);
 
-if (indice !== -1) {
-  setCiclo(indice + 1);
-}
+  const bloquesObjetivo = obtenerBloquesTrabajo(
+    anioObjetivo,
+    mesObjetivo
+  );
+
+  const indice = bloquesObjetivo.findIndex((bloque) =>
+    bloque.some(
+      (dia) =>
+        dia.getFullYear() === fechaObjetivo.getFullYear() &&
+        dia.getMonth() === fechaObjetivo.getMonth() &&
+        dia.getDate() === fechaObjetivo.getDate()
+    )
+  );
+
+  if (indice !== -1) {
+    setCiclo(indice + 1);
+  }
 }, []);
 
 
@@ -463,16 +474,78 @@ if (solicitudesError) {
 
    <div className="mb-6 flex items-center justify-between">
 
-  <h1 className="text-3xl font-bold">
-    🧮 Excel
-  </h1>
+ <h1 className="text-3xl font-bold">
+  <svg
+    viewBox="0 0 24 24"
+    className="mr-2 inline-block h-7 w-7 align-middle text-slate-800"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <rect
+      x="4"
+      y="3"
+      width="16"
+      height="18"
+      rx="2"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    <path
+      d="M8 7H16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M8 11H10M14 11H16M8 15H10M14 15H16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M8 19H16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+  Excel
+</h1>
 
   <button
-    onClick={() => setMostrarLeyenda(true)}
-    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 shadow hover:bg-slate-200"
+  onClick={() => setMostrarLeyenda(true)}
+  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 shadow hover:bg-slate-200"
+  aria-label="Información"
+>
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5 text-slate-600"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
   >
-    ℹ️
-  </button>
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    <path
+      d="M12 11V16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <circle
+      cx="12"
+      cy="8"
+      r="1"
+      fill="currentColor"
+    />
+  </svg>
+</button>
 
 </div>
 
@@ -611,7 +684,42 @@ if (solicitudesError) {
                   key={usuario.id}
                  className="flex h-[42px] items-center whitespace-nowrap rounded-lg bg-slate-100 px-1 text-[9px] font-semibold"
                 >
-                  {usuario.activo ? nombreCorto(usuario.nombre) : "🔒 Inactivo"}
+                 {usuario.activo ? (
+  nombreCorto(usuario.nombre)
+) : (
+  <span className="inline-flex items-center gap-1.5">
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4 shrink-0 text-slate-500"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="10"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M8 10V7.5C8 5.57 9.57 4 11.5 4H12.5C14.43 4 16 5.57 16 7.5V10"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="12"
+        cy="15"
+        r="1"
+        fill="currentColor"
+      />
+    </svg>
+    Inactivo
+  </span>
+)}
                 </div>
 
                {bloque.map((fecha) => {

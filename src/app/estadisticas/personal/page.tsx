@@ -535,15 +535,52 @@ export default function EstadisticasPersonales() {
       "
     >
 
-      <h1
-        className="
-          text-3xl
-          font-bold
-          text-slate-800
-        "
-      >
-        📊 Estadísticas personales
-      </h1>
+     <h1
+  className="
+    text-3xl
+    font-bold
+    text-slate-800
+  "
+>
+  <span className="flex items-center gap-3">
+    <svg
+      viewBox="0 0 24 24"
+      className="h-8 w-8 text-slate-800"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 19V5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4 19H20"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M7 15L11 11L14 13L19 7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16 7H19V10"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+
+    Estadísticas personales
+  </span>
+</h1>
 
       <p
         className="
@@ -736,14 +773,61 @@ export default function EstadisticasPersonales() {
                 "
               >
 
-                <h2
-                  className="
-                    text-xl
-                    font-bold
-                  "
-                >
-                  📅 Días usados
-                </h2>
+              <h2
+  className="
+    flex
+    items-center
+    gap-2
+    text-xl
+    font-bold
+  "
+>
+  <svg
+    viewBox="0 0 24 24"
+    className="h-6 w-6 shrink-0 text-slate-800"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <rect
+      x="3"
+      y="4"
+      width="18"
+      height="17"
+      rx="3"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    <path
+      d="M8 2V6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M16 2V6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M3 9H21"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    <path
+      d="M8 14L10.5 16.5L16 11"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+
+  <span className="whitespace-nowrap">
+    Días usados
+  </span>
+</h2>
 
                 <button
                   onClick={() =>
@@ -761,7 +845,33 @@ export default function EstadisticasPersonales() {
                     hover:bg-slate-200
                   "
                 >
-                  ℹ️
+                  <svg
+  viewBox="0 0 24 24"
+  className="h-5 w-5"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <circle
+    cx="12"
+    cy="12"
+    r="9"
+    stroke="currentColor"
+    strokeWidth="2"
+  />
+  <path
+    d="M12 11V16"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+  <circle
+    cx="12"
+    cy="8"
+    r="1"
+    fill="currentColor"
+  />
+</svg>
                 </button>
 
               </div>
@@ -1052,14 +1162,68 @@ export default function EstadisticasPersonales() {
                 "
               >
 
-                <h2
-                  className="
-                    text-xl
-                    font-bold
-                  "
-                >
-                  📊 Ocupación por meses
-                </h2>
+               <h2
+  className="
+    flex
+    items-center
+    gap-2
+    text-xl
+    font-bold
+  "
+>
+  <svg
+    viewBox="0 0 24 24"
+    className="h-6 w-6 shrink-0 text-slate-800"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path
+      d="M4 19V5"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M4 19H21"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+
+    <rect
+      x="7"
+      y="12"
+      width="3"
+      height="7"
+      rx="1"
+      fill="currentColor"
+    />
+
+    <rect
+      x="12"
+      y="8"
+      width="3"
+      height="11"
+      rx="1"
+      fill="currentColor"
+    />
+
+    <rect
+      x="17"
+      y="4"
+      width="3"
+      height="15"
+      rx="1"
+      fill="currentColor"
+    />
+  </svg>
+
+  <span className="whitespace-nowrap">
+    Ocupación por meses
+  </span>
+</h2>
 
                 <button
                   onClick={() =>
@@ -1077,7 +1241,33 @@ export default function EstadisticasPersonales() {
                     hover:bg-slate-200
                   "
                 >
-                  ℹ️
+                  <svg
+  viewBox="0 0 24 24"
+  className="h-5 w-5"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <circle
+    cx="12"
+    cy="12"
+    r="9"
+    stroke="currentColor"
+    strokeWidth="2"
+  />
+  <path
+    d="M12 11V16"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+  <circle
+    cx="12"
+    cy="8"
+    r="1"
+    fill="currentColor"
+  />
+</svg>
                 </button>
 
               </div>
@@ -1234,7 +1424,33 @@ export default function EstadisticasPersonales() {
                 text-slate-800
               "
             >
-              ℹ️ Cómo se calcula
+              <svg
+  viewBox="0 0 24 24"
+  className="h-5 w-5"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <circle
+    cx="12"
+    cy="12"
+    r="9"
+    stroke="currentColor"
+    strokeWidth="2"
+  />
+  <path
+    d="M12 11V16"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+  <circle
+    cx="12"
+    cy="8"
+    r="1"
+    fill="currentColor"
+  />
+</svg> Cómo se calcula
             </h3>
 
             <p
@@ -1312,7 +1528,33 @@ export default function EstadisticasPersonales() {
                 text-slate-800
               "
             >
-              ℹ️ Cómo se calcula
+              <svg
+  viewBox="0 0 24 24"
+  className="h-5 w-5"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <circle
+    cx="12"
+    cy="12"
+    r="9"
+    stroke="currentColor"
+    strokeWidth="2"
+  />
+  <path
+    d="M12 11V16"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+  <circle
+    cx="12"
+    cy="8"
+    r="1"
+    fill="currentColor"
+  />
+</svg> Cómo se calcula
             </h3>
 
             <p

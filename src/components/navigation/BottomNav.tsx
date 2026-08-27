@@ -196,21 +196,29 @@ export default function BottomNav() {
                   : "text-slate-600 hover:bg-slate-100"
               }`}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className="h-6 w-6"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="3" />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.56V22h-2.84v-.09a1.7 1.7 0 0 0-1.04-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.56-1.04H5.95v-2.84h.09A1.7 1.7 0 0 0 7.6 10a1.7 1.7 0 0 0-.34-1.88L7.2 8.06l1.9-1.9.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.08 5V4h2.84v1a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1.04H21v2.84h-.04A1.7 1.7 0 0 0 19.4 15Z"
-                />
-              </svg>
+             <svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.8"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  className="h-6 w-6"
+  aria-hidden="true"
+>
+  <path d="M12 3.5v2" />
+  <path d="M12 18.5v2" />
+  <path d="M3.5 12h2" />
+  <path d="M18.5 12h2" />
+
+  <path d="m6 6 1.4 1.4" />
+  <path d="m16.6 16.6 1.4 1.4" />
+  <path d="m18 6-1.4 1.4" />
+  <path d="m7.4 16.6L6 18" />
+
+  <circle cx="12" cy="12" r="6" />
+  <circle cx="12" cy="12" r="2.5" />
+</svg>
 
               <span className="text-[10px]">Admin</span>
             </div>
