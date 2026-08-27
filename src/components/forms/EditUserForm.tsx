@@ -49,7 +49,7 @@ export default function EditUserForm({
         throw error;
       }
 
-      alert("✅ Usuario actualizado correctamente.");
+      alert("Usuario actualizado correctamente.");
     } catch (e) {
       console.error(e);
       alert("No se pudieron guardar los cambios.");
@@ -126,7 +126,9 @@ export default function EditUserForm({
 
       <select
         value={puesto}
-        onChange={(e) => setPuesto(e.target.value)}
+        onChange={(e) =>
+          setPuesto(e.target.value)
+        }
         className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
       >
         <option value="gac">
@@ -151,7 +153,9 @@ export default function EditUserForm({
 
       <select
         value={sexo}
-        onChange={(e) => setSexo(e.target.value)}
+        onChange={(e) =>
+          setSexo(e.target.value)
+        }
         className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
       >
         <option value="hombre">
@@ -175,9 +179,20 @@ export default function EditUserForm({
           disabled={guardando}
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-800 py-3.5 font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <span className="text-lg">
-            ✓
-          </span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="h-5 w-5"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m5 12 4 4L19 6"
+            />
+          </svg>
 
           {guardando
             ? "Guardando..."
@@ -191,9 +206,36 @@ export default function EditUserForm({
           href={`/usuarios/password/${usuario.id}`}
           className="flex w-full items-center justify-center gap-2 rounded-2xl border border-orange-400 bg-white py-3.5 font-semibold text-orange-500 transition hover:bg-orange-50"
         >
-          <span className="text-lg">
-            🔑
-          </span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            className="h-5 w-5"
+            aria-hidden="true"
+          >
+            <rect
+              x="5"
+              y="10"
+              width="14"
+              height="10"
+              rx="2"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8 10V7a4 4 0 0 1 8 0v3"
+            />
+            <circle
+              cx="12"
+              cy="15"
+              r="1"
+            />
+            <path
+              strokeLinecap="round"
+              d="M12 16v2"
+            />
+          </svg>
 
           Restablecer contraseña
         </a>
@@ -206,9 +248,27 @@ export default function EditUserForm({
             href={`/usuarios/desactivar/${usuario.id}`}
             className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3.5 font-semibold text-red-600 transition hover:bg-red-100"
           >
-            <span className="text-lg">
-              🔒
-            </span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              className="h-5 w-5"
+              aria-hidden="true"
+            >
+              <rect
+                x="5"
+                y="10"
+                width="14"
+                height="10"
+                rx="2"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 10V7a4 4 0 0 1 8 0v3"
+              />
+            </svg>
 
             Desactivar usuario
           </a>

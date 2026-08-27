@@ -486,14 +486,31 @@ export default function HistorialSolicitudes() {
       ========================= */}
 
       <h1 className="
-        text-3xl
-        font-bold
-        text-slate-800
-      ">
+  flex
+  items-center
+  gap-2
+  text-3xl
+  font-bold
+  text-slate-800
+">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-7 w-7 shrink-0"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 7.5A2.5 2.5 0 015.5 5h4l2 2H18.5A2.5 2.5 0 0121 9.5v7A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z"
+    />
+  </svg>
 
-        📂 Historial de peticiones
-
-      </h1>
+  Historial de peticiones
+</h1>
 
 
       <p className="
@@ -525,11 +542,22 @@ export default function HistorialSolicitudes() {
         ">
 
 
-          <span className="
-            text-xl
-          ">
-            🔎
-          </span>
+          <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  className="h-5 w-5 shrink-0 text-slate-500"
+  aria-hidden="true"
+>
+  <circle cx="11" cy="11" r="7" />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="m20 20-4-4"
+  />
+</svg>
 
 
           <input
@@ -757,17 +785,35 @@ export default function HistorialSolicitudes() {
                               >
 
                                 <p className="
-                                  text-xs
-                                  text-slate-500
-                                ">
+  flex
+  items-center
+  gap-1
+  text-xs
+  text-slate-500
+">
 
-                                  📅 Día{" "}
-                                  {index + 1}:{" "}
-                                  {formatearFecha(
-                                    dia.fecha
-                                  )}
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-3.5 w-3.5 shrink-0"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"
+    />
+  </svg>
 
-                                </p>
+  Día {index + 1}:{" "}
+  {formatearFecha(
+    dia.fecha
+  )}
+
+</p>
 
 
                                 <button
@@ -797,7 +843,36 @@ export default function HistorialSolicitudes() {
                                   "
                                 >
 
-                                  🗑️
+                                  <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  className="h-4 w-4"
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M3 6h18"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M8 6V4h8v2"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M19 6l-1 14H6L5 6"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M10 11v5m4-5v5"
+  />
+</svg>
 
                                 </button>
 
@@ -923,35 +998,45 @@ export default function HistorialSolicitudes() {
                       {/* FECHAS */}
 
                       <p className="
-                        mt-1
-                        text-xs
-                        text-slate-500
-                      ">
+  mt-1
+  flex
+  items-center
+  gap-1
+  text-xs
+  text-slate-500
+">
 
-                        📅{" "}
-                        {
-                          formatearFecha(
-                            solicitud.fecha_inicio
-                          )
-                        }
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-3.5 w-3.5 shrink-0"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"
+    />
+  </svg>
 
-                        {
-                          solicitud.fecha_inicio !==
-                          solicitud.fecha_fin && (
+  {formatearFecha(
+    solicitud.fecha_inicio
+  )}
 
-                            <>
-                              {" → "}
-                              {
-                                formatearFecha(
-                                  solicitud.fecha_fin
-                                )
-                              }
-                            </>
+  {solicitud.fecha_inicio !==
+    solicitud.fecha_fin && (
+      <>
+        {" → "}
+        {formatearFecha(
+          solicitud.fecha_fin
+        )}
+      </>
+    )}
 
-                          )
-                        }
-
-                      </p>
+</p>
 
 
                       {/* OBSERVACIONES */}
@@ -1005,7 +1090,36 @@ export default function HistorialSolicitudes() {
                       "
                     >
 
-                      🗑️
+                      <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  className="h-4 w-4"
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M3 6h18"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M8 6V4h8v2"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M19 6l-1 14H6L5 6"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M10 11v5m4-5v5"
+  />
+</svg>
 
                     </button>
 

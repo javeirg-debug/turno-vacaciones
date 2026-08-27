@@ -405,9 +405,24 @@ setSolicitudesVista(agrupadas);
           CABECERA
       ========================= */}
 
-      <h1 className="text-3xl font-bold text-slate-800">
-        📝 Solicitudes
-      </h1>
+      <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-800">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-7 w-7"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9 4h6m-7 4h8m-8 4h5m-5 4h4M6 3h9l3 3v15H6V3z"
+    />
+  </svg>
+  Solicitudes
+</h1>
 
 
       <button
@@ -429,8 +444,25 @@ setSolicitudesVista(agrupadas);
   active:scale-[0.98]
 "
       >
-        ➕ Nueva solicitud
-      </button>
+  <span className="flex items-center justify-center gap-2">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 5v14M5 12h14"
+      />
+    </svg>
+    Nueva solicitud
+  </span>
+</button>
 
 
       {/* =========================
@@ -440,9 +472,24 @@ setSolicitudesVista(agrupadas);
       <div className="mt-6">
 
 
-        <h2 className="text-xl font-bold">
-          📌 Solicitudes actuales
-        </h2>
+        <h2 className="flex items-center gap-1 text-xl font-bold">
+  <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  className="h-5 w-5"
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5zM12 13v8"
+  />
+</svg>
+  Solicitudes actuales
+</h2>
 
 
         <div className="mt-4 space-y-3">
@@ -587,16 +634,38 @@ setSolicitudesVista(agrupadas);
                                 >
 
                                   <p className="
-                                    text-xs
-                                    text-slate-500
-                                  ">
+  flex
+  items-center
+  whitespace-nowrap
+  text-xs
+  text-slate-500
+">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    className="mr-1.5 h-3.5 w-3.5 shrink-0"
+    aria-hidden="true"
+  >
+    <rect
+      x="4"
+      y="5"
+      width="16"
+      height="15"
+      rx="2"
+    />
 
-                                    📅 Día {index + 1}:{" "}
-                                    {formatearFecha(
-                                      dia.fecha
-                                    )}
+    <path
+      strokeLinecap="round"
+      d="M8 3v4M16 3v4M4 9h16"
+    />
+  </svg>
 
-                                  </p>
+  Día {index + 1}:{" "}
+  {formatearFecha(dia.fecha)}
+</p>
 
 
                                   <button
@@ -623,7 +692,21 @@ setSolicitudesVista(agrupadas);
                                     "
                                     aria-label="Eliminar día"
                                   >
-                                    🗑️
+                                    <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  className="h-4 w-4"
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M9 3h6m-8 4h10M10 11v6m4-6v6M6 7l1 14h10l1-14M9 3l-1 4h8l-1-4"
+  />
+</svg>
                                   </button>
 
                                 </div>
@@ -739,30 +822,46 @@ setSolicitudesVista(agrupadas);
 
                         {/* FECHA */}
 
-                        <p className="
-                          mt-1
-                          text-xs
-                          text-slate-500
-                        ">
+<p className="
+  mt-1
+  flex
+  items-center
+  whitespace-nowrap
+  text-xs
+  text-slate-500
+">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    className="mr-1.5 h-3.5 w-3.5 shrink-0"
+    aria-hidden="true"
+  >
+    <rect
+      x="4"
+      y="5"
+      width="16"
+      height="15"
+      rx="2"
+    />
 
-                          📅{" "}
-                          {formatearFecha(
-                            solicitud.fecha_inicio
-                          )}
+    <path
+      strokeLinecap="round"
+      d="M8 3v4M16 3v4M4 9h16"
+    />
+  </svg>
 
-                          {solicitud.fecha_inicio !==
-                            solicitud.fecha_fin && (
+  {formatearFecha(solicitud.fecha_inicio)}
 
-                            <>
-                              {" → "}
-                              {formatearFecha(
-                                solicitud.fecha_fin
-                              )}
-                            </>
-
-                          )}
-
-                        </p>
+  {solicitud.fecha_inicio !== solicitud.fecha_fin && (
+    <>
+      {" → "}
+      {formatearFecha(solicitud.fecha_fin)}
+    </>
+  )}
+</p>
 
 
                         {/* OBSERVACIONES */}
@@ -813,7 +912,36 @@ setSolicitudesVista(agrupadas);
                         "
                         aria-label={`Eliminar ${solicitud.tipoVisual}`}
                       >
-                        🗑️
+                        <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  className="h-4 w-4"
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M3 6h18"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M8 6V4h8v2"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M19 6l-1 14H6L5 6"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M10 11v5m4-5v5"
+  />
+</svg>
                       </button>
 
 
@@ -852,8 +980,25 @@ setSolicitudesVista(agrupadas);
           text-white
         "
       >
-        📂 Historial de peticiones
-      </button>
+  <span className="flex items-center justify-center gap-2">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 7h6l2 2h10v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
+      />
+    </svg>
+    Historial de peticiones
+  </span>
+</button>
 
 
       <BottomNav />

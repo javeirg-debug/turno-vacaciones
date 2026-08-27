@@ -27,11 +27,39 @@ export default function BotonEstado({
   return (
     <button
       onClick={cambiarEstado}
-      className={`mt-3 rounded-xl px-4 py-2 text-white ${
+      className={`mt-3 flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-white ${
         activo ? "bg-red-600" : "bg-green-600"
       }`}
     >
-      {activo ? "🔴 Desactivar" : "🟢 Activar"}
+      {activo ? (
+        <>
+          {/* Círculo rojo vectorial */}
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="h-3.5 w-3.5"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="8" />
+          </svg>
+
+          Desactivar
+        </>
+      ) : (
+        <>
+          {/* Círculo verde vectorial */}
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="h-3.5 w-3.5"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="8" />
+          </svg>
+
+          Activar
+        </>
+      )}
     </button>
   );
 }

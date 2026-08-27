@@ -68,12 +68,24 @@ export default function Ocupacion() {
   }
 
   function iconoColor(color: string) {
-    if (color === "verde") return "🟢";
-    if (color === "amarillo") return "🟡";
-    if (color === "naranja") return "🟠";
-    if (color === "rojo") return "🔴";
+    const colores: Record<string, string> = {
+      verde: "text-green-500",
+      amarillo: "text-yellow-400",
+      naranja: "text-orange-500",
+      rojo: "text-red-500",
+    };
 
-    return "⚪";
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className={`h-5 w-5 ${colores[color] || "text-slate-400"}`}
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="8" />
+      </svg>
+    );
   }
 
   function estiloColor(color: string) {
@@ -131,14 +143,32 @@ export default function Ocupacion() {
 
       {/* CABECERA */}
 
-      <h1 className="text-3xl font-bold text-slate-800">
-        🎨 Configuración de ocupación
-      </h1>
+      <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-800">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    className="h-8 w-8"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 3a9 9 0 0 0 0 18h1.2a2.3 2.3 0 0 0 0-4.6h-.8a2 2 0 0 1 0-4h3.1A5.5 5.5 0 0 0 21 7.9C19.5 5 16.1 3 12 3Z"
+    />
+    <circle cx="7.5" cy="9" r="1" fill="currentColor" stroke="none" />
+    <circle cx="10" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    <circle cx="14" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    <circle cx="16.5" cy="9" r="1" fill="currentColor" stroke="none" />
+  </svg>
 
+  Configuración de ocupación
+</h1>
       <p className="mt-1 text-sm text-slate-500">
         Configura los rangos de ocupación.
       </p>
-
 
       {/* INFORMACIÓN */}
 
@@ -170,7 +200,21 @@ export default function Ocupacion() {
               text-base
             "
           >
-            ℹ️
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5 text-blue-600"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5" />
+              <path d="M12 8h.01" />
+            </svg>
           </div>
 
           <div>
@@ -191,7 +235,6 @@ export default function Ocupacion() {
         </div>
 
       </div>
-
 
       {/* TARJETAS */}
 
@@ -243,7 +286,6 @@ export default function Ocupacion() {
                 </span>
 
               </div>
-
 
               {/* RANGOS */}
 
@@ -345,7 +387,6 @@ export default function Ocupacion() {
 
       </div>
 
-
       {/* GUARDAR */}
 
       <button
@@ -354,7 +395,11 @@ export default function Ocupacion() {
         disabled={guardando}
         className="
           mt-5
+          flex
           w-full
+          items-center
+          justify-center
+          gap-2
           rounded-2xl
           bg-slate-700
           py-3
@@ -368,11 +413,30 @@ export default function Ocupacion() {
           disabled:opacity-60
         "
       >
-        {guardando
-          ? "Guardando..."
-          : "Guardar cambios"}
-      </button>
+        {guardando ? (
+          "Guardando..."
+        ) : (
+          <>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
+              <path d="M17 21v-8H7v8" />
+              <path d="M7 3v5h8" />
+            </svg>
 
+            Guardar cambios
+          </>
+        )}
+      </button>
 
       <BottomNav />
 
