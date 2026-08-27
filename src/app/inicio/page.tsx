@@ -295,8 +295,8 @@ export default function Inicio() {
 
         {/* CONTENIDO */}
 
-        
-<div className="flex items-center justify-start gap-0.5">
+        <div className="flex items-center justify-start gap-7 px-2">
+
           {/* =========================
               AVATAR
           ========================= */}
@@ -907,16 +907,16 @@ export default function Inicio() {
                               <div className="min-w-0">
 
                                 <p
-                                  className="
-                                    text-xs
-                                    text-slate-600
-                                  "
-                                >
-                                  <span className="inline-flex items-center gap-1">
-                                    📅{" "}
-{formatearFecha(solicitud.fecha_inicio)}
-                                  </span>
-                                </p>
+  className="
+    text-xs
+    text-slate-600
+  "
+>
+  <span className="inline-flex items-center gap-1">
+    📅{" "}
+    {formatearFecha(dia.fecha)}
+  </span>
+</p>
 
                               </div>
 

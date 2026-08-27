@@ -907,16 +907,16 @@ export default function Inicio() {
                               <div className="min-w-0">
 
                                 <p
-                                  className="
-                                    text-xs
-                                    text-slate-600
-                                  "
-                                >
-                                  <span className="inline-flex items-center gap-1">
-                                    📅{" "}
-{formatearFecha(solicitud.fecha_inicio)}
-                                  </span>
-                                </p>
+  className="
+    text-xs
+    text-slate-600
+  "
+>
+  <span className="inline-flex items-center gap-1">
+    📅{" "}
+    {formatearFecha(dia.fecha)}
+  </span>
+</p>
 
                               </div>
 

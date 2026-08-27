@@ -72,24 +72,146 @@ function obtenerTurno(
     ((diferencia % 12) + 12) % 12;
 
   const turnos = [
-    "🌅 Mañana",
-    "🌅 Mañana",
+  "Mañana",
+  "Mañana",
 
-    "🌆 Tarde",
-    "🌆 Tarde",
+  "Tarde",
+  "Tarde",
 
-    "🌙 Noche",
-    "🌙 Noche",
+  "Noche",
+  "Noche",
 
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-  ];
+  "Libre",
+  "Libre",
+  "Libre",
+  "Libre",
+  "Libre",
+  "Libre",
+];
 
   return turnos[ciclo];
+}
+
+function iconoTurno(turno: string) {
+  if (turno === "Mañana") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        {/* Sol amarillo completo */}
+        <circle
+          cx="12"
+          cy="12"
+          r="4.5"
+          fill="#FACC15"
+        />
+
+        {/* Rayos */}
+        <path
+          d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"
+          stroke="#FACC15"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (turno === "Tarde") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        {/* Sol naciendo naranja */}
+        <path
+          d="M7 15a5 5 0 0 1 10 0"
+          fill="#F97316"
+        />
+
+        {/* Rayos del atardecer */}
+        <path
+          d="M12 3v4M5.64 5.64l2.83 2.83M18.36 5.64l-2.83 2.83"
+          stroke="#F97316"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+
+        {/* Horizonte */}
+        <path
+          d="M3 17h18"
+          stroke="#64748B"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+
+        {/* Línea inferior */}
+        <path
+          d="M6 20h12"
+          stroke="#64748B"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (turno === "Noche") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        {/* Luna azul oscuro */}
+        <path
+          d="M20 15.5A8.5 8.5 0 0 1 8.5 4.2
+             A8.5 8.5 0 1 0 20 15.5Z"
+          fill="#1E3A8A"
+          stroke="#172554"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+
+        {/* Pequeño brillo */}
+        <circle
+          cx="7"
+          cy="8"
+          r="0.8"
+          fill="#93C5FD"
+        />
+      </svg>
+    );
+  }
+
+  if (turno === "Libre") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        {/* Día libre */}
+        <circle
+          cx="12"
+          cy="12"
+          r="7"
+          fill="white"
+          stroke="#CBD5E1"
+          strokeWidth="1.5"
+        />
+      </svg>
+    );
+  }
+
+  return null;
 }
 
 /* =====================================================
@@ -106,7 +228,7 @@ function esDiaTrabajo(
       dia,
       mes,
       anio
-    ) !== "⚪ Libre"
+    ) !== "Libre"
   );
 }
 
@@ -566,35 +688,90 @@ export default function Calendario() {
       ">
 
         <h1 className="
-          text-3xl
-          font-bold
-        ">
-          📅 Calendario
-        </h1>
+  flex
+  items-center
+  gap-2
+  text-3xl
+  font-bold
+">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-7 w-7"
+    aria-hidden="true"
+  >
+    <rect
+      width="18"
+      height="18"
+      x="3"
+      y="4"
+      rx="2"
+    />
+    <line
+      x1="16"
+      x2="16"
+      y1="2"
+      y2="6"
+    />
+    <line
+      x1="8"
+      x2="8"
+      y1="2"
+      y2="6"
+    />
+    <line
+      x1="3"
+      x2="21"
+      y1="10"
+      y2="10"
+    />
+  </svg>
+
+  Calendario
+</h1>
 
         <button
-          type="button"
-          onClick={() =>
-            setMostrarLeyenda(true)
-          }
-          className="
-            flex
-            h-9
-            w-9
-            shrink-0
-            items-center
-            justify-center
-            rounded-full
-            bg-blue-100
-            text-blue-700
-            shadow
-            transition
-            hover:bg-blue-200
-          "
-          aria-label="Información"
-        >
-          ℹ️
-        </button>
+  type="button"
+  onClick={() =>
+    setMostrarLeyenda(true)
+  }
+  className="
+    flex
+    h-9
+    w-9
+    shrink-0
+    items-center
+    justify-center
+    rounded-full
+    bg-slate-200
+    text-slate-600
+    shadow
+    transition
+    hover:bg-slate-300
+  "
+  aria-label="Información"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-5 w-5"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" x2="12" y1="16" y2="12" />
+    <line x1="12" x2="12.01" y1="8" y2="8" />
+  </svg>
+</button>
 
       </div>
 
@@ -830,7 +1007,7 @@ export default function Calendario() {
                                 mes,
                                 anio
                               ) ===
-                              "⚪ Libre"
+                              "Libre"
                               ? "bg-white"
                               : colorDia(
                                   fuera.length
@@ -855,29 +1032,27 @@ export default function Calendario() {
                           {/* DIA + TURNO */}
 
                           <div className="
-                            flex
-                            items-center
-                            justify-center
-                            gap-1
-                            font-bold
-                            text-sm
-                          ">
+  flex
+  items-center
+  justify-center
+  gap-1
+  font-bold
+  text-sm
+">
 
-                            <span>
-                              {dia}
-                            </span>
+  <span>
+    {dia}
+  </span>
 
-                            <span>
-                              {obtenerTurno(
-                                dia,
-                                mes,
-                                anio
-                              ).split(
-                                " "
-                              )[0]}
-                            </span>
+  {iconoTurno(
+    obtenerTurno(
+      dia,
+      mes,
+      anio
+    )
+  )}
 
-                          </div>
+</div>
 
                           {/* PERSONAS */}
 
@@ -886,7 +1061,7 @@ export default function Calendario() {
                             mes,
                             anio
                           ) !==
-                            "⚪ Libre" &&
+                            "Libre" &&
                             fuera.length >
                               0 && (
 
@@ -897,7 +1072,20 @@ export default function Calendario() {
                               text-slate-700
                               sm:text-[11px]
                             ">
-                              👤{fuera.length}
+                              <span className="inline-flex items-center gap-1">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className="h-3 w-3 text-blue-600"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="7" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0H4Z" />
+  </svg>
+
+  {fuera.length}
+</span>
                             </div>
 
                           )}
@@ -959,11 +1147,60 @@ export default function Calendario() {
 
               {fechasConflictivas ===
               null
-                ? "⏳ Fechas conflictivas"
+                ? <>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="mr-2 inline-block h-5 w-5 align-[-3px]"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </svg>
+  Fechas conflictivas
+</>
                 : fechasConflictivas.length >
                   0
-                ? "🚨 Fechas conflictivas"
-                : "✅ Fechas conflictivas"}
+                ? <>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="mr-2 inline-block h-5 w-5 align-[-3px]"
+    aria-hidden="true"
+  >
+    <path d="m10.3 3.9-8 14a2 2 0 0 0 1.7 3h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0Z" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
+  </svg>
+  Fechas conflictivas
+</>
+                : <>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="mr-2 inline-block h-5 w-5 align-[-3px]"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <path d="m8 12 2.5 2.5L16 9" />
+  </svg>
+  Fechas conflictivas
+</>}
 
             </h2>
 
@@ -1042,12 +1279,26 @@ export default function Calendario() {
                               }
                             )}
 
-                            · 👥{" "}
-                            {
-                              f.gac +
-                              f.seguridad +
-                              f.sala
-                            }
+                            <span className="inline-flex items-center gap-1">
+  ·
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className="h-4 w-4 text-slate-600"
+    aria-hidden="true"
+  >
+    <circle cx="9" cy="8" r="4" />
+    <path d="M2 21a7 7 0 0 1 14 0H2Z" />
+    <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+    <path d="M17 14a6 6 0 0 1 5 7h-4a7 7 0 0 0-3-5.8" />
+  </svg>
+  {
+    f.gac +
+    f.seguridad +
+    f.sala
+  }
+</span>
 
                           </p>
 
@@ -1055,68 +1306,124 @@ export default function Calendario() {
 
                         {/* OCUPACION */}
 
-                        <div className="
-                          mt-2
-                          grid
-                          grid-cols-3
-                          text-center
-                        ">
+<div className="
+  mt-2
+  grid
+  grid-cols-3
+  text-center
+">
 
-                          <div>
+  <div>
+    <p className="
+      flex
+      items-center
+      justify-center
+      gap-1
+      text-xs
+      text-slate-500
+    ">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-3.5 w-3.5 shrink-0 text-slate-600"
+        aria-hidden="true"
+      >
+        <path d="M3 14h1l2-5h8l4 3h3a2 2 0 0 1 2 2v2h-2a3 3 0 0 1-6 0H9a3 3 0 0 1-6 0H2v-1a1 1 0 0 1 1-1Zm4-3h6l-2-1H7.8L7 11Zm-2 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm13 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
+      </svg>
 
-                            <p className="
-                              text-xs
-                              text-slate-500
-                            ">
-                              🚓 G.A.C.:{" "}
-                              <span className="
-                                font-bold
-                                text-slate-800
-                              ">
-                                {f.gac}
-                              </span>
-                            </p>
+      <span>G.A.C.:</span>
 
-                          </div>
+      <span className="
+        font-bold
+        text-slate-800
+      ">
+        {f.gac}
+      </span>
+    </p>
+  </div>
 
-                          <div className="
-                            border-x
-                            border-red-200
-                          ">
+  <div className="
+    border-x
+    border-red-200
+  ">
+    <p className="
+      flex
+      items-center
+      justify-center
+      gap-1
+      text-xs
+      text-slate-500
+    ">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-3.5 w-3.5 shrink-0 text-slate-600"
+        aria-hidden="true"
+      >
+        <path d="M12 3 5 6v5c0 4.5 2.8 8.2 7 10 4.2-1.8 7-5.5 7-10V6l-7-3Z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
 
-                            <p className="
-                              text-xs
-                              text-slate-500
-                            ">
-                              🛡️ Seguridad:{" "}
-                              <span className="
-                                font-bold
-                                text-slate-800
-                              ">
-                                {f.seguridad}
-                              </span>
-                            </p>
+      <span>Seguridad:</span>
 
-                          </div>
+      <span className="
+        font-bold
+        text-slate-800
+      ">
+        {f.seguridad}
+      </span>
+    </p>
+  </div>
 
-                          <div>
+  <div>
+    <p className="
+      flex
+      items-center
+      justify-center
+      gap-1
+      text-xs
+      text-slate-500
+    ">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-3.5 w-3.5 shrink-0 text-slate-600"
+        aria-hidden="true"
+      >
+        <rect
+          x="3"
+          y="4"
+          width="18"
+          height="13"
+          rx="2"
+        />
+        <path d="M8 21h8" />
+        <path d="M12 17v4" />
+      </svg>
 
-                            <p className="
-                              text-xs
-                              text-slate-500
-                            ">
-                              🖥️ Sala:{" "}
-                              <span className="
-                                font-bold
-                                text-slate-800
-                              ">
-                                {f.sala}
-                              </span>
-                            </p>
+      <span>Sala:</span>
 
-                          </div>
+      <span className="
+        font-bold
+        text-slate-800
+      ">
+        {f.sala}
+      </span>
+    </p>
+  </div>
 
-                        </div>
+</div>
 
                       </button>
 
