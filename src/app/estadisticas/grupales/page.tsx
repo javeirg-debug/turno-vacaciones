@@ -160,7 +160,7 @@ async function calcularEstadisticas() {
 
 
     const finMes =
-      new Date(anio, mes + 1, 0);
+  new Date(anio, mes + 1, 0, 23, 59, 59, 999);
 
 
 
