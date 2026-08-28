@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { obtenerAvisoActivo } from "@/services/avisos";
 import { obtenerConflictosUsuario } from "@/services/conflictos";
 import { eliminarSolicitud } from "@/services/solicitudes";
+import { iconosPermisos } from "@/components/icons/Icons";
 
 type IconProps = {
   className?: string;
@@ -466,8 +467,8 @@ export default function Inicio() {
 
       lista.forEach((s) => {
         if (
-          s.tipo === "🎄 Navidad" ||
-          s.tipo === "✝️ Semana Santa"
+          s.tipo === "Navidad" ||
+          s.tipo === "Semana Santa"
         ) {
           const grupo = agrupadas.find(
             (x) => x.tipo === s.tipo
@@ -570,168 +571,227 @@ export default function Inicio() {
   return (
     <main className="min-h-screen bg-slate-100 px-4 pb-24 pt-6">
 
-      {/* =========================
-          TARJETA PERFIL
-      ========================= */}
+{/* =========================
+    TARJETA PERFIL
+========================= */}
 
-      <div className="relative mx-auto w-full max-w-xl rounded-3xl bg-white p-5 shadow-lg">
+<div className="relative mx-auto w-full max-w-xl rounded-3xl bg-white px-3 py-4 shadow-lg">
 
-        {/* INFORMACIÓN */}
-
-        <button
-          onClick={() => setMostrarInfo(true)}
-          className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-          aria-label="Información"
-        >
-          <IconInfo className="h-5 w-5" />
-        </button>
-
-        {/* CONTENIDO */}
-
-        <div className="flex items-center justify-start gap-7 px-2">
-
-          {/* =========================
-              AVATAR
-          ========================= */}
-
-          <div className="relative shrink-0">
-
-            <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200">
-
-              <IconUser className="h-20 w-20" />
-
-            </div>
-
-            {/* BOTÓN EDITAR */}
-
-            <button
-              onClick={() => {
-                console.log("Editar avatar");
-              }}
-              className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700"
-              aria-label="Editar avatar"
-            >
-              <IconPencil className="h-5 w-5" />
-            </button>
-
-          </div>
-
-          {/* =========================
-              INFORMACIÓN USUARIO
-          ========================= */}
-
-          <div className="min-w-0 text-left">
-
-            {/* NOMBRE COMPLETO */}
-
-            <div className="mb-3">
-
-              <h1 className="text-2xl font-bold leading-[1.05] text-slate-800">
-                {nombrePrimero} {nombreSegundo}
-              </h1>
-
-              {nombreTercero && (
-                <h1 className="text-2xl font-bold leading-[1.05] text-slate-800">
-                  {nombreTercero}
-                </h1>
-              )}
-
-            </div>
-
-           {/* ADMINISTRADOR */}
-
-{usuario?.rol === "admin" && (
-  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
-
+  {/* INFORMACIÓN - ESQUINA SUPERIOR DERECHA */}
+  <button
+    onClick={() => setMostrarInfo(true)}
+    className="absolute right-3 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 active:scale-95"
+    aria-label="Información"
+  >
     <svg
+      xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
-      className="h-4 w-4 shrink-0 text-amber-500"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
       aria-hidden="true"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4 7l4 4 4-7 4 7 4-4-2 11H6L4 7Z"
-      />
-
-      <path
-        strokeLinecap="round"
-        d="M6 21h12"
-      />
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5" />
+      <path d="M12 8h.01" />
     </svg>
+  </button>
 
-    <span>
-      Administrador
-    </span>
+  {/* CONTENIDO */}
+  <div className="flex items-center gap-4 pr-9">
 
-  </div>
-)}
+    {/* =========================
+        AVATAR
+    ========================= */}
 
-{/* POLICÍA + PUESTO */}
+    <div className="relative shrink-0">
 
-<div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
+      <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200">
 
-  {/* CATEGORÍA */}
-
-  <div className="flex items-center gap-2">
-
-    {usuario?.categoria === "oficial" ? (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        className="h-4 w-4 shrink-0 text-amber-500"
-        aria-hidden="true"
-      >
-        <path
+        {/* ICONO USUARIO */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          d="m12 3 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L12 3Z"
-        />
-      </svg>
-    ) : (
-      <IconPolice className="h-4 w-4 shrink-0" />
-    )}
+          className="h-16 w-16"
+          aria-hidden="true"
+        >
+          <path d="M20 21a8 8 0 0 0-16 0" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
 
-    <span className="font-medium">
-      {usuario?.categoria === "oficial"
-        ? "Oficial de Policía"
-        : usuario?.categoria === "policia"
-        ? "Policía"
-        : "—"}
-    </span>
+      </div>
 
-  </div>
+      {/* BOTÓN EDITAR */}
+      <button
+        onClick={() => alert("Próximamente")}
+        className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700 active:scale-95"
+        aria-label="Editar avatar"
+      >
 
-  {/* PUESTO */}
+        {/* ICONO LÁPIZ */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-4 w-4"
+          aria-hidden="true"
+        >
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+        </svg>
 
-  <div className="flex items-center gap-2">
+      </button>
 
-    <IconCar className="h-4 w-4 shrink-0" />
+    </div>
 
-    <span className="font-medium">
-      {usuario?.puesto === "gac"
-        ? "G.A.C"
-        : usuario?.puesto === "seguridad"
-        ? "Seguridad"
-        : usuario?.puesto === "sala"
-        ? "Sala"
-        : "—"}
-    </span>
+    {/* =========================
+        INFORMACIÓN USUARIO
+    ========================= */}
 
-  </div>
+    <div className="min-w-0 flex-1 text-left">
 
-</div>
-          </div>
+      {/* NOMBRE COMPLETO */}
+      <div className="mb-2">
+
+        <h1 className="text-xl font-bold leading-tight text-slate-800">
+          {usuario?.nombre || "Sin nombre"}
+        </h1>
+
+      </div>
+
+      {/* ADMINISTRADOR */}
+      {usuario?.rol === "admin" && (
+        <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
+
+          {/* ICONO ADMINISTRADOR */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4 shrink-0 text-amber-500"
+            aria-hidden="true"
+          >
+            <path d="M4 7l4 4 4-7 4 7 4-4-2 11H6L4 7Z" />
+            <path d="M6 21h12" />
+          </svg>
+
+          <span>
+            Administrador
+          </span>
+
+        </div>
+      )}
+
+      {/* POLICÍA + PUESTO */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+
+        {/* CATEGORÍA */}
+        <div className="flex items-center gap-1.5">
+
+          {usuario?.categoria === "oficial" ? (
+
+            /* ICONO OFICIAL */
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4 shrink-0 text-amber-500"
+              aria-hidden="true"
+            >
+              <path d="m12 3 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L12 3Z" />
+            </svg>
+
+          ) : (
+
+            /* ICONO POLICÍA */
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6Z" />
+              <path d="M9 11h6" />
+              <path d="M12 8v6" />
+            </svg>
+
+          )}
+
+          <span className="font-medium">
+            {usuario?.categoria === "oficial"
+              ? "Oficial de Policía"
+              : usuario?.categoria === "policia"
+              ? "Policía"
+              : "—"}
+          </span>
+
+        </div>
+
+        {/* PUESTO */}
+        <div className="flex items-center gap-1.5">
+
+          {/* ICONO COCHE */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4 shrink-0"
+            aria-hidden="true"
+          >
+            <path d="M5 17h14l-1-7H6Z" />
+            <path d="M7 10 9 5h6l2 5" />
+            <circle cx="8" cy="17" r="1.5" />
+            <circle cx="16" cy="17" r="1.5" />
+          </svg>
+
+          <span className="font-medium">
+            {usuario?.puesto === "gac"
+              ? "G.A.C"
+              : usuario?.puesto === "seguridad"
+              ? "Seguridad"
+              : usuario?.puesto === "sala"
+              ? "Sala"
+              : "—"}
+          </span>
 
         </div>
 
       </div>
 
+    </div>
+
+  </div>
+
+</div>
       {/* =========================
           TURNO DE HOY
       ========================= */}
@@ -1117,354 +1177,437 @@ export default function Inicio() {
     </p>
   )}
 </div>
-      {/* =========================
-          PRÓXIMOS PERMISOS
-      ========================= */}
+    {/* =========================
+    PRÓXIMOS PERMISOS
+========================= */}
 
-      <div className="mt-4 rounded-3xl bg-white p-5 shadow">
+<div className="mt-4 rounded-3xl bg-white p-5 shadow">
 
-        <h2 className="flex items-center gap-2 text-xl font-bold">
-          <IconCalendar className="h-5 w-5" />
-          Próximos permisos
-        </h2>
+  <h2 className="flex items-center gap-2 text-xl font-bold">
+    <IconCalendar className="h-5 w-5" />
+    Próximos permisos
+  </h2>
 
-        {cargando ? (
+  {cargando ? (
 
-          <p className="mt-4">
-            Cargando...
-          </p>
+    <p className="mt-4">
+      Cargando...
+    </p>
 
-        ) : solicitudes.length === 0 ? (
+  ) : solicitudes.length === 0 ? (
 
-          <p className="mt-4 text-slate-500">
-            No tienes permisos pendientes.
-          </p>
+    <p className="mt-4 text-slate-500">
+      No tienes permisos pendientes.
+    </p>
 
-        ) : (
+  ) : (
 
-          <div className="mt-4 space-y-3">
+    <div className="mt-4 space-y-3">
 
-            {solicitudesVista.map((solicitud) => {
+      {solicitudesVista.map((solicitud) => {
 
-              const tipo = solicitud.tipo;
+        const tipo = solicitud.tipo;
 
-              let abreviatura = "OT";
-              let color = "bg-slate-500";
+        // Icono vectorial correspondiente al tipo de permiso
+       const Icono =
+  iconosPermisos[
+    tipo as keyof typeof iconosPermisos
+  ] ?? iconosPermisos["Otros permisos"];
 
-              switch (tipo) {
+        let abreviatura = "OT";
+        let color = "bg-slate-500";
 
-                case "🌴 Vacaciones":
-                  abreviatura = "VAC";
-                  color = "bg-teal-500";
-                  break;
+        switch (tipo) {
 
-                case "🟢 AP":
-                  abreviatura = "AP";
-                  color = "bg-sky-500";
-                  break;
+          case "Vacaciones":
+            abreviatura = "VAC";
+            color = "bg-teal-500";
+            break;
 
-                case "⏰ Compensación horaria":
-                  abreviatura = "CH";
-                  color = "bg-slate-600";
-                  break;
+          case "Asunto propio":
+            abreviatura = "AP";
+            color = "bg-sky-500";
+            break;
 
-                case "🤒 Indisposición":
-                  abreviatura = "IND";
-                  color = "bg-red-500";
-                  break;
+          case "Compensación horaria":
+            abreviatura = "CH";
+            color = "bg-slate-600";
+            break;
 
-                case "🎄 Navidad":
-                  abreviatura = "NAV";
-                  color = "bg-indigo-500";
-                  break;
+          case "Indisposición":
+            abreviatura = "IND";
+            color = "bg-red-500";
+            break;
 
-                case "✝️ Semana Santa":
-                  abreviatura = "SS";
-                  color = "bg-violet-500";
-                  break;
+          case "Navidad":
+            abreviatura = "NAV";
+            color = "bg-indigo-500";
+            break;
 
-                case "👶 Paternidad":
-                  abreviatura = "PAT";
-                  color = "bg-blue-500";
-                  break;
+          case "Semana Santa":
+            abreviatura = "SS";
+            color = "bg-violet-500";
+            break;
 
-                case "🤰 Maternidad":
-                  abreviatura = "MAT";
-                  color = "bg-pink-500";
-                  break;
+          case "Paternidad":
+            abreviatura = "PAT";
+            color = "bg-blue-500";
+            break;
 
-                case "🍼 Lactancia":
-                  abreviatura = "LAC";
-                  color = "bg-amber-500";
-                  break;
+          case "Maternidad":
+            abreviatura = "MAT";
+            color = "bg-pink-500";
+            break;
 
-                case "📄 Otros permisos":
-                  abreviatura = "OT";
-                  color = "bg-fuchsia-500";
-                  break;
+          case "Lactancia":
+            abreviatura = "LAC";
+            color = "bg-amber-500";
+            break;
 
-                case "🚨 Permiso urgente":
-                  abreviatura = "URG";
-                  color = "bg-orange-500";
-                  break;
-              }
+          case "Otros permisos":
+            abreviatura = "OT";
+            color = "bg-fuchsia-500";
+            break;
 
-              return (
+          case "Permiso urgente":
+            abreviatura = "URG";
+            color = "bg-orange-500";
+            break;
+        }
 
-                <div
-                  key={solicitud.id}
+        return (
+
+          <div
+            key={solicitud.id}
+            className="
+              rounded-2xl
+              bg-white
+              px-3
+              py-3
+              shadow-md
+              border
+              border-slate-200
+            "
+          >
+
+            <div className="flex items-center gap-3">
+
+              {/* =========================
+                  CÍRCULO DE ABREVIATURA
+              ========================= */}
+
+              <div
+                className={`
+                  flex
+                  h-14
+                  w-14
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  text-[11px]
+                  font-extrabold
+                  text-white
+                  ${color}
+                `}
+              >
+                {abreviatura}
+              </div>
+
+              {/* =========================
+                  INFORMACIÓN
+              ========================= */}
+
+              <button
+                onClick={() =>
+                  router.push("/solicitudes")
+                }
+                className="
+                  min-w-0
+                  flex-1
+                  text-left
+                "
+              >
+
+                {/* TIPO + ICONO VECTORIAL */}
+
+                <p
                   className="
-                    rounded-2xl
-                    bg-white
-                    px-3
-                    py-3
-                    shadow-md
-                    border
-                    border-slate-200
+                    flex
+                    items-center
+                    gap-2
+                    text-base
+                    font-bold
+                    leading-tight
+                    text-slate-800
                   "
                 >
+                  <Icono
+                    className="
+                      h-5
+                      w-5
+                      shrink-0
+                      text-slate-600
+                    "
+                    strokeWidth={2}
+                  />
 
-                  <div className="flex items-center gap-3">
+                  <span className="truncate">
+                    {tipo}
+                  </span>
+                </p>
 
-                    <div
-                      className={`
-                        flex
-                        h-14
-                        w-14
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-full
-                        text-[11px]
-                        font-extrabold
-                        text-white
-                        ${color}
-                      `}
-                    >
-                      {abreviatura}
-                    </div>
+                {/* =========================
+                    FECHAS
+                ========================= */}
 
-                    <button
-                      onClick={() =>
-                        router.push("/solicitudes")
-                      }
+                {!solicitud.dias && (
+
+                  <p
+                    className="
+                      mt-1
+                      text-xs
+                      text-slate-500
+                    "
+                  >
+
+                    <span
                       className="
-                        min-w-0
-                        flex-1
-                        text-left
+                        inline-flex
+                        items-center
+                        gap-1
                       "
                     >
-
-                      <p
-                        className="
-                          text-base
-                          font-bold
-                          leading-tight
-                          text-slate-800
-                        "
-                      >
-                        {tipo}
-                      </p>
-
-                      {!solicitud.dias && (
-
-                        <p
-                          className="
-                            mt-1
-                            text-xs
-                            text-slate-500
-                          "
-                        >
-
-                          <span className="inline-flex items-center gap-1">
-                            📅{" "}
-{formatearFecha(solicitud.fecha_inicio)}
-                          </span>
-
-                          {solicitud.fecha_inicio !==
-                            solicitud.fecha_fin && (
-                            <>
-                              {" → "}
-                              {formatearFecha(
-                                solicitud.fecha_fin
-                              )}
-                            </>
-                          )}
-
-                        </p>
-
+                      📅{" "}
+                      {formatearFecha(
+                        solicitud.fecha_inicio
                       )}
+                    </span>
 
-                      {!solicitud.dias &&
-                        solicitud.motivo && (
+                    {solicitud.fecha_inicio !==
+                      solicitud.fecha_fin && (
 
-                          <p
-                            className="
-                              mt-1
-                              text-xs
-                              italic
-                              text-slate-500
-                            "
-                          >
-                            Observaciones:{" "}
-                            {solicitud.motivo}
-                          </p>
+                      <>
+                        {" → "}
 
+                        {formatearFecha(
+                          solicitud.fecha_fin
                         )}
-
-                    </button>
-
-                    {!solicitud.dias && (
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          borrar(
-                            solicitud.id
-                          )
-                        }
-                        className="
-                          flex
-                          h-10
-                          w-10
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-full
-                          bg-red-100
-                          text-base
-                          transition
-                          hover:bg-red-200
-                          active:scale-95
-                        "
-                        aria-label="Eliminar solicitud"
-                      >
-                        <IconTrash className="h-4 w-4 text-red-600" />
-                      </button>
+                      </>
 
                     )}
 
-                  </div>
+                  </p>
 
-                  {solicitud.dias && (
+                )}
 
-                    <div
+                {/* =========================
+                    OBSERVACIONES
+                ========================= */}
+
+                {!solicitud.dias &&
+                  solicitud.motivo && (
+
+                    <p
                       className="
-                        mt-3
-                        ml-[68px]
-                        space-y-2
+                        mt-1
+                        text-xs
+                        italic
+                        text-slate-500
                       "
                     >
-
-                      {[...solicitud.dias]
-                        .sort(
-                          (
-                            a: any,
-                            b: any
-                          ) =>
-                            new Date(
-                              a.fecha
-                            ).getTime() -
-                            new Date(
-                              b.fecha
-                            ).getTime()
-                        )
-                        .map(
-                          (
-                            dia: any,
-                            index: number
-                          ) => (
-
-                            <div
-                              key={dia.id}
-                              className="
-                                flex
-                                items-center
-                                justify-between
-                                rounded-xl
-                                bg-slate-50
-                                px-3
-                                py-2
-                              "
-                            >
-
-                              <div className="min-w-0">
-
-                                <p
-  className="
-    text-xs
-    text-slate-600
-  "
->
-  <span className="inline-flex items-center gap-1">
-    📅{" "}
-    {formatearFecha(dia.fecha)}
-  </span>
-</p>
-
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  borrar(
-                                    dia.id
-                                  )
-                                }
-                                className="
-                                  ml-3
-                                  flex
-                                  h-8
-                                  w-8
-                                  shrink-0
-                                  items-center
-                                  justify-center
-                                  rounded-full
-                                  bg-red-100
-                                  text-sm
-                                  transition
-                                  hover:bg-red-200
-                                  active:scale-95
-                                "
-                                aria-label="Eliminar día"
-                              >
-                                <IconTrash className="h-4 w-4 text-red-600" />
-                              </button>
-
-                            </div>
-
-                          )
-                        )}
-
-                      {solicitud.motivo && (
-                        <p
-                          className="
-                            mt-2
-                            text-xs
-                            italic
-                            text-slate-500
-                          "
-                        >
-                          Observaciones:{" "}
-                          {solicitud.motivo}
-                        </p>
-                      )}
-
-                    </div>
+                      Observaciones:{" "}
+                      {solicitud.motivo}
+                    </p>
 
                   )}
 
-                </div>
+              </button>
 
-              );
+              {/* =========================
+                  BOTÓN ELIMINAR
+              ========================= */}
 
-            })}
+              {!solicitud.dias && (
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    borrar(solicitud.id)
+                  }
+                  className="
+                    flex
+                    h-10
+                    w-10
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-red-100
+                    text-base
+                    transition
+                    hover:bg-red-200
+                    active:scale-95
+                  "
+                  aria-label="Eliminar solicitud"
+                >
+                  <IconTrash
+                    className="
+                      h-4
+                      w-4
+                      text-red-600
+                    "
+                  />
+                </button>
+
+              )}
+
+            </div>
+
+            {/* =========================
+                NAVIDAD / SEMANA SANTA
+                DÍAS INDIVIDUALES
+            ========================= */}
+
+            {solicitud.dias && (
+
+              <div
+                className="
+                  mt-3
+                  ml-[68px]
+                  space-y-2
+                "
+              >
+
+                {[...solicitud.dias]
+                  .sort(
+                    (
+                      a: any,
+                      b: any
+                    ) =>
+                      new Date(
+                        a.fecha
+                      ).getTime() -
+                      new Date(
+                        b.fecha
+                      ).getTime()
+                  )
+                  .map(
+                    (
+                      dia: any,
+                      index: number
+                    ) => (
+
+                      <div
+                        key={dia.id}
+                        className="
+                          flex
+                          items-center
+                          justify-between
+                          rounded-xl
+                          bg-slate-50
+                          px-3
+                          py-2
+                        "
+                      >
+
+                        <div className="min-w-0">
+
+                          <p
+                            className="
+                              text-xs
+                              text-slate-600
+                            "
+                          >
+
+                            <span
+                              className="
+                                inline-flex
+                                items-center
+                                gap-1
+                              "
+                            >
+                              📅{" "}
+                              {formatearFecha(
+                                dia.fecha
+                              )}
+                            </span>
+
+                          </p>
+
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            borrar(dia.id)
+                          }
+                          className="
+                            ml-3
+                            flex
+                            h-8
+                            w-8
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-red-100
+                            text-sm
+                            transition
+                            hover:bg-red-200
+                            active:scale-95
+                          "
+                          aria-label="Eliminar día"
+                        >
+
+                          <IconTrash
+                            className="
+                              h-4
+                              w-4
+                              text-red-600
+                            "
+                          />
+
+                        </button>
+
+                      </div>
+
+                    )
+                  )}
+
+                {/* OBSERVACIONES */}
+
+                {solicitud.motivo && (
+
+                  <p
+                    className="
+                      mt-2
+                      text-xs
+                      italic
+                      text-slate-500
+                    "
+                  >
+                    Observaciones:{" "}
+                    {solicitud.motivo}
+                  </p>
+
+                )}
+
+              </div>
+
+            )}
 
           </div>
 
-        )}
+        );
 
-      </div>
+      })}
+
+    </div>
+
+  )}
+
+</div>
 
       {/* =========================
           CUENTA

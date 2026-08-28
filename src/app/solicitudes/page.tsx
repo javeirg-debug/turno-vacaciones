@@ -7,6 +7,7 @@ import {
   obtenerSolicitudes,
   eliminarSolicitud,
 } from "@/services/solicitudes";
+import { iconosPermisos } from "@/components/icons/Icons";
 
 
 type Solicitud = {
@@ -25,7 +26,7 @@ type Solicitud = {
 
 type SolicitudVistaNormal = Solicitud & {
   tipoVisual: string;
-  icono: string;
+  icono: React.ElementType;
   abreviatura: string;
   color: string;
 };
@@ -34,7 +35,7 @@ type SolicitudVistaNormal = Solicitud & {
 type SolicitudVistaAgrupada = {
   id: string;
   tipo: string;
-  icono: string;
+  icono: React.ElementType;
   abreviatura: string;
   color: string;
   dias: {
@@ -65,93 +66,94 @@ function formatearFecha(fecha: string) {
 ========================= */
 
 function obtenerVisual(tipo: string) {
+  const icono =
+  iconosPermisos[tipo as keyof typeof iconosPermisos];
 
   switch (tipo) {
-
-    case "🌴 Vacaciones":
+    case "Vacaciones":
       return {
         tipoVisual: "Vacaciones",
-        icono: "🌴",
+        icono,
         abreviatura: "VAC",
         color: "bg-teal-500",
       };
 
-    case "🟢 AP":
+    case "Asunto propio":
       return {
-        tipoVisual: "AP",
-        icono: "🟢",
+        tipoVisual: "Asunto propio",
+        icono,
         abreviatura: "AP",
         color: "bg-sky-500",
       };
 
-    case "⏰ Compensación horaria":
+    case "Compensación horaria":
       return {
         tipoVisual: "Compensación horaria",
-        icono: "⏰",
+        icono,
         abreviatura: "CH",
         color: "bg-slate-600",
       };
 
-    case "🤒 Indisposición":
+    case "Indisposición":
       return {
         tipoVisual: "Indisposición",
-        icono: "🤒",
+        icono,
         abreviatura: "IND",
         color: "bg-red-500",
       };
 
-    case "🎄 Navidad":
+    case "Navidad":
       return {
         tipoVisual: "Navidad",
-        icono: "🎄",
+        icono,
         abreviatura: "NAV",
         color: "bg-indigo-500",
       };
 
-    case "✝️ Semana Santa":
+    case "Semana Santa":
       return {
         tipoVisual: "Semana Santa",
-        icono: "✝️",
+        icono,
         abreviatura: "SS",
         color: "bg-violet-500",
       };
 
-    case "👶 Paternidad":
+    case "Paternidad":
       return {
         tipoVisual: "Paternidad",
-        icono: "👶",
+        icono,
         abreviatura: "PAT",
         color: "bg-blue-500",
       };
 
-    case "🤰 Maternidad":
+    case "Maternidad":
       return {
         tipoVisual: "Maternidad",
-        icono: "🤰",
+        icono,
         abreviatura: "MAT",
         color: "bg-pink-500",
       };
 
-    case "🍼 Lactancia":
+    case "Lactancia":
       return {
         tipoVisual: "Lactancia",
-        icono: "🍼",
+        icono,
         abreviatura: "LAC",
         color: "bg-amber-500",
       };
 
-    case "📄 Otros permisos":
+    case "Otros permisos":
       return {
         tipoVisual: "Otros permisos",
-        icono: "📄",
+        icono,
         abreviatura: "OT",
         color: "bg-fuchsia-500",
       };
 
-    case "🚨 Permiso urgente":
+    case "Permiso urgente":
       return {
         tipoVisual: "Permiso urgente",
-        icono: "🚨",
+        icono,
         abreviatura: "URG",
         color: "bg-orange-500",
       };
@@ -159,15 +161,12 @@ function obtenerVisual(tipo: string) {
     default:
       return {
         tipoVisual: tipo,
-        icono: "📄",
+        icono: iconosPermisos["Otros permisos"],
         abreviatura: "OT",
         color: "bg-slate-500",
       };
-
   }
-
 }
-
 
 export default function Solicitudes() {
 
@@ -238,8 +237,8 @@ export default function Solicitudes() {
 
 
         if (
-          s.tipo === "🎄 Navidad" ||
-          s.tipo === "✝️ Semana Santa"
+          s.tipo === "Navidad" ||
+          s.tipo === "Semana Santa"
         ) {
 
 
@@ -543,8 +542,10 @@ setSolicitudesVista(agrupadas);
 
                 if ("dias" in solicitud) {
 
+                  const Icono = solicitud.icono;
                   return (
 
+                    
                     <div
                       key={solicitud.id}
                       className="
@@ -595,23 +596,16 @@ setSolicitudesVista(agrupadas);
 
                           {/* TIPO */}
 
-                          <h2 className="
-                            text-base
-                            font-bold
-                            leading-tight
-                            text-slate-800
-                          ">
 
-                            <span className="mr-1">
-                              {solicitud.icono}
-                            </span>
+{/* TIPO */}
 
-                            {solicitud.tipo ===
-                              "🎄 Navidad"
-                              ? "Navidad"
-                              : "Semana Santa"}
+<h2 className="flex items-center gap-2 text-base font-bold leading-tight text-slate-800">
+  <Icono className="h-5 w-5 shrink-0 text-slate-600" />
 
-                          </h2>
+  {solicitud.tipo === "Navidad"
+    ? "Navidad"
+    : "Semana Santa"}
+</h2>
 
 
                           {/* DÍAS */}
@@ -745,7 +739,7 @@ setSolicitudesVista(agrupadas);
 
                 }
 
-
+const Icono = solicitud.icono;
                 /* =========================
                    SOLICITUD NORMAL
                 ========================= */
@@ -804,20 +798,12 @@ setSolicitudesVista(agrupadas);
 
                         {/* TIPO */}
 
-                        <h2 className="
-                          text-base
-                          font-bold
-                          leading-tight
-                          text-slate-800
-                        ">
+                      
 
-                          <span className="mr-1">
-                            {solicitud.icono}
-                          </span>
-
-                          {solicitud.tipoVisual}
-
-                        </h2>
+<h2 className="flex items-center gap-2 text-base font-bold leading-tight text-slate-800">
+  <Icono className="h-5 w-5 shrink-0 text-slate-600" />
+  {solicitud.tipo}
+</h2>
 
 
                         {/* FECHA */}

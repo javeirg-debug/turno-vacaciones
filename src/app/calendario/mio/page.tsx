@@ -235,77 +235,77 @@ function obtenerVisual(
 
   switch (tipo) {
 
-    case "🌴 Vacaciones":
+    case "Vacaciones":
       return {
         abreviatura: "VAC",
         nombre: "Vacaciones",
         color: "bg-teal-500",
       };
 
-    case "🟢 AP":
+    case "Asunto propio":
       return {
         abreviatura: "AP",
         nombre: "Asunto Propio",
         color: "bg-sky-500",
       };
 
-    case "⏰ Compensación horaria":
+    case "Compensación horaria":
       return {
         abreviatura: "CH",
         nombre: "Compensación horaria",
         color: "bg-slate-600",
       };
 
-    case "🤒 Indisposición":
+    case "Indisposición":
       return {
         abreviatura: "IND",
         nombre: "Indisposición",
         color: "bg-red-500",
       };
 
-    case "🎄 Navidad":
+    case "Navidad":
       return {
         abreviatura: "NAV",
         nombre: "Navidad",
         color: "bg-indigo-500",
       };
 
-    case "✝️ Semana Santa":
+    case "Semana Santa":
       return {
         abreviatura: "SS",
         nombre: "Semana Santa",
         color: "bg-violet-500",
       };
 
-    case "👶 Paternidad":
+    case "Paternidad":
       return {
         abreviatura: "PAT",
         nombre: "Paternidad",
         color: "bg-blue-500",
       };
 
-    case "🤰 Maternidad":
+    case "Maternidad":
       return {
         abreviatura: "MAT",
         nombre: "Maternidad",
         color: "bg-pink-500",
       };
 
-    case "🍼 Lactancia":
+    case "Lactancia":
       return {
         abreviatura: "LAC",
         nombre: "Lactancia",
         color: "bg-amber-500",
       };
 
-    case "📄 Otros permisos":
+    case "Otros permisos":
       return {
         abreviatura: "OT",
         nombre: "Otros permisos",
         color: "bg-fuchsia-500",
       };
 
-    case "🚨 Permiso urgente":
+    case "Permiso urgente":
       return {
         abreviatura: "URG",
         nombre: "Permiso urgente",

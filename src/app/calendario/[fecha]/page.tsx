@@ -8,6 +8,7 @@ import {
   eliminarSolicitud,
 } from "@/services/solicitudes";
 import { supabase } from "@/lib/supabase";
+import { iconosPermisos } from "@/components/icons/Icons";
 
 const inicioTurno = new Date(2026, 6, 16);
 
@@ -77,76 +78,97 @@ function formatearFechaGrande(fecha: string) {
   );
 }
 
+/* =========================
+   CONFIGURACIÓN VISUAL
+========================= */
+
 function obtenerVisual(tipo: string) {
+  const icono =
+    iconosPermisos[
+      tipo as keyof typeof iconosPermisos
+    ];
+
   switch (tipo) {
-    case "🌴 Vacaciones":
+    case "Vacaciones":
       return {
+        icono,
         abreviatura: "VAC",
         color: "bg-teal-500",
       };
 
-    case "🟢 AP":
+    case "Asunto propio":
       return {
+        icono,
         abreviatura: "AP",
         color: "bg-sky-500",
       };
 
-    case "⏰ Compensación horaria":
+    case "Compensación horaria":
       return {
+        icono,
         abreviatura: "CH",
         color: "bg-slate-600",
       };
 
-    case "🤒 Indisposición":
+    case "Indisposición":
       return {
+        icono,
         abreviatura: "IND",
         color: "bg-red-500",
       };
 
-    case "🎄 Navidad":
+    case "Navidad":
       return {
+        icono,
         abreviatura: "NAV",
         color: "bg-indigo-500",
       };
 
-    case "✝️ Semana Santa":
+    case "Semana Santa":
       return {
+        icono,
         abreviatura: "SS",
         color: "bg-violet-500",
       };
 
-    case "👶 Paternidad":
+    case "Paternidad":
       return {
+        icono,
         abreviatura: "PAT",
         color: "bg-blue-500",
       };
 
-    case "🤰 Maternidad":
+    case "Maternidad":
       return {
+        icono,
         abreviatura: "MAT",
         color: "bg-pink-500",
       };
 
-    case "🍼 Lactancia":
+    case "Lactancia":
       return {
+        icono,
         abreviatura: "LAC",
         color: "bg-amber-500",
       };
 
-    case "📄 Otros permisos":
+    case "Otros permisos":
       return {
+        icono,
         abreviatura: "OT",
         color: "bg-fuchsia-500",
       };
 
-    case "🚨 Permiso urgente":
+    case "Permiso urgente":
       return {
+        icono,
         abreviatura: "URG",
         color: "bg-orange-500",
       };
 
     default:
       return {
+        icono: iconosPermisos["Otros permisos"],
         abreviatura: "OT",
         color: "bg-slate-500",
       };
@@ -202,7 +224,6 @@ export default function DiaCalendario() {
           await obtenerSolicitudesDia(fecha);
 
         setSolicitudes(datos || []);
-
       } catch (error) {
         console.error(error);
       } finally {
@@ -227,7 +248,6 @@ export default function DiaCalendario() {
             solicitud.id !== id
         )
       );
-
     } catch {
       alert(
         "No se pudo eliminar la solicitud."
@@ -281,7 +301,6 @@ export default function DiaCalendario() {
             text-center
           "
         >
-
           <p
             className="
               text-lg
@@ -292,14 +311,11 @@ export default function DiaCalendario() {
           >
             {formatearFechaGrande(fecha)}
           </p>
-
         </div>
-
 
         {/* LÍNEA DIVISORIA */}
 
         <div className="border-t border-slate-200" />
-
 
         {/* INFORMACIÓN TURNO */}
 
@@ -367,59 +383,59 @@ export default function DiaCalendario() {
 
         {/* CABECERA PERSONAL */}
 
-<div 
-  className="
-    relative
-    flex
-    items-center
-    justify-between
-    bg-blue-200
-    px-4
-    py-3
-  "
->
+        <div
+          className="
+            relative
+            flex
+            items-center
+            justify-between
+            bg-blue-200
+            px-4
+            py-3
+          "
+        >
 
-  <h2 
-    className="
-      absolute
-      left-1/2
-      -translate-x-1/2
-      text-lg
-      font-bold
-      text-slate-800
-    "
-  >
-    Personal de permiso
-  </h2>
+          <h2
+            className="
+              absolute
+              left-1/2
+              -translate-x-1/2
+              text-lg
+              font-bold
+              text-slate-800
+            "
+          >
+            Personal de permiso
+          </h2>
 
-  {!cargando &&
-    solicitudes.length > 0 && (
+          {!cargando &&
+            solicitudes.length > 0 && (
 
-      <div 
-        className="
-          ml-auto
-          flex
-          h-9
-          w-9
-          items-center
-          justify-center
-          rounded-full
-          bg-blue-500
-          text-sm
-          font-bold
-          text-white
-          shadow-sm
-        "
-      >
-        {solicitudes.length}
-      </div>
+              <div
+                className="
+                  ml-auto
+                  flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-blue-500
+                  text-sm
+                  font-bold
+                  text-white
+                  shadow-sm
+                "
+              >
+                {solicitudes.length}
+              </div>
 
-    )}
+            )}
 
-</div>
+        </div>
 
 
-{/* LÍNEA DIVISORIA COMPLETA */}
+        {/* LÍNEA DIVISORIA COMPLETA */}
 
         <div className="border-t-2 border-slate-200" />
 
@@ -500,6 +516,16 @@ export default function DiaCalendario() {
                       obtenerVisual(
                         solicitud.tipo
                       );
+
+                    /* IMPORTANTE:
+                       El icono es un COMPONENTE,
+                       por eso hay que guardarlo
+                       en una variable que empiece
+                       por mayúscula.
+                    */
+
+                    const IconoPermiso =
+                      visual.icono;
 
                     return (
 
@@ -624,15 +650,31 @@ export default function DiaCalendario() {
                             "
                           >
 
+                            {/* TIPO DE PERMISO */}
+
                             <p
                               className="
+                                flex
+                                items-center
+                                gap-2
                                 text-base
                                 font-bold
                                 leading-tight
                                 text-slate-800
                               "
                             >
+
+                              <IconoPermiso
+                                className="
+                                  h-5
+                                  w-5
+                                  shrink-0
+                                  text-slate-700
+                                "
+                              />
+
                               {solicitud.tipo}
+
                             </p>
 
 

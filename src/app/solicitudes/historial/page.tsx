@@ -7,6 +7,8 @@ import {
   eliminarSolicitud,
 } from "@/services/solicitudes";
 
+import { iconosPermisos } from "@/components/icons/Icons";
+
 
 type Solicitud = {
   id: string;
@@ -37,99 +39,99 @@ function formatearFecha(fecha: string) {
 
 }
 
-
 /* =========================
    CONFIGURACIÓN VISUAL
 ========================= */
 
 function obtenerVisual(tipo: string) {
+  const icono =
+  iconosPermisos[tipo as keyof typeof iconosPermisos];
 
   switch (tipo) {
-
-    case "🌴 Vacaciones":
+    case "Vacaciones":
       return {
         tipoVisual: "Vacaciones",
-        icono: "🌴",
+        icono,
         abreviatura: "VAC",
         color: "bg-teal-500",
       };
 
-    case "🟢 AP":
+    case "Asunto propio":
       return {
-        tipoVisual: "AP",
-        icono: "🟢",
+        tipoVisual: "Asunto propio",
+        icono,
         abreviatura: "AP",
         color: "bg-sky-500",
       };
 
-    case "⏰ Compensación horaria":
+    case "Compensación horaria":
       return {
         tipoVisual: "Compensación horaria",
-        icono: "⏰",
+        icono,
         abreviatura: "CH",
         color: "bg-slate-600",
       };
 
-    case "🤒 Indisposición":
+    case "Indisposición":
       return {
         tipoVisual: "Indisposición",
-        icono: "🤒",
+        icono,
         abreviatura: "IND",
         color: "bg-red-500",
       };
 
-    case "🎄 Navidad":
+    case "Navidad":
       return {
         tipoVisual: "Navidad",
-        icono: "🎄",
+        icono,
         abreviatura: "NAV",
         color: "bg-indigo-500",
       };
 
-    case "✝️ Semana Santa":
+    case "Semana Santa":
       return {
         tipoVisual: "Semana Santa",
-        icono: "✝️",
+        icono,
         abreviatura: "SS",
         color: "bg-violet-500",
       };
 
-    case "👶 Paternidad":
+    case "Paternidad":
       return {
         tipoVisual: "Paternidad",
-        icono: "👶",
+        icono,
         abreviatura: "PAT",
         color: "bg-blue-500",
       };
 
-    case "🤰 Maternidad":
+    case "Maternidad":
       return {
         tipoVisual: "Maternidad",
-        icono: "🤰",
+        icono,
         abreviatura: "MAT",
         color: "bg-pink-500",
       };
 
-    case "🍼 Lactancia":
+    case "Lactancia":
       return {
         tipoVisual: "Lactancia",
-        icono: "🍼",
+        icono,
         abreviatura: "LAC",
         color: "bg-amber-500",
       };
 
-    case "📄 Otros permisos":
+    case "Otros permisos":
       return {
         tipoVisual: "Otros permisos",
-        icono: "📄",
+        icono,
         abreviatura: "OT",
         color: "bg-fuchsia-500",
       };
 
-    case "🚨 Permiso urgente":
+    case "Permiso urgente":
       return {
         tipoVisual: "Permiso urgente",
-        icono: "🚨",
+        icono,
         abreviatura: "URG",
         color: "bg-orange-500",
       };
@@ -137,13 +139,11 @@ function obtenerVisual(tipo: string) {
     default:
       return {
         tipoVisual: tipo,
-        icono: "📄",
+        icono: iconosPermisos["Otros permisos"],
         abreviatura: "OT",
         color: "bg-slate-500",
       };
-
   }
-
 }
 
 
@@ -191,16 +191,16 @@ export default function HistorialSolicitudes() {
       const especiales =
         antiguas.filter(
           (s) =>
-            s.tipo === "🎄 Navidad" ||
-            s.tipo === "✝️ Semana Santa"
+            s.tipo === "Navidad" ||
+            s.tipo === "Semana Santa"
         );
 
 
       const normales =
         antiguas.filter(
           (s) =>
-            s.tipo !== "🎄 Navidad" &&
-            s.tipo !== "✝️ Semana Santa"
+            s.tipo !== "Navidad" &&
+            s.tipo !== "Semana Santa"
         );
 
 
@@ -686,6 +686,8 @@ export default function HistorialSolicitudes() {
                 solicitud.dias
               ) {
 
+                const Icono = visual.icono;
+
                 return (
 
                   <div
@@ -742,22 +744,25 @@ export default function HistorialSolicitudes() {
                       ">
 
 
-                        <h2 className="
-                          text-base
-                          font-bold
-                          leading-tight
-                          text-slate-800
-                        ">
+  <h2 className="
+    flex
+    items-center
+    gap-2
+    text-base
+    font-bold
+    leading-tight
+    text-slate-800
+  ">
+    {(() => {
+      const Icono = visual.icono;
 
-                          <span className="mr-1">
-                            {visual.icono}
-                          </span>
+      return (
+        <Icono className="h-5 w-5 shrink-0 text-slate-600" />
+      );
+    })()}
 
-                          {
-                            visual.tipoVisual
-                          }
-
-                        </h2>
+    {visual.tipoVisual}
+  </h2>
 
 
                         {/* DÍAS */}
@@ -918,6 +923,7 @@ export default function HistorialSolicitudes() {
               /* =========================
                  SOLICITUD NORMAL
               ========================= */
+const Icono = visual.icono;
 
               return (
 
@@ -977,22 +983,10 @@ export default function HistorialSolicitudes() {
 
                       {/* TIPO */}
 
-                      <h2 className="
-                        text-base
-                        font-bold
-                        leading-tight
-                        text-slate-800
-                      ">
-
-                        <span className="mr-1">
-                          {visual.icono}
-                        </span>
-
-                        {
-                          visual.tipoVisual
-                        }
-
-                      </h2>
+<h2 className="flex items-center gap-2 text-base font-bold leading-tight text-slate-800">
+  <Icono className="h-5 w-5 shrink-0 text-slate-600" />
+  {visual.tipoVisual}
+</h2>
 
 
                       {/* FECHAS */}

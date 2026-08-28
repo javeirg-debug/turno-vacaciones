@@ -5,6 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import BottomNav from "@/components/navigation/BottomNav";
 import { guardarSolicitud } from "@/services/solicitudes";
 import { supabase } from "@/lib/supabase";
+import {
+  iconosPermisos,
+  type TipoPermiso,
+} from "@/components/icons/Icons";
 
 export default function NuevaSolicitud() {
   const router = useRouter();
@@ -15,13 +19,15 @@ export default function NuevaSolicitud() {
   console.log("¿Viene del calendario?", vieneDelCalendario);
   console.log("Fecha:", searchParams.get("fecha"));
 
-  const [tipo, setTipo] = useState(
-    vieneDelCalendario ? "🟢 AP" : "🌴 Vacaciones"
-  );
+  const [tipo, setTipo] = useState<TipoPermiso>(
+  vieneDelCalendario ? "Asunto propio" : "Vacaciones"
+);
 
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [mostrarFechaFin, setMostrarFechaFin] = useState(false);
+const [mostrarSelector, setMostrarSelector] = useState(false);
+
 
   const [dia2, setDia2] = useState("");
   const [dia3, setDia3] = useState("");
@@ -61,7 +67,7 @@ export default function NuevaSolicitud() {
   }, [searchParams]);
 
   async function guardar() {
-    if (tipo === "🌴 Vacaciones") {
+    if (tipo === "Vacaciones") {
       if (!fechaInicio || !fechaFin) {
         setMensaje("Selecciona las fechas");
         return;
@@ -73,7 +79,7 @@ export default function NuevaSolicitud() {
       }
     }
 
-    if (tipo === "🌴 Vacaciones" && fechaFin < fechaInicio) {
+    if (tipo === "Vacaciones" && fechaFin < fechaInicio) {
       setMensaje(
         "⚠️ La fecha de fin no puede ser anterior a la fecha de inicio."
       );
@@ -87,8 +93,8 @@ export default function NuevaSolicitud() {
       // SE GUARDAN COMO 3 SOLICITUDES INDEPENDIENTES
 
       if (
-        tipo === "🎄 Navidad" ||
-        tipo === "✝️ Semana Santa"
+        tipo === "Navidad" ||
+        tipo === "Semana Santa"
       ) {
         const dias = [
           fechaInicio,
@@ -110,10 +116,10 @@ export default function NuevaSolicitud() {
           fechaInicio,
 
           fechaFin:
-            tipo === "🌴 Vacaciones" ||
-            tipo === "👶 Paternidad" ||
-            tipo === "🤰 Maternidad" ||
-            tipo === "🍼 Lactancia"
+            tipo === "Vacaciones" ||
+            tipo === "Paternidad" ||
+            tipo === "Maternidad" ||
+            tipo === "Lactancia"
               ? fechaFin
               : fechaFin || fechaInicio,
 
@@ -142,9 +148,37 @@ export default function NuevaSolicitud() {
   return (
     <main className="min-h-screen bg-slate-100 p-6 pb-24">
 
-      <h1 className="text-3xl font-bold">
-        ➕ Nueva solicitud
-      </h1>
+      <h1 className="flex items-center gap-3 text-3xl font-bold">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-8 w-8"
+    aria-hidden="true"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    <path
+      d="M12 8V16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path
+      d="M8 12H16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+
+  Nueva solicitud
+</h1>
 
       <div className="mt-6 space-y-5 rounded-3xl bg-white p-5 shadow">
 
@@ -155,55 +189,125 @@ export default function NuevaSolicitud() {
             Tipo
           </label>
 
-          <select
-            value={tipo}
-            onChange={(e) =>
-              setTipo(e.target.value)
-            }
-            className="
-              mt-2
-              block
-              w-full
-              min-w-0
-              max-w-full
-              box-border
-              appearance-none
-              rounded-xl
-              border
-              border-slate-200
-              p-3
-            "
-          >
-            <option>🌴 Vacaciones</option>
-            <option>🟢 AP</option>
-            <option>⏰ Compensación horaria</option>
-            <option>🤒 Indisposición</option>
-            <option>🚨 Permiso urgente</option>
-            <option>🎄 Navidad</option>
-            <option>✝️ Semana Santa</option>
+        <div className="relative mt-2">
 
-            {sexo === "hombre" && (
-              <option>👶 Paternidad</option>
-            )}
 
-            {sexo === "mujer" && (
-              <option>🤰 Maternidad</option>
-            )}
+<div className="relative">
+  <button
+    type="button"
+    onClick={() => setMostrarSelector(!mostrarSelector)}
+    className="
+      flex
+      w-full
+      items-center
+      justify-between
+      rounded-xl
+      border
+      border-slate-200
+      bg-white
+      py-3
+      pl-11
+      pr-3
+      text-left
+    "
+  >
+    <div className="flex items-center gap-3">
+      {(() => {
+        const Icono = iconosPermisos[tipo];
 
-            <option>🍼 Lactancia</option>
-            <option>📄 Otros permisos</option>
-          </select>
-        </div>
+        return (
+          <Icono
+            className="h-5 w-5 text-slate-600"
+            strokeWidth={1.8}
+          />
+        );
+      })()}
 
+      <span>{tipo}</span>
+    </div>
+
+    <span className="text-slate-400">
+      ▼
+    </span>
+  </button>
+
+  {mostrarSelector && (
+    <div className="
+      absolute
+      left-0
+      right-0
+      z-50
+      mt-2
+      max-h-80
+      overflow-y-auto
+      rounded-xl
+      border
+      border-slate-200
+      bg-white
+      shadow-lg
+    ">
+      {(Object.keys(iconosPermisos) as TipoPermiso[]).map(
+        (permiso) => {
+          if (
+            permiso === "Paternidad" &&
+            sexo !== "hombre"
+          ) {
+            return null;
+          }
+
+          if (
+            permiso === "Maternidad" &&
+            sexo !== "mujer"
+          ) {
+            return null;
+          }
+
+          const Icono = iconosPermisos[permiso];
+
+          return (
+            <button
+              key={permiso}
+              type="button"
+              onClick={() => {
+                setTipo(permiso);
+                setMostrarSelector(false);
+              }}
+              className="
+                flex
+                w-full
+                items-center
+                gap-3
+                px-4
+                py-3
+                text-left
+                transition
+                hover:bg-slate-100
+              "
+            >
+              <Icono
+                className="h-5 w-5 shrink-0 text-slate-600"
+                strokeWidth={1.8}
+              />
+
+              <span>{permiso}</span>
+            </button>
+          );
+        }
+      )}
+    </div>
+  )}
+</div>
+</div>
+</div>
         {/* FECHA INICIO */}
 
         <div>
           <label className="font-semibold">
             {
-              tipo === "🌴 Vacaciones"
+              tipo === "Vacaciones"
                 ? "Desde"
-                : tipo === "🎄 Navidad" ||
-                  tipo === "✝️ Semana Santa"
+                : tipo === "Navidad" ||
+                  tipo === "Semana Santa"
                 ? "Día 1"
                 : "Fecha"
             }
@@ -232,8 +336,8 @@ export default function NuevaSolicitud() {
 
           {/* NAVIDAD / SEMANA SANTA */}
 
-          {(tipo === "🎄 Navidad" ||
-            tipo === "✝️ Semana Santa") && (
+          {(tipo === "Navidad" ||
+            tipo === "Semana Santa") && (
             <>
               <div className="mt-5">
                 <label className="font-semibold">
@@ -295,10 +399,10 @@ export default function NuevaSolicitud() {
         {/* HASTA */}
 
         {(
-          tipo === "🌴 Vacaciones" ||
-          tipo === "👶 Paternidad" ||
-          tipo === "🤰 Maternidad" ||
-          tipo === "🍼 Lactancia"
+          tipo === "Vacaciones" ||
+          tipo === "Paternidad" ||
+          tipo === "Maternidad" ||
+          tipo === "Lactancia"
         ) && (
           <div>
             <label className="font-semibold">
@@ -331,11 +435,11 @@ export default function NuevaSolicitud() {
         {/* AMPLIAR FECHA */}
 
         {(
-          tipo === "🟢 AP" ||
-          tipo === "⏰ Compensación horaria" ||
-          tipo === "🤒 Indisposición" ||
-          tipo === "📄 Otros permisos" ||
-          tipo === "🚨 Permiso urgente"
+          tipo === "Asunto propio" ||
+          tipo === "Compensación horaria" ||
+          tipo === "Indisposición" ||
+          tipo === "Otros permisos" ||
+          tipo === "Permiso urgente"
         ) && (
           <div>
             {!mostrarFechaFin ? (

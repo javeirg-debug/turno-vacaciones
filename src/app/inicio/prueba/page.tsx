@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "@/components/navigation/BottomNav";
-import { iconosPermisos } from "@/components/icons/Icons";
 
 type Solicitud = {
   tipo: string;
@@ -53,7 +52,7 @@ export default function EstadisticasPersonales() {
 
   const tipos = [
     "Vacaciones",
-    "Asunto propio",
+    "AP",
     "Compensación horaria",
     "Indisposición",
     "Navidad",
@@ -61,7 +60,7 @@ export default function EstadisticasPersonales() {
     ...(sexo === "hombre" ? ["Paternidad"] : []),
     ...(sexo === "mujer" ? ["Maternidad"] : []),
     "Lactancia",
-    "Otros permisos",
+    "Otros",
     "Permiso urgente",
   ];
 
@@ -80,7 +79,72 @@ export default function EstadisticasPersonales() {
     "Diciembre",
   ];
 
-  
+  function buscarTipoBD(tipo: string): string[] {
+
+    const equivalencias: Record<string, string[]> = {
+
+      "Vacaciones": [
+        "Vacaciones",
+        "🌴 Vacaciones"
+      ],
+
+      "AP": [
+        "AP",
+        "🟢 AP"
+      ],
+
+      "Compensación horaria": [
+        "Compensación horaria",
+        "⏰ Compensación horaria"
+      ],
+
+      "Indisposición": [
+        "Indisposición",
+        "🤒 Indisposición"
+      ],
+
+      "Navidad": [
+        "Navidad",
+        "🎄 Navidad"
+      ],
+
+      "Semana Santa": [
+        "Semana Santa",
+        "✝️ Semana Santa"
+      ],
+
+      "Paternidad": [
+        "Paternidad",
+        "👶 Paternidad"
+      ],
+
+      "Maternidad": [
+        "Maternidad",
+        "🤰 Maternidad"
+      ],
+
+      "Lactancia": [
+        "Lactancia",
+        "🍼 Lactancia"
+      ],
+
+      "Otros": [
+        "Otros",
+        "📄 Otros permisos",
+        "Otros permisos"
+      ],
+
+      "Permiso urgente": [
+        "Permiso urgente",
+        "🚨 Permiso urgente"
+      ]
+
+    };
+
+    return equivalencias[tipo];
+
+  }
+
   const inicioTurno =
     new Date(2026, 6, 16);
 
@@ -201,14 +265,14 @@ export default function EstadisticasPersonales() {
             "usuario_id",
             user.id
           )
+          .gte(
+            "fecha_inicio",
+            fechaInicio
+          )
           .lte(
-  "fecha_inicio",
-  fechaFin
-)
-.gte(
-  "fecha_fin",
-  fechaInicio
-);
+            "fecha_inicio",
+            fechaFin
+          );
 
       if (error) {
 
@@ -236,87 +300,63 @@ export default function EstadisticasPersonales() {
       (data || []).forEach(
         (solicitud: Solicitud) => {
 
-         const inicioOriginal =
-  new Date(
-    solicitud.fecha_inicio
-  );
+          const inicio =
+            new Date(
+              solicitud.fecha_inicio
+            );
 
-const finOriginal =
-  new Date(
-    solicitud.fecha_fin
-  );
+          const fin =
+            new Date(
+              solicitud.fecha_fin
+            );
 
-const inicioAnio =
-  new Date(anio, 0, 1);
+          const diasTotales =
+            Math.floor(
+              (
+                fin.getTime()
+                -
+                inicio.getTime()
+              )
+              /
+              (1000 * 60 * 60 * 24)
+            ) + 1;
 
-const finAnio =
-  new Date(anio, 11, 31);
+          for (
+            let i = 0;
+            i < diasTotales;
+            i++
+          ) {
 
-const inicio =
-  inicioOriginal < inicioAnio
-    ? inicioAnio
-    : inicioOriginal;
+            const fecha =
+              new Date(inicio);
 
-const fin =
-  finOriginal > finAnio
-    ? finAnio
-    : finOriginal;
+            fecha.setDate(
+              inicio.getDate() + i
+            );
 
-if (inicio > fin) {
-  return;
-}
+            if (
+              esDiaTrabajado(fecha)
+            ) {
 
-const diasTotales =
-  Math.floor(
-    (
-      fin.getTime()
-      -
-      inicio.getTime()
-    )
-    /
-    (1000 * 60 * 60 * 24)
-  ) + 1;
+              const mes =
+                fecha.getMonth();
 
-          let diasContados = 0;
+              mesesTotales[mes]++;
 
-for (
-  let i = 0;
-  i < diasTotales;
-  i++
-) {
+            }
 
-  const fecha =
-    new Date(inicio);
+          }
 
-  fecha.setDate(
-    inicio.getDate() + i
-  );
-
-  if (
-    esDiaTrabajado(fecha)
-  ) {
-
-    diasContados++;
-
-    const mes =
-      fecha.getMonth();
-
-    mesesTotales[mes]++;
-
-  }
-
-}
-
-       totales[
-  solicitud.tipo
-] =
-  (
-    totales[
-      solicitud.tipo
-    ] || 0
-  )
-  +
-  diasContados;
+          totales[
+            solicitud.tipo
+          ] =
+            (
+              totales[
+                solicitud.tipo
+              ] || 0
+            )
+            +
+            diasTotales;
 
         }
       );
@@ -369,14 +409,14 @@ for (
             "usuario_id",
             user.id
           )
+          .gte(
+            "fecha_inicio",
+            fechaInicio
+          )
           .lte(
-  "fecha_inicio",
-  fechaFin
-)
-.gte(
-  "fecha_fin",
-  fechaInicio
-);
+            "fecha_inicio",
+            fechaFin
+          );
 
       if (error) {
 
@@ -401,46 +441,26 @@ for (
       (data || []).forEach(
         (solicitud) => {
 
-        const inicioOriginal =
-  new Date(
-    solicitud.fecha_inicio
-  );
+          const inicio =
+            new Date(
+              solicitud.fecha_inicio
+            );
 
-const finOriginal =
-  new Date(
-    solicitud.fecha_fin
-  );
+          const fin =
+            new Date(
+              solicitud.fecha_fin
+            );
 
-const inicioAnio =
-  new Date(anio, 0, 1);
-
-const finAnio =
-  new Date(anio, 11, 31);
-
-const inicio =
-  inicioOriginal < inicioAnio
-    ? inicioAnio
-    : inicioOriginal;
-
-const fin =
-  finOriginal > finAnio
-    ? finAnio
-    : finOriginal;
-
-if (inicio > fin) {
-  return;
-}
-
-const diasTotales =
-  Math.floor(
-    (
-      fin.getTime()
-      -
-      inicio.getTime()
-    )
-    /
-    (1000 * 60 * 60 * 24)
-  ) + 1;
+          const diasTotales =
+            Math.floor(
+              (
+                fin.getTime()
+                -
+                inicio.getTime()
+              )
+              /
+              (1000 * 60 * 60 * 24)
+            ) + 1;
 
           for (
             let i = 0;
@@ -904,69 +924,89 @@ const diasTotales =
                   </thead>
 
 
-                 <tbody>
-{tipos.map((tipo) => {
-  const Icono =
-    iconosPermisos[
-      tipo as keyof typeof iconosPermisos
-    ];
+                  <tbody>
 
-  return (
-      <tr
-        key={tipo}
-        className="border-t"
-      >
+                    {tipos.map(
+                      (tipo) => (
 
-        <td
-          className="
-            p-4
-            font-medium
-          "
-        >
-          <div className="flex items-center gap-3">
+                        <tr
+                          key={tipo}
+                          className="
+                            border-t
+                          "
+                        >
 
-            {Icono && (
-              <Icono
-                className="
-                  h-6
-                  w-6
-                  shrink-0
-                  text-slate-600
-                "
-              />
-            )}
+                          <td
+                            className="
+                              p-4
+                              font-medium
+                            "
+                          >
 
-            <span>
-              {tipo}
-            </span>
+                            {tipo === "Vacaciones" && "🌴 "}
+                            {tipo === "AP" && "🟢 "}
+                            {tipo === "Compensación horaria" && "⏰ "}
+                            {tipo === "Indisposición" && "🤒 "}
+                            {tipo === "Navidad" && "🎄 "}
+                            {tipo === "Semana Santa" && "✝️ "}
+                            {tipo === "Paternidad" && "👶 "}
+                            {tipo === "Maternidad" && "🤰 "}
+                            {tipo === "Lactancia" && "🍼 "}
+                            {tipo === "Otros" && "📄 "}
+                            {tipo === "Permiso urgente" && "🚨 "}
 
-          </div>
-        </td>
+                            {tipo}
 
-        <td
-          className="
-            p-4
-            text-right
-          "
-        >
-          <span
-            className="
-              rounded-full
-              bg-blue-100
-              px-4
-              py-1
-              font-bold
-              text-blue-700
-            "
-          >
-            {resumen[tipo] || 0}
-          </span>
-        </td>
+                          </td>
 
-      </tr>
-    );
-  })}
-</tbody>
+                          <td
+                            className="
+                              p-4
+                              text-right
+                            "
+                          >
+
+                            <span
+                              className="
+                                rounded-full
+                                bg-blue-100
+                                px-4
+                                py-1
+                                font-bold
+                                text-blue-700
+                              "
+                            >
+
+                              {
+                                (
+                                  buscarTipoBD(
+                                    tipo
+                                  ) || []
+                                ).reduce(
+                                  (
+                                    total,
+                                    nombre
+                                  ) =>
+                                    total +
+                                    (
+                                      resumen[
+                                        nombre
+                                      ] || 0
+                                    ),
+                                  0
+                                )
+                              }
+
+                            </span>
+
+                          </td>
+
+                        </tr>
+
+                      )
+                    )}
+
+                  </tbody>
 
 
                   <tfoot>

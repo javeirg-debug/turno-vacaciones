@@ -222,37 +222,37 @@ if (!solicitud) return turno;
 
 switch (solicitud.tipo) {
 
-  case "🌴 Vacaciones":
+  case "Vacaciones":
     return "VAC";
 
-  case "🟢 AP":
+  case "Asunto propio":
     return "AP";
 
-  case "✝️ Semana Santa":
+  case "Semana Santa":
     return "SS";
 
-  case "🎄 Navidad":
+  case "Navidad":
     return "NAV";
 
-  case "⏰ Compensación horaria":
+  case "Compensación horaria":
     return "CH";
 
-  case "🤒 Indisposición":
+  case "Indisposición":
     return "IND";
 
-  case "👶 Paternidad":
+  case "Paternidad":
     return "PAT";
 
-  case "🤰 Maternidad":
+  case "Maternidad":
     return "MAT";
 
-case "🍼 Lactancia":
+case "Lactancia":
   return "LAC";
 
-case "🚨 Permiso urgente":
+case "Permiso urgente":
   return "URG";
 
-case "📄 Otros permisos":
+case "Otros permisos":
   return "OT";
 
   default:
@@ -904,7 +904,7 @@ return (
 
             <div className="flex items-center gap-3">
               <div className="h-5 w-5 rounded bg-sky-500"></div>
-              AP
+              Asunto propio
             </div>
 
             <div className="flex items-center gap-3">

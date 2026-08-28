@@ -51,9 +51,30 @@ export default function Login() {
 
       <div className="w-full rounded-3xl bg-white p-6 shadow">
 
-        <h1 className="text-3xl font-bold">
-          🔐 Acceso
-        </h1>
+        <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-800">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-7 w-7 text-slate-600"
+    aria-hidden="true"
+  >
+    <rect
+      x="5"
+      y="10"
+      width="14"
+      height="10"
+      rx="2"
+    />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    <path d="M12 14v3" />
+  </svg>
+
+  Acceso
+</h1>
 
         <div className="mt-6 space-y-4">
 
