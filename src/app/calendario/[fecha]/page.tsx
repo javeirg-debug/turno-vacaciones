@@ -268,13 +268,29 @@ export default function DiaCalendario() {
 
       {/* CABECERA */}
 
-      <h1 className="text-3xl font-bold text-slate-800">
-        📅 Calendario
-      </h1>
+<h1 className="flex items-center gap-2 text-3xl font-bold text-slate-800">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="h-7 w-7 shrink-0"
+    aria-hidden="true"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"
+    />
+  </svg>
 
-      <p className="mt-2 text-slate-500">
-        Consulta los turnos y permisos del personal.
-      </p>
+  Calendario
+</h1>
+
+<p className="mt-2 text-slate-500">
+  Consulta los turnos y permisos del personal.
+</p>
 
 
       {/* =========================
@@ -471,9 +487,35 @@ export default function DiaCalendario() {
                 "
               >
 
-                <p className="text-2xl">
-                  📭
-                </p>
+                <div className="flex justify-center text-slate-400">
+  {/* ICONO SIN SOLICITUDES */}
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-7 w-7"
+    aria-hidden="true"
+  >
+    <path
+      d="M4 5.5C4 4.67 4.67 4 5.5 4H18.5C19.33 4 20 4.67 20 5.5V15.5C20 16.33 19.33 17 18.5 17H15L13 20H11L9 17H5.5C4.67 17 4 16.33 4 15.5V5.5Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 9H16"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+    <path
+      d="M8 12H13"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+  </svg>
+</div>
 
                 <p
                   className="
@@ -680,48 +722,101 @@ export default function DiaCalendario() {
 
                             {/* FECHA */}
 
-                            <p
-                              className="
-                                mt-3
-                                text-sm
-                                font-bold
-                                text-slate-700
-                              "
-                            >
+                          
+<p
+  className="
+    mt-3
+    flex
+    items-center
+    gap-1.5
+    text-sm
+    font-bold
+    text-slate-700
+  "
+>
+<svg
+                    viewBox="0 0 24 24"
+                    className="h-3.5 w-3.5 shrink-0"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <rect
+                      x="3"
+                      y="5"
+                      width="18"
+                      height="16"
+                      rx="3"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    />
+                    <path
+                      d="M3 10H21"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M8 3V7"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M16 3V7"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M8 15H8.01"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M12 15H12.01"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M16 15H16.01"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
 
-                              📅{" "}
+  {new Date(
+    solicitud.fecha_inicio
+  ).toLocaleDateString(
+    "es-ES",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+    }
+  )}
 
-                              {new Date(
-                                solicitud.fecha_inicio
-                              ).toLocaleDateString(
-                                "es-ES",
-                                {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "2-digit",
-                                }
-                              )}
+  {solicitud.fecha_inicio !==
+    solicitud.fecha_fin && (
+    <>
+      {" → "}
 
-                              {solicitud.fecha_inicio !==
-                                solicitud.fecha_fin && (
-                                <>
-                                  {" → "}
-
-                                  {new Date(
-                                    solicitud.fecha_fin
-                                  ).toLocaleDateString(
-                                    "es-ES",
-                                    {
-                                      day: "2-digit",
-                                      month: "2-digit",
-                                      year: "2-digit",
-                                    }
-                                  )}
-                                </>
-                              )}
-
-                            </p>
-
+      {new Date(
+        solicitud.fecha_fin
+      ).toLocaleDateString(
+        "es-ES",
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+        }
+      )}
+    </>
+  )}
+</p>
 
                             {/* OBSERVACIÓN */}
 
@@ -752,10 +847,32 @@ export default function DiaCalendario() {
                                 text-slate-400
                               "
                             >
-                              🕐{" "}
-                              {formatearFecha(
-                                solicitud.created_at
-                              )}
+                              <span className="inline-flex items-center gap-1.5">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-4 w-4 shrink-0"
+    aria-hidden="true"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="8.5"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    />
+    <path
+      d="M12 7.5V12L15 14"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+
+  {formatearFecha(solicitud.created_at)}
+</span>
                             </p>
 
                           </div>
@@ -786,42 +903,63 @@ export default function DiaCalendario() {
                           </div>
 
 
-                          {/* PAPELERA */}
+{/* PAPELERA */}
 
-                          {solicitud.usuario_id ===
-                            miUsuarioId && (
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                borrar(
-                                  solicitud.id
-                                )
-                              }
-                              className="
-                                absolute
-                                bottom-4
-                                right-4
-                                flex
-                                h-9
-                                w-9
-                                items-center
-                                justify-center
-                                rounded-full
-                                bg-red-100
-                                text-sm
-                                transition
-                                hover:bg-red-200
-                                active:scale-95
-                              "
-                              aria-label="
-                                Eliminar solicitud
-                              "
-                            >
-                              🗑️
-                            </button>
-
-                          )}
+{solicitud.usuario_id === miUsuarioId && (
+  <button
+    type="button"
+    onClick={() => borrar(solicitud.id)}
+    className="
+      absolute
+      bottom-4
+      right-4
+      flex
+      h-10
+      w-10
+      shrink-0
+      items-center
+      justify-center
+      rounded-full
+      bg-red-100
+      text-red-600
+      transition
+      hover:bg-red-200
+      active:scale-95
+    "
+    aria-label="Eliminar solicitud"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 6h18"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8 6V4h8v2"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19 6l-1 14H6L5 6"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10 11v5m4-5v5"
+      />
+    </svg>
+  </button>
+)}
 
                         </div>
 
@@ -844,33 +982,58 @@ export default function DiaCalendario() {
           SOLICITAR PERMISO
       ========================= */}
 
-      <button
-        type="button"
-        onClick={() =>
-          router.push(
-            `/solicitudes/nueva?fecha=${fecha}`
-          )
-        }
-        className="
-          mt-7
-          flex
-          w-full
-          items-center
-          justify-center
-          gap-2
-          rounded-2xl
-          bg-slate-800
-          py-3.5
-          font-bold
-          text-white
-          shadow-md
-          transition
-          hover:bg-slate-700
-          active:scale-[0.98]
-        "
-      >
-        📝 Solicitar permiso
-      </button>
+<button
+  type="button"
+  onClick={() =>
+    router.push(`/solicitudes/nueva?fecha=${fecha}`)
+  }
+  className="
+    mt-7
+    flex
+    w-full
+    items-center
+    justify-center
+    gap-2
+    rounded-2xl
+    bg-slate-800
+    py-3.5
+    font-bold
+    text-white
+    shadow-md
+    transition
+    hover:bg-slate-700
+    active:scale-[0.98]
+  "
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-5 w-5"
+    aria-hidden="true"
+  >
+    <path
+      d="M6 4H14L18 8V20H6V4Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M14 4V8H18"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 16L15.5 9.5L17.5 11.5L11 18H9V16Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+  </svg>
+
+  Solicitar permiso
+</button>
 
 
       <BottomNav />

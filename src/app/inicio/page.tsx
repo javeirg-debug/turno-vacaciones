@@ -1361,46 +1361,93 @@ export default function Inicio() {
                     FECHAS
                 ========================= */}
 
-                {!solicitud.dias && (
+{!solicitud.dias && (
+  <p
+    className="
+      mt-1
+      text-xs
+      text-slate-500
+    "
+  >
+    <span
+      className="
+        inline-flex
+        items-center
+        gap-1
+      "
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-3.5 w-3.5 shrink-0"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <rect
+          x="3"
+          y="5"
+          width="18"
+          height="16"
+          rx="3"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
 
-                  <p
-                    className="
-                      mt-1
-                      text-xs
-                      text-slate-500
-                    "
-                  >
+        <path
+          d="M3 10H21"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
 
-                    <span
-                      className="
-                        inline-flex
-                        items-center
-                        gap-1
-                      "
-                    >
-                      📅{" "}
-                      {formatearFecha(
-                        solicitud.fecha_inicio
-                      )}
-                    </span>
+        <path
+          d="M8 3V7"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
 
-                    {solicitud.fecha_inicio !==
-                      solicitud.fecha_fin && (
+        <path
+          d="M16 3V7"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
 
-                      <>
-                        {" → "}
+        <path
+          d="M8 14H8.01"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
 
-                        {formatearFecha(
-                          solicitud.fecha_fin
-                        )}
-                      </>
+        <path
+          d="M12 14H12.01"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
 
-                    )}
+        <path
+          d="M16 14H16.01"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
 
-                  </p>
+      {formatearFecha(solicitud.fecha_inicio)}
+    </span>
 
-                )}
+    {solicitud.fecha_inicio !== solicitud.fecha_fin && (
+      <>
+        {" → "}
 
+        {formatearFecha(solicitud.fecha_fin)}
+      </>
+    )}
+  </p>
+)}
                 {/* =========================
                     OBSERVACIONES
                 ========================= */}
@@ -1527,10 +1574,67 @@ export default function Inicio() {
                                 gap-1
                               "
                             >
-                              📅{" "}
-                              {formatearFecha(
-                                dia.fecha
-                              )}
+                              <svg
+  viewBox="0 0 24 24"
+  className="h-3.5 w-3.5 shrink-0"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <rect
+    x="3"
+    y="5"
+    width="18"
+    height="16"
+    rx="3"
+    stroke="currentColor"
+    strokeWidth="1.8"
+  />
+
+  <path
+    d="M3 10H21"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+  />
+
+  <path
+    d="M8 3V7"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+  />
+
+  <path
+    d="M16 3V7"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+  />
+
+  <path
+    d="M8 15H8.01"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+
+  <path
+    d="M12 15H12.01"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+
+  <path
+    d="M16 15H16.01"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  />
+</svg>
+                              Día {index + 1}:{" "}
+{formatearFecha(dia.fecha)}
                             </span>
 
                           </p>
