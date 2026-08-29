@@ -1017,27 +1017,27 @@ setTiempo({
 </div>
 
 
-
 {/* =========================
     PANEL DE INICIO
 ========================= */}
 
-<div className="mx-auto mt-4 w-full max-w-xl rounded-3xl bg-white p-5 shadow-lg">
+<div className="mx-auto mt-4 mb-8 w-full max-w-xl rounded-[22px] bg-white p-6 shadow-[0_4px_18px_rgba(15,23,42,0.08)]">
+
   {/* =========================
       PARTE SUPERIOR
   ========================= */}
 
-  <div className="flex items-start justify-between">
+  <div className="flex items-center justify-between gap-6">
 
     {/* HORA - IZQUIERDA */}
 
-    <div className="text-left">
+    <div className="min-w-0 text-left">
 
-      <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <div className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
         Madrid
       </div>
 
-      <div className="mt-1 text-3xl font-bold leading-none text-slate-800">
+      <div className="mt-1 text-4xl font-extrabold leading-none tracking-tight text-slate-800">
         {horaActual}
       </div>
 
@@ -1046,33 +1046,41 @@ setTiempo({
 
     {/* TIEMPO - DERECHA */}
 
-    <div className="text-right">
+    <div className="shrink-0 text-right">
+
+      {/* LOCALIDAD + ICONO */}
 
       <div className="flex items-center justify-end gap-1.5">
 
-  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-    Coslada
-  </p>
+        <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
+          Coslada
+        </p>
 
- <IconWeather
-  codigo={tiempo.codigo}
-  className="h-6 w-6"
-/>
+        <IconWeather
+          codigo={tiempo.codigo}
+          className="h-6 w-6 shrink-0"
+        />
 
-</div>
+      </div>
 
-      <div className="mt-1 flex items-baseline justify-end gap-1.5">
 
-        <span className="text-2xl font-bold leading-tight text-slate-800">
+      {/* TEMPERATURA */}
+
+      <div className="mt-1 flex items-baseline justify-end gap-2">
+
+        <span className="text-3xl font-extrabold leading-none tracking-tight text-slate-800">
           {tiempo.temperatura !== null
-  ? `${tiempo.temperatura}°C`
-  : "--"}
+            ? `${tiempo.temperatura}°C`
+            : "--"}
         </span>
 
-        <span className="text-xs font-medium text-slate-500">
-          · Máx. {tiempo.maxima ?? "--"}° · Mín. {tiempo.minima ?? "--"}
-        </span>
+      </div>
 
+
+      {/* MÁXIMA / MÍNIMA */}
+
+      <div className="mt-1 text-[11px] font-normal text-slate-400">
+        Máx. {tiempo.maxima ?? "--"}° · Mín. {tiempo.minima ?? "--"}°
       </div>
 
     </div>
@@ -1081,48 +1089,52 @@ setTiempo({
 
 
   {/* =========================
-      SEPARADOR
+      ESPACIADOR
   ========================= */}
 
-  <div className="my-4 h-px bg-slate-100" />
+  <div className="h-5" />
 
 
   {/* =========================
       TURNO
   ========================= */}
 
+  <div className="flex items-center justify-center gap-2">
 
-<div className="flex items-center justify-center gap-2 rounded-2xl bg-slate-50 px-4 py-3">
+    <span className="text-sm font-medium text-slate-500">
+      Hoy estás de
+    </span>
 
-  <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-    Hoy estás de
-  </span>
 
-  {turnoHoy.icono === "sunrise" && (
-    <IconSunrise className="h-6 w-6 shrink-0" />
-  )}
+    {/* CHIP DEL TURNO */}
 
-  {turnoHoy.icono === "sun" && (
-    <IconSun className="h-6 w-6 shrink-0" />
-  )}
+    <div className="flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2">
 
-  {turnoHoy.icono === "moon" && (
-    <IconMoon className="h-6 w-6 shrink-0" />
-  )}
+      {turnoHoy.icono === "sunrise" && (
+        <IconSunrise className="h-5 w-5 shrink-0" />
+      )}
 
-  {turnoHoy.icono === "free" && (
-    <IconFree className="h-6 w-6 shrink-0" />
-  )}
+      {turnoHoy.icono === "sun" && (
+        <IconSun className="h-5 w-5 shrink-0" />
+      )}
 
-  <span className="text-lg font-bold text-slate-800">
-    {turnoHoy.texto}
-  </span>
+      {turnoHoy.icono === "moon" && (
+        <IconMoon className="h-5 w-5 shrink-0" />
+      )}
 
-</div>
+      {turnoHoy.icono === "free" && (
+        <IconFree className="h-5 w-5 shrink-0" />
+      )}
+
+      <span className="text-sm font-semibold text-white">
+        {turnoHoy.texto}
+      </span>
+
+    </div>
 
   </div>
 
-
+</div>
 
 
 
