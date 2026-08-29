@@ -1,4 +1,3 @@
-"use client";
 
 "use client";
 
@@ -328,6 +327,182 @@ function IconSmartphone({ className }: IconProps) {
   );
 }
 
+function IconWeather({
+  className,
+  codigo,
+}: IconProps & { codigo: number | null }) {
+
+  if (codigo === null) {
+    return null;
+  }
+
+  if (codigo === 0) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4.5" fill="#FACC15" />
+
+        <path
+          d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"
+          stroke="#FACC15"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  // 1-3 — parcialmente nublado / nublado
+  if (codigo >= 1 && codigo <= 3) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+      >
+        <circle cx="8" cy="8" r="3.5" fill="#FACC15" />
+        <path
+          d="M8 3v1.5M3 8h1.5M4.5 4.5l1 1"
+          stroke="#FACC15"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+
+        <path
+          d="M7 18h10.5a3.5 3.5 0 0 0 .4-7 5.5 5.5 0 0 0-10.5 1.5A3 3 0 0 0 7 18Z"
+          fill="#CBD5E1"
+          stroke="#94A3B8"
+          strokeWidth="1.4"
+        />
+      </svg>
+    );
+  }
+
+  // 45-48 — niebla
+  if (codigo >= 45 && codigo <= 48) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+      >
+        <path
+          d="M4 9h16M3 13h18M5 17h14"
+          stroke="#94A3B8"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  // 51-67, 80-82 — lluvia
+  if (
+    (codigo >= 51 && codigo <= 67) ||
+    (codigo >= 80 && codigo <= 82)
+  ) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+      >
+        <path
+          d="M7 14h10.5a3.5 3.5 0 0 0 .4-7 5.5 5.5 0 0 0-10.5 1.5A3 3 0 0 0 7 14Z"
+          fill="#CBD5E1"
+          stroke="#64748B"
+          strokeWidth="1.4"
+        />
+
+        <path
+          d="M8 17l-1 2M12 17l-1 2M16 17l-1 2"
+          stroke="#38BDF8"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  // 71-77 — nieve
+  if (codigo >= 71 && codigo <= 77) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+      >
+        <path
+          d="M7 14h10.5a3.5 3.5 0 0 0 .4-7 5.5 5.5 0 0 0-10.5 1.5A3 3 0 0 0 7 14Z"
+          fill="#E2E8F0"
+          stroke="#94A3B8"
+          strokeWidth="1.4"
+        />
+
+        <path
+          d="M8 18h.01M12 18h.01M16 18h.01"
+          stroke="#38BDF8"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  // 95-99 — tormenta
+  if (codigo >= 95) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={className}
+        aria-hidden="true"
+      >
+        <path
+          d="M7 13h10.5a3.5 3.5 0 0 0 .4-7 5.5 5.5 0 0 0-10.5 1.5A3 3 0 0 0 7 13Z"
+          fill="#64748B"
+          stroke="#475569"
+          strokeWidth="1.4"
+        />
+
+        <path
+          d="m13 12-3 5h3l-1 4 4-6h-3l2-3Z"
+          fill="#FACC15"
+          stroke="#EAB308"
+          strokeWidth="1"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  // Fallback
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="4.5" fill="#FACC15" />
+      <path
+        d="M12 2v3M12 19v3M2 12h3M19 12h3"
+        stroke="#FACC15"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 const inicioTurno = new Date(2026, 6, 16);
 
 function obtenerTurnoHoy() {
@@ -424,8 +599,55 @@ export default function Inicio() {
   const [mostrarInfo, setMostrarInfo] =
     useState(false);
 
+  const [horaActual, setHoraActual] = useState("");
+  
+  const [tiempo, setTiempo] = useState({
+  temperatura: null as number | null,
+  maxima: null as number | null,
+  minima: null as number | null,
+  codigo: null as number | null,
+});
+
+  useEffect(() => {
+  function actualizarHora() {
+    const ahora = new Date();
+
+    setHoraActual(
+      ahora.toLocaleTimeString("es-ES", {
+        timeZone: "Europe/Madrid",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+  }
+
+  actualizarHora();
+
+  const intervalo = setInterval(actualizarHora, 1000);
+
+  return () => clearInterval(intervalo);
+}, []);
+
+  
   useEffect(() => {
     async function cargar() {
+
+const respuestaTiempo = await fetch(
+  "https://api.open-meteo.com/v1/forecast?latitude=40.4233&longitude=-3.5613&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FMadrid"
+);
+
+if (!respuestaTiempo.ok) {
+  throw new Error("No se pudo obtener el tiempo");
+}
+
+const datosTiempo = await respuestaTiempo.json();
+
+setTiempo({
+  temperatura: Math.round(datosTiempo.current.temperature_2m),
+  maxima: Math.round(datosTiempo.daily.temperature_2m_max[0]),
+  minima: Math.round(datosTiempo.daily.temperature_2m_min[0]),
+  codigo: datosTiempo.current.weather_code,
+});
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -571,11 +793,12 @@ export default function Inicio() {
   return (
     <main className="min-h-screen bg-slate-100 px-4 pb-24 pt-6">
 
+
 {/* =========================
     TARJETA PERFIL
 ========================= */}
 
-<div className="relative mx-auto w-full max-w-xl rounded-3xl bg-white px-3 py-4 shadow-lg">
+<div className="mx-auto mt-4 w-full max-w-xl rounded-3xl bg-white px-3 py-4 shadow-lg">
 
   {/* INFORMACIÓN - ESQUINA SUPERIOR DERECHA */}
   <button
@@ -792,42 +1015,116 @@ export default function Inicio() {
   </div>
 
 </div>
-      {/* =========================
-          TURNO DE HOY
-      ========================= */}
 
-      <div className="mt-4 rounded-3xl bg-white p-5 shadow">
 
-        <h2 className="flex items-center gap-2 text-xl font-bold">
-          <IconClock className="h-5 w-5" />
-          Turno de hoy
-        </h2>
 
-        <div className="mt-4 flex items-center gap-3 text-3xl font-bold">
+{/* =========================
+    PANEL DE INICIO
+========================= */}
 
-          {turnoHoy.icono === "sunrise" && (
-            <IconSunrise className="h-8 w-8 shrink-0" />
-          )}
+<div className="mx-auto mt-4 w-full max-w-xl rounded-3xl bg-white p-5 shadow-lg">
+  {/* =========================
+      PARTE SUPERIOR
+  ========================= */}
 
-          {turnoHoy.icono === "sun" && (
-            <IconSun className="h-8 w-8 shrink-0" />
-          )}
+  <div className="flex items-start justify-between">
 
-          {turnoHoy.icono === "moon" && (
-            <IconMoon className="h-8 w-8 shrink-0" />
-          )}
+    {/* HORA - IZQUIERDA */}
 
-          {turnoHoy.icono === "free" && (
-            <IconFree className="h-8 w-8 shrink-0" />
-          )}
+    <div className="text-left">
 
-          <span>
-            {turnoHoy.texto}
-          </span>
+      <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        Madrid
+      </div>
 
-        </div>
+      <div className="mt-1 text-3xl font-bold leading-none text-slate-800">
+        {horaActual}
+      </div>
+
+    </div>
+
+
+    {/* TIEMPO - DERECHA */}
+
+    <div className="text-right">
+
+      <div className="flex items-center justify-end gap-1.5">
+
+  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+    Coslada
+  </p>
+
+ <IconWeather
+  codigo={tiempo.codigo}
+  className="h-6 w-6"
+/>
+
+</div>
+
+      <div className="mt-1 flex items-baseline justify-end gap-1.5">
+
+        <span className="text-2xl font-bold leading-tight text-slate-800">
+          {tiempo.temperatura !== null
+  ? `${tiempo.temperatura}°C`
+  : "--"}
+        </span>
+
+        <span className="text-xs font-medium text-slate-500">
+          · Máx. {tiempo.maxima ?? "--"}° · Mín. {tiempo.minima ?? "--"}
+        </span>
 
       </div>
+
+    </div>
+
+  </div>
+
+
+  {/* =========================
+      SEPARADOR
+  ========================= */}
+
+  <div className="my-4 h-px bg-slate-100" />
+
+
+  {/* =========================
+      TURNO
+  ========================= */}
+
+
+<div className="flex items-center justify-center gap-2 rounded-2xl bg-slate-50 px-4 py-3">
+
+  <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+    Hoy estás de
+  </span>
+
+  {turnoHoy.icono === "sunrise" && (
+    <IconSunrise className="h-6 w-6 shrink-0" />
+  )}
+
+  {turnoHoy.icono === "sun" && (
+    <IconSun className="h-6 w-6 shrink-0" />
+  )}
+
+  {turnoHoy.icono === "moon" && (
+    <IconMoon className="h-6 w-6 shrink-0" />
+  )}
+
+  {turnoHoy.icono === "free" && (
+    <IconFree className="h-6 w-6 shrink-0" />
+  )}
+
+  <span className="text-lg font-bold text-slate-800">
+    {turnoHoy.texto}
+  </span>
+
+</div>
+
+  </div>
+
+
+
+
 
       {/* =========================
           AVISOS
