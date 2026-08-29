@@ -10,6 +10,128 @@ import {
 import { supabase } from "@/lib/supabase";
 import { iconosPermisos } from "@/components/icons/Icons";
 
+type IconProps = {
+  className?: string;
+};
+
+/* =========================
+   ICONOS DE TURNOS
+========================= */
+
+function IconSunrise({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="4.5"
+        fill="#FACC15"
+      />
+
+      <path
+        d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"
+        stroke="#FACC15"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconSun({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M7 15a5 5 0 0 1 10 0"
+        fill="#F97316"
+      />
+
+      <path
+        d="M12 3v4M5.64 5.64l2.83 2.83M18.36 5.64l-2.83 2.83"
+        stroke="#F97316"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M3 17h18"
+        stroke="#64748B"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M6 20h12"
+        stroke="#64748B"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconMoon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M20 15.5A8.5 8.5 0 0 1 8.5 4.2
+           A8.5 8.5 0 1 0 20 15.5Z"
+        fill="#1E3A8A"
+        stroke="#172554"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      <circle
+        cx="7"
+        cy="8"
+        r="0.8"
+        fill="#93C5FD"
+      />
+    </svg>
+  );
+}
+
+function IconFree({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="7"
+        fill="white"
+        stroke="#CBD5E1"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+
+/* =========================
+   CÁLCULO DE TURNOS
+========================= */
+
 const inicioTurno = new Date(2026, 6, 16);
 
 function obtenerTurno(fechaTexto: string) {
@@ -23,18 +145,21 @@ function obtenerTurno(fechaTexto: string) {
   const ciclo = ((diferencia % 12) + 12) % 12;
 
   const turnos = [
-    "🌅 Mañana",
-    "🌅 Mañana",
-    "🌆 Tarde",
-    "🌆 Tarde",
-    "🌙 Noche",
-    "🌙 Noche",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
-    "⚪ Libre",
+    { texto: "Mañana", icono: "sunrise" },
+    { texto: "Mañana", icono: "sunrise" },
+
+    { texto: "Tarde", icono: "sun" },
+    { texto: "Tarde", icono: "sun" },
+
+    { texto: "Noche", icono: "moon" },
+    { texto: "Noche", icono: "moon" },
+
+    { texto: "Libre", icono: "free" },
+    { texto: "Libre", icono: "free" },
+    { texto: "Libre", icono: "free" },
+    { texto: "Libre", icono: "free" },
+    { texto: "Libre", icono: "free" },
+    { texto: "Libre", icono: "free" },
   ];
 
   return turnos[ciclo];
@@ -175,24 +300,58 @@ function obtenerVisual(tipo: string) {
   }
 }
 
-function obtenerCategoria(
-  categoria: string | null,
-  sexo: string
-) {
+function obtenerCategoria(categoria: string | null) {
   if (categoria === "oficial") {
-    return sexo === "mujer"
-      ? "👮‍♀️ Oficial de Policía"
-      : "👮‍♂️ Oficial de Policía";
+    return (
+      <div className="flex items-center gap-1.5">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-4 w-4 shrink-0 text-amber-500"
+          aria-hidden="true"
+        >
+          <path d="m12 3 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L12 3Z" />
+        </svg>
+
+        <span>Oficial de Policía</span>
+      </div>
+    );
   }
 
   if (categoria === "policia") {
-    return sexo === "mujer"
-      ? "👮‍♀️ Policía"
-      : "👮‍♂️ Policía";
+    return (
+      <div className="flex items-center gap-1.5">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-4 w-4 shrink-0"
+          aria-hidden="true"
+        >
+          <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6Z" />
+          <path d="M9 11h6" />
+          <path d="M12 8v6" />
+        </svg>
+
+        <span>Policía</span>
+      </div>
+    );
   }
 
-  return "--";
+  return <span>--</span>;
 }
+/* =========================
+   PÁGINA
+========================= */
 
 export default function DiaCalendario() {
   const params = useParams();
@@ -255,6 +414,8 @@ export default function DiaCalendario() {
     }
   }
 
+  const turnoHoy = obtenerTurno(fecha);
+
   return (
     <main
       className="
@@ -266,52 +427,53 @@ export default function DiaCalendario() {
       "
     >
 
-      {/* CABECERA */}
+      {/* =========================
+          CABECERA
+      ========================= */}
 
-<h1 className="flex items-center gap-2 text-3xl font-bold text-slate-800">
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    className="h-7 w-7 shrink-0"
-    aria-hidden="true"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"
-    />
-  </svg>
+      <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-800">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="h-7 w-7 shrink-0"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"
+          />
+        </svg>
 
-  Calendario
-</h1>
+        Calendario
+      </h1>
 
-<p className="mt-2 text-slate-500">
-  Consulta los turnos y permisos del personal.
-</p>
-
+      <p className="mt-2 text-slate-500">
+        Consulta los turnos y permisos del personal.
+      </p>
 
       {/* =========================
-          TURNO
+          TARJETA TURNO
       ========================= */}
 
       <div
-        className="
-          mt-1
-          overflow-hidden
-          rounded-3xl
-          bg-white
-          shadow-md
-        "
-      >
+  className="
+    mt-1
+    overflow-hidden
+    rounded-3xl
+    bg-white
+    shadow-md
+  "
+>
 
         {/* FECHA */}
 
         <div
           className="
-            bg-blue-200
+            bg-slate-200
             px-5
             py-3
             text-center
@@ -333,12 +495,11 @@ export default function DiaCalendario() {
 
         <div className="border-t border-slate-200" />
 
-        {/* INFORMACIÓN TURNO */}
+ {/* INFORMACIÓN TURNO */}
 
         <div
           className="
             flex
-            flex-col
             items-center
             justify-center
             px-5
@@ -347,41 +508,41 @@ export default function DiaCalendario() {
           "
         >
 
-          <p className="text-3xl">
-            {obtenerTurno(fecha).split(" ")[0]}
-          </p>
+          <div className="flex items-center justify-center gap-3">
 
-          <p
-            className="
-              mt-2
-              text-xs
-              font-semibold
-              uppercase
-              tracking-wider
-              text-slate-400
-            "
-          >
-            Turno
-          </p>
+            <p
+              className="
+                text-2xl
+                font-bold
+                text-slate-800
+              "
+            >
+              {turnoHoy.texto === "Libre"
+                ? "Día Libre"
+                : `Turno de ${turnoHoy.texto}`}
+            </p>
 
-          <p
-            className="
-              mt-1
-              text-2xl
-              font-bold
-              text-slate-800
-            "
-          >
-            {obtenerTurno(fecha)
-              .split(" ")
-              .slice(1)
-              .join(" ")}
-          </p>
+            {turnoHoy.icono === "sunrise" && (
+              <IconSunrise className="h-9 w-9 shrink-0" />
+            )}
+
+            {turnoHoy.icono === "sun" && (
+              <IconSun className="h-9 w-9 shrink-0" />
+            )}
+
+            {turnoHoy.icono === "moon" && (
+              <IconMoon className="h-9 w-9 shrink-0" />
+            )}
+
+            {turnoHoy.icono === "free" && (
+              <IconFree className="h-9 w-9 shrink-0" />
+            )}
+
+          </div>
 
         </div>
 
       </div>
-
 
       {/* =========================
           PERSONAL DE PERMISO
@@ -405,7 +566,7 @@ export default function DiaCalendario() {
             flex
             items-center
             justify-between
-            bg-blue-200
+            bg-slate-200
             px-4
             py-3
           "
@@ -436,7 +597,7 @@ export default function DiaCalendario() {
                   items-center
                   justify-center
                   rounded-full
-                  bg-blue-500
+                  bg-slate-500
                   text-sm
                   font-bold
                   text-white
@@ -640,31 +801,92 @@ export default function DiaCalendario() {
                                   text-slate-500
                                 "
                               >
-                                {obtenerCategoria(
-                                  solicitud.categoria,
-                                  solicitud.sexo
-                                )}
+                                {obtenerCategoria(solicitud.categoria)}
+
                               </p>
 
-                              <p
-                                className="
-                                  mt-1
-                                  text-xs
-                                  font-semibold
-                                  text-slate-500
-                                "
-                              >
-                                {solicitud.puesto ===
-                                "gac"
-                                  ? "🚓 G.A.C"
-                                  : solicitud.puesto ===
-                                    "seguridad"
-                                  ? "🛡️ Seguridad"
-                                  : solicitud.puesto ===
-                                    "sala"
-                                  ? "🖥️ Sala"
-                                  : "—"}
-                              </p>
+<div
+  className="
+    mt-1
+    flex
+    items-center
+    justify-end
+    gap-1.5
+    text-xs
+    font-semibold
+    text-slate-500
+  "
+>
+  {solicitud.puesto === "gac" && (
+    <>
+      {/* ICONO COCHE - G.A.C */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M5 17h14l-1-7H6Z" />
+        <path d="M7 10 9 5h6l2 5" />
+        <circle cx="8" cy="17" r="1.5" />
+        <circle cx="16" cy="17" r="1.5" />
+      </svg>
+
+      <span>G.A.C</span>
+    </>
+  )}
+
+  {solicitud.puesto === "seguridad" && (
+    <>
+      {/* ICONO ESCUDO - SEGURIDAD */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6Z" />
+      </svg>
+
+      <span>Seguridad</span>
+    </>
+  )}
+
+  {solicitud.puesto === "sala" && (
+    <>
+      {/* ICONO MONITOR - SALA */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <rect x="3" y="4" width="18" height="13" rx="2" />
+        <path d="M8 21h8M12 17v4" />
+      </svg>
+
+      <span>Sala</span>
+    </>
+  )}
+
+  {!["gac", "seguridad", "sala"].includes(
+    solicitud.puesto
+  ) && (
+    <span>—</span>
+  )}
+</div>
 
                             </div>
 

@@ -1352,66 +1352,71 @@ const diasTotales =
           INFO OCUPACIÓN
       ========================= */}
 
-      {mostrarInfo && (
+{mostrarInfo && (
+  <div
+    className="
+      fixed
+      inset-0
+      z-50
+      flex
+      items-center
+      justify-center
+      bg-black/40
+    "
+  >
+    <div
+      className="
+        w-[90%]
+        max-w-md
+        rounded-3xl
+        bg-white
+        p-6
+        shadow-2xl
+      "
+    >
 
-        <div
-          className="
-            fixed
-            inset-0
-            z-50
-            flex
-            items-center
-            justify-center
-            bg-black/40
-          "
+      <h3
+        className="
+          flex
+          items-center
+          gap-2
+          text-xl
+          font-bold
+          text-slate-800
+        "
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5 shrink-0"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
 
-          <div
-            className="
-              w-[90%]
-              max-w-md
-              rounded-3xl
-              bg-white
-              p-6
-              shadow-2xl
-            "
-          >
+          <path
+            d="M12 11V16"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
 
-            <h3
-              className="
-                text-xl
-                font-bold
-                text-slate-800
-              "
-            >
-              <svg
-  viewBox="0 0 24 24"
-  className="h-5 w-5"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-  aria-hidden="true"
->
-  <circle
-    cx="12"
-    cy="12"
-    r="9"
-    stroke="currentColor"
-    strokeWidth="2"
-  />
-  <path
-    d="M12 11V16"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  />
-  <circle
-    cx="12"
-    cy="8"
-    r="1"
-    fill="currentColor"
-  />
-</svg> Cómo se calcula
-            </h3>
+          <circle
+            cx="12"
+            cy="8"
+            r="1"
+            fill="currentColor"
+          />
+        </svg>
+
+        <span>Cómo se calcula</span>
+      </h3>
 
             <p
               className="
@@ -1427,23 +1432,12 @@ const diasTotales =
               no se tienen en cuenta.
             </p>
 
-            <button
-              onClick={() =>
-                setMostrarInfo(false)
-              }
-              className="
-                mt-6
-                w-full
-                rounded-2xl
-                bg-blue-600
-                py-3
-                font-semibold
-                text-white
-                hover:bg-blue-700
-              "
-            >
-              Cerrar
-            </button>
+    <button
+      onClick={() => setMostrarInfo(false)}
+      className="mt-6 w-full rounded-xl bg-blue-900 py-3 font-bold text-white"
+    >
+      Entendido
+    </button>
 
           </div>
 
@@ -1456,99 +1450,93 @@ const diasTotales =
           INFO DÍAS USADOS
       ========================= */}
 
-      {mostrarInfoDias && (
+{mostrarInfoDias && (
+  <div
+    className="
+      fixed
+      inset-0
+      z-50
+      flex
+      items-center
+      justify-center
+      bg-black/40
+    "
+  >
+    <div
+      className="
+        w-[90%]
+        max-w-md
+        rounded-3xl
+        bg-white
+        p-6
+        shadow-2xl
+      "
+    >
 
-        <div
-          className="
-            fixed
-            inset-0
-            z-50
-            flex
-            items-center
-            justify-center
-            bg-black/40
-          "
+      <h3
+        className="
+          flex
+          items-center
+          gap-2
+          text-xl
+          font-bold
+          text-slate-800
+        "
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5 shrink-0"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
 
-          <div
-            className="
-              w-[90%]
-              max-w-md
-              rounded-3xl
-              bg-white
-              p-6
-              shadow-2xl
-            "
-          >
+          <path
+            d="M12 11V16"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
 
-            <h3
-              className="
-                text-xl
-                font-bold
-                text-slate-800
-              "
-            >
-              <svg
-  viewBox="0 0 24 24"
-  className="h-5 w-5"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-  aria-hidden="true"
+          <circle
+            cx="12"
+            cy="8"
+            r="1"
+            fill="currentColor"
+          />
+        </svg>
+
+        <span>Cómo se calcula</span>
+      </h3>
+
+      <p
+        className="
+          mt-4
+          leading-7
+          text-slate-600
+        "
+      >
+        Los días usados se cuentan únicamente
+        dentro del año seleccionado. Si un
+        permiso empieza antes o termina después
+        de ese año, solo se tienen en cuenta las
+        fechas que pertenecen al calendario del
+        año mostrado.
+      </p>
+
+<button
+  onClick={() => setMostrarInfoDias(false)}
+  className="mt-6 w-full rounded-xl bg-blue-900 py-3 font-bold text-white"
 >
-  <circle
-    cx="12"
-    cy="12"
-    r="9"
-    stroke="currentColor"
-    strokeWidth="2"
-  />
-  <path
-    d="M12 11V16"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  />
-  <circle
-    cx="12"
-    cy="8"
-    r="1"
-    fill="currentColor"
-  />
-</svg> Cómo se calcula
-            </h3>
-
-            <p
-              className="
-                mt-4
-                leading-7
-                text-slate-600
-              "
-            >
-              Los días usados se cuentan únicamente
-              dentro del año seleccionado. Si un
-              permiso empieza antes o termina después
-              de ese año, solo se tienen en cuenta las
-              fechas que pertenecen al calendario del
-              año mostrado.
-            </p>
-
-            <button
-              onClick={() =>
-                setMostrarInfoDias(false)
-              }
-              className="
-                mt-6
-                w-full
-                rounded-2xl
-                bg-blue-600
-                py-3
-                font-semibold
-                text-white
-                hover:bg-blue-700
-              "
-            >
-              Cerrar
-            </button>
+  Entendido
+</button>
 
           </div>
 

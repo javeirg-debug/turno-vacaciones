@@ -855,7 +855,7 @@ export default function BottomNav() {
             <button
               type="button"
               onClick={() => setMostrarInfoUsuarios(false)}
-              className="mt-6 w-full rounded-xl bg-slate-800 py-3 font-bold text-white transition hover:bg-slate-700"
+              className="mt-6 w-full rounded-xl bg-blue-900 py-3 font-bold text-white"
             >
               Entendido
             </button>

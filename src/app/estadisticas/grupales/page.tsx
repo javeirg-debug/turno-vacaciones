@@ -444,34 +444,6 @@ Estadísticas grupales
 </div>
 
 
-{mostrarInfo && (
-
-  <div className="mb-5 rounded-2xl bg-blue-50 p-5 text-sm text-slate-600 shadow">
-
-    <h3 className="mb-3 font-bold text-blue-900">
-      ¿Cómo se calculan estos datos?
-    </h3>
-
-    <p className="mb-2">
-      • Se revisan los permisos registrados del mes seleccionado.
-    </p>
-
-    <p className="mb-2">
-      • Solo se cuentan los días en los que el usuario tiene turno trabajado.
-    </p>
-
-    <p className="mb-2">
-      • Los días libres del ciclo de turnos no suman como ocupación.
-    </p>
-
-    <p>
-      • El porcentaje indica qué parte de los días laborables del mes está ocupada.
-    </p>
-
-  </div>
-
-)}
-
   <div className="space-y-5">
 
 
@@ -683,26 +655,58 @@ width:`${usuario.porcentaje}%`
       </div>
 
 
-      {mostrarInfo && (
+{mostrarInfo && (
 
-<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
 
-  <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
+    <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
 
-    <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
 
-      <h2 className="text-xl font-bold text-blue-900">
-        ¿Cómo se calcula?
-      </h2>
+        <h2 className="flex items-center gap-2 text-xl font-bold text-blue-900">
 
-      <button
-        onClick={() => setMostrarInfo(false)}
-        className="text-xl text-slate-400"
-      >
-        ✕
-      </button>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5 shrink-0"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
 
-    </div>
+            <path
+              d="M12 11V16"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+
+            <circle
+              cx="12"
+              cy="8"
+              r="1"
+              fill="currentColor"
+            />
+          </svg>
+
+          <span>¿Cómo se calcula?</span>
+
+        </h2>
+
+        <button
+          onClick={() => setMostrarInfo(false)}
+          className="text-xl text-slate-400"
+        >
+          ✕
+        </button>
+
+      </div>
 
 
 <div className="mt-5 space-y-3 text-sm text-slate-600">
