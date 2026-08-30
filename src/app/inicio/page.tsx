@@ -576,6 +576,72 @@ type FechaConflictiva = {
   sala: number;
 };
 
+async function comprimirImagen(
+  archivo: File,
+  maxKB = 200
+): Promise<Blob> {
+  const imagen = new Image();
+
+  const url = URL.createObjectURL(archivo);
+
+  await new Promise<void>((resolve, reject) => {
+    imagen.onload = () => resolve();
+    imagen.onerror = reject;
+    imagen.src = url;
+  });
+
+  URL.revokeObjectURL(url);
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("No se pudo preparar la imagen.");
+  }
+
+  const maxLado = 1000;
+
+  let ancho = imagen.width;
+  let alto = imagen.height;
+
+  if (ancho > maxLado || alto > maxLado) {
+    if (ancho > alto) {
+      alto = Math.round((alto * maxLado) / ancho);
+      ancho = maxLado;
+    } else {
+      ancho = Math.round((ancho * maxLado) / alto);
+      alto = maxLado;
+    }
+  }
+
+  canvas.width = ancho;
+  canvas.height = alto;
+
+  ctx.drawImage(imagen, 0, 0, ancho, alto);
+
+  let calidad = 0.8;
+  let blob: Blob | null = null;
+
+  while (calidad >= 0.2) {
+    blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", calidad)
+    );
+
+    if (blob && blob.size <= maxKB * 1024) {
+      return blob;
+    }
+
+    calidad -= 0.1;
+  }
+
+  if (!blob) {
+    throw new Error("No se pudo comprimir la imagen.");
+  }
+
+  return blob;
+}
+
+
 export default function Inicio() {
   const router = useRouter();
 
@@ -889,6 +955,11 @@ onChange={async (e) => {
 
   if (!archivo) return;
 
+  if (!archivo.type.startsWith("image/")) {
+    alert("Selecciona una imagen.");
+    return;
+  }
+
   if (!usuario?.id) {
     alert("No se ha encontrado el usuario.");
     return;
@@ -898,13 +969,15 @@ onChange={async (e) => {
     setSubiendoAvatar(true);
 
     const nombreArchivo = `${usuario.id}/avatar.jpg`;
+const imagenComprimida = await comprimirImagen(archivo, 200);
+
 
     const { error } = await supabase.storage
       .from("avatars")
-      .upload(nombreArchivo, archivo, {
-        upsert: true,
-        contentType: archivo.type,
-      });
+   .upload(nombreArchivo, imagenComprimida, {
+  upsert: true,
+  contentType: "image/jpeg",
+});
 
     if (error) {
       console.error("ERROR SUBIENDO AVATAR:", error);
