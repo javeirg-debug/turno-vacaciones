@@ -170,6 +170,7 @@ type Solicitud = {
   usuario_id: string;
   nombre: string;
   sexo: string;
+  avatar_url: string | null;
   categoria: string | null;
   puesto: string;
   tipo: string;
@@ -770,20 +771,51 @@ export default function DiaCalendario() {
                             "
                           >
 
-                            {/* NOMBRE */}
+{/* AVATAR + NOMBRE */}
 
-                            <p
-                              className="
-                                min-w-0
-                                flex-1
-                                text-base
-                                font-bold
-                                text-slate-800
-                              "
-                            >
-                              {solicitud.nombre}
-                            </p>
+<div className="flex min-w-0 flex-1 items-center gap-2.5">
 
+  <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-slate-200 ring-1 ring-slate-300">
+
+    {solicitud.avatar_url ? (
+      <img
+        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${solicitud.avatar_url}`}
+        alt=""
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <div className="flex h-full w-full items-center justify-center">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-5 w-5 text-slate-400"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="7" r="4" />
+          <path d="M4 21a8 8 0 0 1 16 0" />
+        </svg>
+      </div>
+    )}
+
+  </div>
+
+  <p
+    className="
+      min-w-0
+      truncate
+      text-base
+      font-bold
+      text-slate-800
+    "
+  >
+    {solicitud.nombre}
+  </p>
+
+</div>
 
                             {/* CATEGORÍA + PUESTO */}
 

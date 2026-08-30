@@ -548,6 +548,7 @@ type Usuario = {
   sexo: string;
   categoria: string | null;
   puesto: string;
+  avatar_url: string | null;
 };
 
 type Solicitud = {
@@ -600,7 +601,13 @@ export default function Inicio() {
     useState(false);
 
   const [horaActual, setHoraActual] = useState("");
-  
+
+  const [subiendoAvatar, setSubiendoAvatar] = useState(false);
+ 
+const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+const [mostrarMenuAvatar, setMostrarMenuAvatar] = useState(false);
+
   const [tiempo, setTiempo] = useState({
   temperatura: null as number | null,
   maxima: null as number | null,
@@ -661,12 +668,27 @@ setTiempo({
         await supabase
           .from("usuarios")
           .select(
-            "id,nombre,rol,sexo,categoria,puesto"
+            "id,nombre,rol,sexo,categoria,puesto,avatar_url"
           )
           .eq("id", user.id)
           .single();
 
       setUsuario(perfil);
+
+if (perfil?.avatar_url) {
+  const { data: avatarData, error: avatarError } =
+    await supabase.storage
+      .from("avatars")
+      .createSignedUrl(perfil.avatar_url, 60 * 60);
+
+  if (avatarError) {
+    console.error("ERROR OBTENIENDO AVATAR:", avatarError);
+  } else {
+    setAvatarUrl(avatarData.signedUrl);
+    
+  }
+}
+
 
       const hoy =
         new Date()
@@ -833,49 +855,193 @@ setTiempo({
     <div className="relative shrink-0">
 
       <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200">
+  {avatarUrl ? (
+    <img
+      src={avatarUrl}
+      alt="Foto de perfil"
+      className="h-full w-full object-cover"
+    />
+  ) : (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-16 w-16"
+      aria-hidden="true"
+    >
+      <path d="M20 21a8 8 0 0 0-16 0" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  )}
+</div>
 
-        {/* ICONO USUARIO */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-16 w-16"
-          aria-hidden="true"
-        >
-          <path d="M20 21a8 8 0 0 0-16 0" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
+<input
+  id="avatar-input"
+  type="file"
+  accept="image/*"
+  className="hidden"
+onChange={async (e) => {
+  const archivo = e.target.files?.[0];
 
-      </div>
+  if (!archivo) return;
+
+  if (!usuario?.id) {
+    alert("No se ha encontrado el usuario.");
+    return;
+  }
+
+  try {
+    setSubiendoAvatar(true);
+
+    const nombreArchivo = `${usuario.id}/avatar.jpg`;
+
+    const { error } = await supabase.storage
+      .from("avatars")
+      .upload(nombreArchivo, archivo, {
+        upsert: true,
+        contentType: archivo.type,
+      });
+
+    if (error) {
+      console.error("ERROR SUBIENDO AVATAR:", error);
+      alert("No se ha podido subir la foto.");
+      return;
+    }
+const { error: errorPerfil } = await supabase
+  .from("usuarios")
+  .update({
+    avatar_url: nombreArchivo,
+  })
+  .eq("id", usuario.id);
+
+if (errorPerfil) {
+  console.error("ERROR GUARDANDO AVATAR EN USUARIO:", errorPerfil);
+  alert("La foto se subió, pero no se pudo guardar el perfil.");
+  return;
+}
+
+const { data: avatarData, error: avatarError } =
+  await supabase.storage
+    .from("avatars")
+    .createSignedUrl(nombreArchivo, 60 * 60);
+
+if (avatarError) {
+  console.error("ERROR OBTENIENDO AVATAR:", avatarError);
+  alert("La foto se guardó, pero no se pudo mostrar.");
+  return;
+}
+
+setAvatarUrl(avatarData.signedUrl);
+
+  } finally {
+    setSubiendoAvatar(false);
+  }
+}}
+/>
 
       {/* BOTÓN EDITAR */}
+<div className="absolute bottom-0 right-0">
+
+  {/* BOTÓN LÁPIZ */}
+  <button
+    type="button"
+    onClick={() => setMostrarMenuAvatar(!mostrarMenuAvatar)}
+    className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700 active:scale-95"
+    aria-label="Editar avatar"
+  >
+    {/* ICONO LÁPIZ */}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+    </svg>
+  </button>
+
+  {/* MENÚ */}
+  {mostrarMenuAvatar && (
+    <div className="absolute left-0 top-11 z-50 w-40 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+
       <button
-        onClick={() => alert("Próximamente")}
-        className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700 active:scale-95"
-        aria-label="Editar avatar"
+        type="button"
+        onClick={() => {
+          setMostrarMenuAvatar(false);
+          document.getElementById("avatar-input")?.click();
+        }}
+        className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
       >
-
-        {/* ICONO LÁPIZ */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-4 w-4"
-          aria-hidden="true"
-        >
-          <path d="M12 20h9" />
-          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
-        </svg>
-
+        Añadir foto
       </button>
+
+{avatarUrl && (
+  <button
+    type="button"
+    onClick={async () => {
+      if (!usuario?.id) return;
+
+      try {
+        setMostrarMenuAvatar(false);
+
+        const nombreArchivo = `${usuario.id}/avatar.jpg`;
+
+        // 1. Borrar foto de Storage
+        const { error: errorStorage } = await supabase.storage
+          .from("avatars")
+          .remove([nombreArchivo]);
+
+        if (errorStorage) {
+          console.error("ERROR ELIMINANDO AVATAR:", errorStorage);
+          alert("No se ha podido eliminar la foto.");
+          return;
+        }
+
+        // 2. Quitar la referencia del perfil
+        const { error: errorPerfil } = await supabase
+          .from("usuarios")
+          .update({
+            avatar_url: null,
+          })
+          .eq("id", usuario.id);
+
+        if (errorPerfil) {
+          console.error(
+            "ERROR QUITANDO AVATAR DEL PERFIL:",
+            errorPerfil
+          );
+          alert("La foto se eliminó, pero no se pudo actualizar el perfil.");
+          return;
+        }
+
+        // 3. Volver al icono de usuario inmediatamente
+        setAvatarUrl(null);
+
+      } catch (error) {
+        console.error("ERROR ELIMINANDO AVATAR:", error);
+        alert("Ha ocurrido un error al eliminar la foto.");
+      }
+    }}
+    className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
+  >
+    Eliminar foto
+  </button>
+)}
+
+    </div>
+  )}
+
+</div>
 
     </div>
 
@@ -1017,27 +1183,27 @@ setTiempo({
 </div>
 
 
+
 {/* =========================
     PANEL DE INICIO
 ========================= */}
 
-<div className="mx-auto mt-4 mb-8 w-full max-w-xl rounded-[22px] bg-white p-6 shadow-[0_4px_18px_rgba(15,23,42,0.08)]">
-
+<div className="mx-auto mt-4 w-full max-w-xl rounded-3xl bg-white p-5 shadow-lg">
   {/* =========================
       PARTE SUPERIOR
   ========================= */}
 
-  <div className="flex items-center justify-between gap-6">
+  <div className="flex items-start justify-between">
 
     {/* HORA - IZQUIERDA */}
 
-    <div className="min-w-0 text-left">
+    <div className="text-left">
 
-      <div className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
+      <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
         Madrid
       </div>
 
-      <div className="mt-1 text-4xl font-extrabold leading-none tracking-tight text-slate-800">
+      <div className="mt-1 text-3xl font-bold leading-none text-slate-800">
         {horaActual}
       </div>
 
@@ -1046,41 +1212,33 @@ setTiempo({
 
     {/* TIEMPO - DERECHA */}
 
-    <div className="shrink-0 text-right">
-
-      {/* LOCALIDAD + ICONO */}
+    <div className="text-right">
 
       <div className="flex items-center justify-end gap-1.5">
 
-        <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
-          Coslada
-        </p>
+  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+    Coslada
+  </p>
 
-        <IconWeather
-          codigo={tiempo.codigo}
-          className="h-6 w-6 shrink-0"
-        />
+ <IconWeather
+  codigo={tiempo.codigo}
+  className="h-6 w-6"
+/>
 
-      </div>
+</div>
 
+      <div className="mt-1 flex items-baseline justify-end gap-1.5">
 
-      {/* TEMPERATURA */}
-
-      <div className="mt-1 flex items-baseline justify-end gap-2">
-
-        <span className="text-3xl font-extrabold leading-none tracking-tight text-slate-800">
+        <span className="text-2xl font-bold leading-tight text-slate-800">
           {tiempo.temperatura !== null
-            ? `${tiempo.temperatura}°C`
-            : "--"}
+  ? `${tiempo.temperatura}°C`
+  : "--"}
         </span>
 
-      </div>
+        <span className="text-xs font-medium text-slate-500">
+          · Máx. {tiempo.maxima ?? "--"}° · Mín. {tiempo.minima ?? "--"}
+        </span>
 
-
-      {/* MÁXIMA / MÍNIMA */}
-
-      <div className="mt-1 text-[11px] font-normal text-slate-400">
-        Máx. {tiempo.maxima ?? "--"}° · Mín. {tiempo.minima ?? "--"}°
       </div>
 
     </div>
@@ -1089,52 +1247,48 @@ setTiempo({
 
 
   {/* =========================
-      ESPACIADOR
+      SEPARADOR
   ========================= */}
 
-  <div className="h-5" />
+  <div className="my-4 h-px bg-slate-100" />
 
 
   {/* =========================
       TURNO
   ========================= */}
 
-  <div className="flex items-center justify-center gap-2">
 
-    <span className="text-sm font-medium text-slate-500">
-      Hoy estás de
-    </span>
+<div className="flex items-center justify-center gap-2 rounded-2xl bg-slate-50 px-4 py-3">
 
+  <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+    Hoy estás de
+  </span>
 
-    {/* CHIP DEL TURNO */}
+  {turnoHoy.icono === "sunrise" && (
+    <IconSunrise className="h-6 w-6 shrink-0" />
+  )}
 
-    <div className="flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2">
+  {turnoHoy.icono === "sun" && (
+    <IconSun className="h-6 w-6 shrink-0" />
+  )}
 
-      {turnoHoy.icono === "sunrise" && (
-        <IconSunrise className="h-5 w-5 shrink-0" />
-      )}
+  {turnoHoy.icono === "moon" && (
+    <IconMoon className="h-6 w-6 shrink-0" />
+  )}
 
-      {turnoHoy.icono === "sun" && (
-        <IconSun className="h-5 w-5 shrink-0" />
-      )}
+  {turnoHoy.icono === "free" && (
+    <IconFree className="h-6 w-6 shrink-0" />
+  )}
 
-      {turnoHoy.icono === "moon" && (
-        <IconMoon className="h-5 w-5 shrink-0" />
-      )}
+  <span className="text-lg font-bold text-slate-800">
+    {turnoHoy.texto}
+  </span>
 
-      {turnoHoy.icono === "free" && (
-        <IconFree className="h-5 w-5 shrink-0" />
-      )}
-
-      <span className="text-sm font-semibold text-white">
-        {turnoHoy.texto}
-      </span>
-
-    </div>
+</div>
 
   </div>
 
-</div>
+
 
 
 
