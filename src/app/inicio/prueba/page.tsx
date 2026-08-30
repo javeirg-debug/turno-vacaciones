@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,7 +9,6 @@ import { obtenerAvisoActivo } from "@/services/avisos";
 import { obtenerConflictosUsuario } from "@/services/conflictos";
 import { eliminarSolicitud } from "@/services/solicitudes";
 import { iconosPermisos } from "@/components/icons/Icons";
-import Avatar from "@/components/perfil/Avatar";
 
 type IconProps = {
   className?: string;
@@ -548,8 +548,7 @@ type Usuario = {
   sexo: string;
   categoria: string | null;
   puesto: string;
-    avatar_url: string | null;
-
+  avatar_url: string | null;
 };
 
 type Solicitud = {
@@ -577,14 +576,77 @@ type FechaConflictiva = {
   sala: number;
 };
 
+async function comprimirImagen(
+  archivo: File,
+  maxKB = 200
+): Promise<Blob> {
+  const imagen = new Image();
+
+  const url = URL.createObjectURL(archivo);
+
+  await new Promise<void>((resolve, reject) => {
+    imagen.onload = () => resolve();
+    imagen.onerror = reject;
+    imagen.src = url;
+  });
+
+  URL.revokeObjectURL(url);
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("No se pudo preparar la imagen.");
+  }
+
+  const maxLado = 1000;
+
+  let ancho = imagen.width;
+  let alto = imagen.height;
+
+  if (ancho > maxLado || alto > maxLado) {
+    if (ancho > alto) {
+      alto = Math.round((alto * maxLado) / ancho);
+      ancho = maxLado;
+    } else {
+      ancho = Math.round((ancho * maxLado) / alto);
+      alto = maxLado;
+    }
+  }
+
+  canvas.width = ancho;
+  canvas.height = alto;
+
+  ctx.drawImage(imagen, 0, 0, ancho, alto);
+
+  let calidad = 0.8;
+  let blob: Blob | null = null;
+
+  while (calidad >= 0.2) {
+    blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", calidad)
+    );
+
+    if (blob && blob.size <= maxKB * 1024) {
+      return blob;
+    }
+
+    calidad -= 0.1;
+  }
+
+  if (!blob) {
+    throw new Error("No se pudo comprimir la imagen.");
+  }
+
+  return blob;
+}
+
+
 export default function Inicio() {
   const router = useRouter();
 
   const [usuario, setUsuario] =
     useState<Usuario | null>(null);
-    
-const [avatarUrl, setAvatarUrl] =
-  useState<string | null>(null);
 
   const [solicitudes, setSolicitudes] =
     useState<Solicitud[]>([]);
@@ -605,7 +667,15 @@ const [avatarUrl, setAvatarUrl] =
     useState(false);
 
   const [horaActual, setHoraActual] = useState("");
-  
+
+  const [subiendoAvatar, setSubiendoAvatar] = useState(false);
+ 
+const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+const [avatarNombreArchivo, setAvatarNombreArchivo] = useState<string | null>(null);
+
+const [mostrarMenuAvatar, setMostrarMenuAvatar] = useState(false);
+
   const [tiempo, setTiempo] = useState({
   temperatura: null as number | null,
   maxima: null as number | null,
@@ -672,6 +742,21 @@ setTiempo({
           .single();
 
       setUsuario(perfil);
+
+if (perfil?.avatar_url) {
+  const { data: avatarData, error: avatarError } =
+    await supabase.storage
+      .from("avatars")
+      .createSignedUrl(perfil.avatar_url, 60 * 60);
+
+  if (avatarError) {
+    console.error("ERROR OBTENIENDO AVATAR:", avatarError);
+  } else {
+    setAvatarUrl(avatarData.signedUrl);
+    
+  }
+}
+
 
       const hoy =
         new Date()
@@ -793,10 +878,6 @@ setTiempo({
     );
   }
 
-if (!usuario) {
-  return null;
-}
-
   const turnoHoy = obtenerTurnoHoy();
 
   return (
@@ -833,19 +914,291 @@ if (!usuario) {
   </button>
 
   {/* CONTENIDO */}
-<div className="flex items-center gap-4 pr-9">
+  <div className="flex items-center gap-4 pr-9">
 
-  {/* =========================
-      AVATAR
-  ========================= */}
+    {/* =========================
+        AVATAR
+    ========================= */}
 
-  <div className="relative shrink-0">
-    <Avatar
-      usuarioId={usuario.id}
-      avatarUrl={usuario.avatar_url}
+    <div className="relative shrink-0">
+
+      <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200">
+  {avatarUrl ? (
+    <img
+      src={avatarUrl}
+      alt="Foto de perfil"
+      className="h-full w-full object-cover"
     />
-  </div>
+  ) : (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-16 w-16"
+      aria-hidden="true"
+    >
+      <path d="M20 21a8 8 0 0 0-16 0" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  )}
+</div>
 
+<input
+  id="avatar-input"
+  type="file"
+  accept="image/*"
+  className="hidden"
+onChange={async (e) => {
+  const archivo = e.target.files?.[0];
+
+  if (!archivo) return;
+
+  if (!archivo.type.startsWith("image/")) {
+    alert("Selecciona una imagen.");
+    return;
+  }
+
+  if (!usuario?.id) {
+    alert("No se ha encontrado el usuario.");
+    return;
+  }
+
+  try {
+    setSubiendoAvatar(true);
+
+    // Guardamos el nombre de la foto anterior
+    const avatarAnterior = avatarNombreArchivo;
+
+    // 1. Comprimir la nueva imagen
+    const imagenComprimida = await comprimirImagen(
+      archivo,
+      200
+    );
+
+    // 2. Crear nombre único para la nueva foto
+    const nombreArchivo =
+      `${usuario.id}/avatar-${Date.now()}.jpg`;
+
+    // 3. Subir la nueva foto
+    const { error: errorSubida } =
+      await supabase.storage
+        .from("avatars")
+        .upload(
+          nombreArchivo,
+          imagenComprimida,
+          {
+            upsert: true,
+            contentType: "image/jpeg",
+          }
+        );
+
+    if (errorSubida) {
+      console.error(
+        "ERROR SUBIENDO AVATAR:",
+        errorSubida
+      );
+
+      alert("No se ha podido subir la foto.");
+      return;
+    }
+
+    // 4. Guardar la nueva referencia en el perfil
+    const { error: errorPerfil } =
+      await supabase
+        .from("usuarios")
+        .update({
+          avatar_url: nombreArchivo,
+        })
+        .eq("id", usuario.id);
+
+    if (errorPerfil) {
+      console.error(
+        "ERROR GUARDANDO AVATAR EN USUARIO:",
+        errorPerfil
+      );
+
+      alert(
+        "La foto se subió, pero no se pudo guardar el perfil."
+      );
+
+      return;
+    }
+
+    // 5. Crear URL firmada para mostrar la nueva foto
+    const {
+      data: avatarData,
+      error: avatarError,
+    } = await supabase.storage
+      .from("avatars")
+      .createSignedUrl(
+        nombreArchivo,
+        60 * 60
+      );
+
+    if (avatarError) {
+      console.error(
+        "ERROR OBTENIENDO AVATAR:",
+        avatarError
+      );
+
+      alert(
+        "La foto se guardó, pero no se pudo mostrar."
+      );
+
+      return;
+    }
+
+    // 6. Mostrar inmediatamente la nueva foto
+    setAvatarUrl(
+      `${avatarData.signedUrl}&t=${Date.now()}`
+    );
+
+    // 7. Guardar en el estado el nombre de la nueva foto
+    setAvatarNombreArchivo(nombreArchivo);
+
+    // 8. Ahora que todo ha funcionado,
+    // borramos la foto anterior
+    if (avatarAnterior) {
+      const { error: errorBorrando } =
+        await supabase.storage
+          .from("avatars")
+          .remove([avatarAnterior]);
+
+      if (errorBorrando) {
+        console.error(
+          "ERROR BORRANDO AVATAR ANTERIOR:",
+          errorBorrando
+        );
+      }
+    }
+
+  } catch (error) {
+    console.error(
+      "ERROR CAMBIANDO AVATAR:",
+      error
+    );
+
+    alert(
+      "Ha ocurrido un error al cambiar la foto."
+    );
+
+  } finally {
+    setSubiendoAvatar(false);
+
+    // Permite volver a seleccionar la misma foto
+    e.target.value = "";
+  }
+}}
+/>
+
+      {/* BOTÓN EDITAR */}
+<div className="absolute bottom-0 right-0">
+
+  {/* BOTÓN LÁPIZ */}
+  <button
+    type="button"
+    onClick={() => setMostrarMenuAvatar(!mostrarMenuAvatar)}
+    className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700 active:scale-95"
+    aria-label="Editar avatar"
+  >
+    {/* ICONO LÁPIZ */}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+    </svg>
+  </button>
+
+  {/* MENÚ */}
+  {mostrarMenuAvatar && (
+    <div className="absolute left-0 top-11 z-50 w-40 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+
+      <button
+        type="button"
+        onClick={() => {
+          setMostrarMenuAvatar(false);
+          document.getElementById("avatar-input")?.click();
+        }}
+        className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      >
+        Añadir foto
+      </button>
+
+{avatarUrl && (
+  <button
+    type="button"
+    onClick={async () => {
+      if (!usuario?.id) return;
+
+      try {
+        setMostrarMenuAvatar(false);
+
+
+        // 1. Borrar foto de Storage
+      if (!avatarNombreArchivo) {
+  alert("No se ha encontrado la foto actual.");
+  return;
+}
+
+const { error: errorStorage } = await supabase.storage
+  .from("avatars")
+  .remove([avatarNombreArchivo]);
+        if (errorStorage) {
+          console.error("ERROR ELIMINANDO AVATAR:", errorStorage);
+          alert("No se ha podido eliminar la foto.");
+          return;
+        }
+
+        // 2. Quitar la referencia del perfil
+        const { error: errorPerfil } = await supabase
+          .from("usuarios")
+          .update({
+            avatar_url: null,
+          })
+          .eq("id", usuario.id);
+
+        if (errorPerfil) {
+          console.error(
+            "ERROR QUITANDO AVATAR DEL PERFIL:",
+            errorPerfil
+          );
+          alert("La foto se eliminó, pero no se pudo actualizar el perfil.");
+          return;
+        }
+
+        // 3. Volver al icono de usuario inmediatamente
+        setAvatarUrl(null);
+
+      } catch (error) {
+        console.error("ERROR ELIMINANDO AVATAR:", error);
+        alert("Ha ocurrido un error al eliminar la foto.");
+      }
+    }}
+    className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
+  >
+    Eliminar foto
+  </button>
+)}
+
+    </div>
+  )}
+
+</div>
+
+    </div>
 
     {/* =========================
         INFORMACIÓN USUARIO
