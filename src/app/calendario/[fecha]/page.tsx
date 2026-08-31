@@ -178,6 +178,7 @@ type Solicitud = {
   fecha_fin: string;
   motivo: string | null;
   estado: string;
+  activo: boolean
   created_at: string;
 };
 
@@ -350,6 +351,8 @@ function obtenerCategoria(categoria: string | null) {
 
   return <span>--</span>;
 }
+
+
 /* =========================
    PÁGINA
 ========================= */
@@ -368,6 +371,9 @@ export default function DiaCalendario() {
 
   const [miUsuarioId, setMiUsuarioId] =
     useState("");
+
+    const [fotoAmpliada, setFotoAmpliada] =
+  useState<string | null>(null);
 
   useEffect(() => {
     async function cargar() {
@@ -775,16 +781,81 @@ export default function DiaCalendario() {
 
 <div className="flex min-w-0 flex-1 items-center gap-2.5">
 
-  <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-slate-200 ring-1 ring-slate-300">
+  {solicitud.activo ? (
+    <>
+      {/* USUARIO ACTIVO */}
 
-    {solicitud.avatar_url ? (
-      <img
-        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${solicitud.avatar_url}`}
-        alt=""
-        className="h-full w-full object-cover"
-      />
-    ) : (
-      <div className="flex h-full w-full items-center justify-center">
+      <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-slate-200 ring-1 ring-slate-300">
+
+        {solicitud.avatar_url ? (
+          <button
+            type="button"
+            onClick={() =>
+              setFotoAmpliada(
+                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${solicitud.avatar_url}`
+              )
+            }
+            className="h-full w-full cursor-pointer"
+            aria-label={`Ampliar foto de ${solicitud.nombre}`}
+          >
+            <img
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${solicitud.avatar_url}`}
+              alt={`Foto de ${solicitud.nombre}`}
+              className="h-full w-full object-cover transition hover:scale-105"
+            />
+          </button>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5 text-slate-400"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="7" r="4" />
+              <path d="M4 21a8 8 0 0 1 16 0" />
+            </svg>
+          </div>
+        )}
+
+      </div>
+
+      <p
+        className="
+          min-w-0
+          truncate
+          text-base
+          font-bold
+          text-slate-800
+        "
+      >
+        {solicitud.nombre}
+      </p>
+    </>
+  ) : (
+    <>
+      {/* USUARIO INACTIVO */}
+
+      <div
+        className="
+          flex
+          h-9
+          w-9
+          shrink-0
+          items-center
+          justify-center
+          rounded-full
+          bg-slate-300
+          text-slate-600
+          ring-1
+          ring-slate-400
+        "
+        aria-hidden="true"
+      >
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -792,31 +863,34 @@ export default function DiaCalendario() {
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="h-5 w-5 text-slate-400"
-          aria-hidden="true"
+          className="h-5 w-5"
         >
-          <circle cx="12" cy="7" r="4" />
-          <path d="M4 21a8 8 0 0 1 16 0" />
+          <rect
+            x="5"
+            y="10"
+            width="14"
+            height="10"
+            rx="2"
+          />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
         </svg>
       </div>
-    )}
 
-  </div>
-
-  <p
-    className="
-      min-w-0
-      truncate
-      text-base
-      font-bold
-      text-slate-800
-    "
-  >
-    {solicitud.nombre}
-  </p>
+      <p
+        className="
+          min-w-0
+          truncate
+          text-base
+          font-bold
+          text-slate-500
+        "
+      >
+        Usuario inactivo
+      </p>
+    </>
+  )}
 
 </div>
-
                             {/* CATEGORÍA + PUESTO */}
 
                             <div
@@ -1289,8 +1363,52 @@ export default function DiaCalendario() {
   Solicitar permiso
 </button>
 
+{fotoAmpliada && (
+  <div
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+    onClick={() => setFotoAmpliada(null)}
+  >
+    <div
+      className="relative flex max-h-[90vh] max-w-[95vw] items-center justify-center"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <img
+        src={fotoAmpliada}
+        alt="Foto ampliada"
+        className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+      />
 
-      <BottomNav />
+      <button
+        type="button"
+        onClick={() => setFotoAmpliada(null)}
+        className="
+          absolute
+          right-2
+          top-2
+          flex
+          h-10
+          w-10
+          items-center
+          justify-center
+          rounded-full
+          bg-black/60
+          text-2xl
+          text-white
+          shadow-lg
+          transition
+          hover:bg-black/80
+          active:scale-95
+        "
+        aria-label="Cerrar foto"
+      >
+        ×
+      </button>
+    </div>
+  </div>
+)}
+
+<BottomNav />
+
 
     </main>
   );

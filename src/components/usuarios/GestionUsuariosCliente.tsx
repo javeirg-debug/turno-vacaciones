@@ -10,6 +10,7 @@ type Usuario = {
   categoria: string | null;
   puesto: string;
   sexo: string;
+  avatar_url: string | null;
   activo: boolean;
 };
 
@@ -475,39 +476,45 @@ export default function GestionUsuariosCliente({
                 "
               >
 
-                {/* INICIALES */}
+{/* AVATAR / INICIALES */}
 
-                <div
-                  className="
-                    flex
-                    w-[76px]
-                    shrink-0
-                    items-center
-                    justify-center
-                  "
-                >
-                  <div
-                    className={`
-                      flex
-                      h-14
-                      w-14
-                      items-center
-                      justify-center
-                      rounded-full
-                      text-lg
-                      font-bold
-                      ${
-                        usuario.sexo === "mujer"
-                          ? "bg-pink-100 text-pink-600"
-                          : "bg-blue-100 text-blue-600"
-                      }
-                    `}
-                  >
-                    {obtenerIniciales(
-                      usuario.nombre || "Usuario"
-                    )}
-                  </div>
-                </div>
+<div
+  className="
+    flex
+    w-[76px]
+    shrink-0
+    items-center
+    justify-center
+  "
+>
+  <div
+    className={`
+      h-14
+      w-14
+      overflow-hidden
+      rounded-full
+      ${
+        usuario.sexo === "mujer"
+          ? "bg-pink-100 text-pink-600"
+          : "bg-blue-100 text-blue-600"
+      }
+    `}
+  >
+    {usuario.avatar_url ? (
+      <img
+        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`}
+        alt={`Foto de ${usuario.nombre}`}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <div className="flex h-full w-full items-center justify-center text-lg font-bold">
+        {obtenerIniciales(
+          usuario.nombre || "Usuario"
+        )}
+      </div>
+    )}
+  </div>
+</div>
 
 
                 {/* INFORMACIÓN */}
@@ -714,42 +721,45 @@ export default function GestionUsuariosCliente({
                 "
               >
 
-                {/* INICIALES */}
+    {/* AVATAR / INICIALES */}
 
-                <div
-                  className="
-                    flex
-                    w-[76px]
-                    shrink-0
-                    items-center
-                    justify-center
-                  "
-                >
-
-                  <div
-                    className={`
-                      flex
-                      h-14
-                      w-14
-                      items-center
-                      justify-center
-                      rounded-full
-                      text-lg
-                      font-bold
-                      ${
-                        usuario.sexo === "mujer"
-                          ? "bg-pink-100 text-pink-600"
-                          : "bg-blue-100 text-blue-600"
-                      }
-                    `}
-                  >
-                    {obtenerIniciales(
-                      usuario.nombre || "Usuario"
-                    )}
-                  </div>
-
-                </div>
-
+<div
+  className="
+    flex
+    w-[76px]
+    shrink-0
+    items-center
+    justify-center
+  "
+>
+  <div
+    className={`
+      h-14
+      w-14
+      overflow-hidden
+      rounded-full
+      ${
+        usuario.sexo === "mujer"
+          ? "bg-pink-100 text-pink-600"
+          : "bg-blue-100 text-blue-600"
+      }
+    `}
+  >
+    {usuario.avatar_url ? (
+      <img
+        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`}
+        alt={`Foto de ${usuario.nombre}`}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <div className="flex h-full w-full items-center justify-center text-lg font-bold">
+        {obtenerIniciales(
+          usuario.nombre || "Usuario"
+        )}
+      </div>
+    )}
+  </div>
+</div>
 
                 {/* INFORMACIÓN */}
 

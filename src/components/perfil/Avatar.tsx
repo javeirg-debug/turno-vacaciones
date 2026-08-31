@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -121,19 +122,41 @@ export default function Avatar({
   avatarUrl,
 }: AvatarProps) {
   const [avatar, setAvatar] = useState<string | null>(avatarUrl);
+
   const [avatarNombreArchivo, setAvatarNombreArchivo] =
     useState<string | null>(null);
 
   const [subiendoAvatar, setSubiendoAvatar] = useState(false);
   const [mostrarMenuAvatar, setMostrarMenuAvatar] = useState(false);
+  const [mostrarAvatarGrande, setMostrarAvatarGrande] = useState(false);
 
   /*
-   * Cargar la referencia real del avatar desde el perfil.
-   *
-   * avatarUrl puede ser:
-   * - null
-   * - una ruta de Supabase Storage
-   * - una URL ya preparada
+   * RECORTADOR
+   */
+  const [imagenParaRecortar, setImagenParaRecortar] =
+    useState<string | null>(null);
+
+  const [zoom, setZoom] = useState(1);
+
+  const [posicion, setPosicion] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  const [arrastrando, setArrastrando] = useState(false);
+
+  const [inicioArrastre, setInicioArrastre] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  const [posicionInicio, setPosicionInicio] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  /*
+   * Cargar avatar desde Supabase
    */
   useEffect(() => {
     async function cargarAvatar() {
@@ -162,10 +185,15 @@ export default function Avatar({
 
         setAvatarNombreArchivo(perfil.avatar_url);
 
-        const { data: avatarData, error: avatarError } =
-          await supabase.storage
-            .from("avatars")
-            .createSignedUrl(perfil.avatar_url, 60 * 60);
+        const {
+          data: avatarData,
+          error: avatarError,
+        } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(
+            perfil.avatar_url,
+            60 * 60
+          );
 
         if (avatarError) {
           console.error(
@@ -189,7 +217,13 @@ export default function Avatar({
     cargarAvatar();
   }, [usuarioId]);
 
-  async function cambiarAvatar(
+  /*
+   * Cuando el usuario selecciona una imagen,
+   * NO se sube todavía.
+   *
+   * Primero abrimos el recortador.
+   */
+  function seleccionarImagen(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
     const archivo = e.target.files?.[0];
@@ -208,93 +242,151 @@ export default function Avatar({
       return;
     }
 
+    const url = URL.createObjectURL(archivo);
+
+    setImagenParaRecortar(url);
+
+    /*
+     * IMPORTANTE:
+     * Empezamos siempre en 1x.
+     * La imagen se adapta visualmente al
+     * área del recortador mediante object-contain.
+     */
+    setZoom(1);
+
+    setPosicion({
+      x: 0,
+      y: 0,
+    });
+
+    e.target.value = "";
+  }
+
+  /*
+   * Confirmar recorte
+   */
+  async function confirmarRecorte() {
+    if (!imagenParaRecortar || !usuarioId) {
+      return;
+    }
+
     try {
       setSubiendoAvatar(true);
 
-      /*
-       * IMPORTANTE:
-       * Guardamos primero el nombre de la foto actual.
-       */
-      const avatarAnterior = avatarNombreArchivo;
+      const imagen = new Image();
+
+      await new Promise<void>((resolve, reject) => {
+        imagen.onload = () => resolve();
+        imagen.onerror = reject;
+        imagen.src = imagenParaRecortar;
+      });
 
       /*
-       * 1. Si existe una foto anterior,
-       *    la borramos PRIMERO.
+       * Tamaño final del avatar.
        */
-      if (avatarAnterior) {
-        const { error: errorBorrando } =
-          await supabase.storage
-            .from("avatars")
-            .remove([avatarAnterior]);
+      const tamaño = 800;
 
-        if (errorBorrando) {
-          console.error(
-            "ERROR BORRANDO AVATAR ANTERIOR:",
-            errorBorrando
-          );
+      const canvas = document.createElement("canvas");
+      canvas.width = tamaño;
+      canvas.height = tamaño;
 
-          alert(
-            "No se ha podido eliminar la foto anterior."
-          );
+      const ctx = canvas.getContext("2d");
 
-          return;
-        }
-
-        /*
-         * Quitamos inmediatamente la referencia
-         * anterior de la base de datos.
-         */
-        const { error: errorPerfilAnterior } =
-          await supabase
-            .from("usuarios")
-            .update({
-              avatar_url: null,
-            })
-            .eq("id", usuarioId);
-
-        if (errorPerfilAnterior) {
-          console.error(
-            "ERROR QUITANDO AVATAR ANTERIOR DEL PERFIL:",
-            errorPerfilAnterior
-          );
-
-          alert(
-            "No se pudo actualizar el perfil."
-          );
-
-          return;
-        }
-
-        setAvatar(null);
-        setAvatarNombreArchivo(null);
+      if (!ctx) {
+        throw new Error(
+          "No se pudo preparar el recorte."
+        );
       }
 
       /*
-       * 2. Comprimir la nueva imagen.
+       * Calculamos la escala necesaria para
+       * cubrir completamente el círculo.
+       *
+       * Esto evita huecos blancos.
        */
-      const imagenComprimida =
-        await comprimirImagen(archivo, 200);
+      const escalaBase = Math.max(
+        tamaño / imagen.width,
+        tamaño / imagen.height
+      );
+
+      const escala = escalaBase * zoom;
+
+      const anchoFinal = imagen.width * escala;
+      const altoFinal = imagen.height * escala;
 
       /*
-       * 3. Crear nombre único.
+       * Posición centrada + desplazamiento del usuario.
+       */
+      const x =
+        (tamaño - anchoFinal) / 2 +
+        posicion.x;
+
+      const y =
+        (tamaño - altoFinal) / 2 +
+        posicion.y;
+
+      /*
+       * Fondo blanco para evitar transparencias
+       * extrañas en algunas imágenes.
+       */
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, tamaño, tamaño);
+
+      ctx.drawImage(
+        imagen,
+        x,
+        y,
+        anchoFinal,
+        altoFinal
+      );
+
+      /*
+       * Crear Blob JPEG.
+       */
+      const blob = await new Promise<Blob | null>(
+        (resolve) =>
+          canvas.toBlob(
+            resolve,
+            "image/jpeg",
+            0.9
+          )
+      );
+
+      if (!blob) {
+        throw new Error(
+          "No se pudo crear la imagen recortada."
+        );
+      }
+
+      /*
+       * Nombre único.
        */
       const nombreArchivo =
         `${usuarioId}/avatar-${Date.now()}.jpg`;
 
       /*
-       * 4. Subir la nueva imagen.
+       * Foto anterior.
        */
-      const { error: errorSubida } =
-        await supabase.storage
-          .from("avatars")
-          .upload(
-            nombreArchivo,
-            imagenComprimida,
-            {
-              upsert: true,
-              contentType: "image/jpeg",
-            }
-          );
+      const avatarAnterior =
+        avatarNombreArchivo;
+
+      /*
+       * Subimos primero la nueva foto.
+       * Así nunca dejamos al usuario sin avatar
+       * si la subida nueva falla.
+       */
+      const {
+        error: errorSubida,
+      } = await supabase.storage
+        .from("avatars")
+        .upload(
+          nombreArchivo,
+          blob,
+          {
+            upsert: true,
+            contentType: "image/jpeg",
+          }
+        );
 
       if (errorSubida) {
         console.error(
@@ -310,16 +402,16 @@ export default function Avatar({
       }
 
       /*
-       * 5. Guardar la nueva referencia
-       *    en el perfil.
+       * Guardar nueva referencia.
        */
-      const { error: errorPerfil } =
-        await supabase
-          .from("usuarios")
-          .update({
-            avatar_url: nombreArchivo,
-          })
-          .eq("id", usuarioId);
+      const {
+        error: errorPerfil,
+      } = await supabase
+        .from("usuarios")
+        .update({
+          avatar_url: nombreArchivo,
+        })
+        .eq("id", usuarioId);
 
       if (errorPerfil) {
         console.error(
@@ -327,24 +419,19 @@ export default function Avatar({
           errorPerfil
         );
 
-        alert(
-          "La foto se subió, pero no se pudo guardar el perfil."
-        );
-
-        /*
-         * Si falla la base de datos intentamos
-         * eliminar la foto recién subida para
-         * no dejar basura en Storage.
-         */
         await supabase.storage
           .from("avatars")
           .remove([nombreArchivo]);
+
+        alert(
+          "La foto se subió, pero no se pudo guardar el perfil."
+        );
 
         return;
       }
 
       /*
-       * 6. Crear URL firmada.
+       * Crear URL firmada.
        */
       const {
         data: avatarData,
@@ -370,18 +457,49 @@ export default function Avatar({
       }
 
       /*
-       * 7. Mostrar inmediatamente
-       *    la nueva foto.
+       * Mostrar nueva imagen.
        */
       setAvatar(
         `${avatarData.signedUrl}&t=${Date.now()}`
       );
 
-      /*
-       * 8. Guardar la nueva referencia.
-       */
-      setAvatarNombreArchivo(nombreArchivo);
+      setAvatarNombreArchivo(
+        nombreArchivo
+      );
 
+      /*
+       * Ahora sí podemos borrar la anterior.
+       */
+      if (avatarAnterior) {
+        const {
+          error: errorBorrando,
+        } = await supabase.storage
+          .from("avatars")
+          .remove([avatarAnterior]);
+
+        if (errorBorrando) {
+          console.error(
+            "ERROR BORRANDO AVATAR ANTERIOR:",
+            errorBorrando
+          );
+        }
+      }
+
+      /*
+       * Cerrar recortador.
+       */
+      URL.revokeObjectURL(
+        imagenParaRecortar
+      );
+
+      setImagenParaRecortar(null);
+
+      setZoom(1);
+
+      setPosicion({
+        x: 0,
+        y: 0,
+      });
     } catch (error) {
       console.error(
         "ERROR CAMBIANDO AVATAR:",
@@ -393,15 +511,97 @@ export default function Avatar({
       );
     } finally {
       setSubiendoAvatar(false);
-
-      /*
-       * Permite volver a seleccionar
-       * la misma foto.
-       */
-      e.target.value = "";
     }
   }
 
+  /*
+   * Cancelar recorte.
+   */
+  function cancelarRecorte() {
+    if (imagenParaRecortar) {
+      URL.revokeObjectURL(
+        imagenParaRecortar
+      );
+    }
+
+    setImagenParaRecortar(null);
+
+    setZoom(1);
+
+    setPosicion({
+      x: 0,
+      y: 0,
+    });
+  }
+
+  /*
+   * Arrastrar imagen.
+   */
+  function comenzarArrastre(
+    e: React.PointerEvent<HTMLDivElement>
+  ) {
+    e.currentTarget.setPointerCapture(
+      e.pointerId
+    );
+
+    setArrastrando(true);
+
+    setInicioArrastre({
+      x: e.clientX,
+      y: e.clientY,
+    });
+
+    setPosicionInicio({
+      ...posicion,
+    });
+  }
+
+  function moverImagen(
+    e: React.PointerEvent<HTMLDivElement>
+  ) {
+    if (!arrastrando) return;
+
+    const deltaX =
+      e.clientX - inicioArrastre.x;
+
+    const deltaY =
+      e.clientY - inicioArrastre.y;
+
+    /*
+     * Limitamos el movimiento para que nunca
+     * se pueda sacar completamente la imagen.
+     */
+    const limite = 180;
+
+    const nuevoX = Math.max(
+      -limite,
+      Math.min(
+        limite,
+        posicionInicio.x + deltaX
+      )
+    );
+
+    const nuevoY = Math.max(
+      -limite,
+      Math.min(
+        limite,
+        posicionInicio.y + deltaY
+      )
+    );
+
+    setPosicion({
+      x: nuevoX,
+      y: nuevoY,
+    });
+  }
+
+  function terminarArrastre() {
+    setArrastrando(false);
+  }
+
+  /*
+   * Eliminar avatar.
+   */
   async function eliminarAvatar() {
     if (!usuarioId) return;
 
@@ -416,13 +616,13 @@ export default function Avatar({
       setSubiendoAvatar(true);
       setMostrarMenuAvatar(false);
 
-      /*
-       * 1. Borrar foto de Storage.
-       */
-      const { error: errorStorage } =
-        await supabase.storage
-          .from("avatars")
-          .remove([avatarNombreArchivo]);
+      const {
+        error: errorStorage,
+      } = await supabase.storage
+        .from("avatars")
+        .remove([
+          avatarNombreArchivo,
+        ]);
 
       if (errorStorage) {
         console.error(
@@ -437,16 +637,14 @@ export default function Avatar({
         return;
       }
 
-      /*
-       * 2. Quitar referencia del perfil.
-       */
-      const { error: errorPerfil } =
-        await supabase
-          .from("usuarios")
-          .update({
-            avatar_url: null,
-          })
-          .eq("id", usuarioId);
+      const {
+        error: errorPerfil,
+      } = await supabase
+        .from("usuarios")
+        .update({
+          avatar_url: null,
+        })
+        .eq("id", usuarioId);
 
       if (errorPerfil) {
         console.error(
@@ -461,12 +659,8 @@ export default function Avatar({
         return;
       }
 
-      /*
-       * 3. Actualizar interfaz.
-       */
       setAvatar(null);
       setAvatarNombreArchivo(null);
-
     } catch (error) {
       console.error(
         "ERROR ELIMINANDO AVATAR:",
@@ -482,89 +676,331 @@ export default function Avatar({
   }
 
   return (
-    <div className="relative shrink-0">
+    <>
+      {/* =========================
+          AVATAR
+      ========================= */}
 
-      {/* AVATAR */}
-      <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200">
+      <div className="relative shrink-0">
 
-        {avatar ? (
-          <img
-            src={avatar}
-            alt="Foto de perfil"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <IconUser className="h-16 w-16" />
-        )}
-
-      </div>
-
-      {/* INPUT OCULTO */}
-      <input
-        id={`avatar-input-${usuarioId}`}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        disabled={subiendoAvatar}
-        onChange={cambiarAvatar}
-      />
-
-      {/* BOTÓN EDITAR */}
-      <div className="absolute bottom-0 right-0">
+        {/* FOTO / AVATAR */}
 
         <button
           type="button"
-          disabled={subiendoAvatar}
-          onClick={() =>
-            setMostrarMenuAvatar(
-              !mostrarMenuAvatar
-            )
+          disabled={!avatar}
+          onClick={() => {
+            if (avatar) {
+              setMostrarAvatarGrande(true);
+            }
+          }}
+          className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200 transition active:scale-95 disabled:cursor-default"
+          aria-label={
+            avatar
+              ? "Ver foto de perfil"
+              : "Sin foto de perfil"
           }
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-          aria-label="Editar avatar"
         >
-          <IconPencil className="h-4 w-4" />
+          {avatar ? (
+            <img
+              src={avatar}
+              alt="Foto de perfil"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <IconUser className="h-16 w-16" />
+          )}
         </button>
 
-        {/* MENÚ */}
-        {mostrarMenuAvatar && (
-          <div className="absolute left-0 top-11 z-50 w-40 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+        {/* =========================
+            INPUT OCULTO
+        ========================= */}
 
-            {/* AÑADIR FOTO */}
-            <button
-              type="button"
-              disabled={subiendoAvatar}
-              onClick={() => {
-                setMostrarMenuAvatar(false);
+        <input
+          id={`avatar-input-${usuarioId}`}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={subiendoAvatar}
+          onChange={seleccionarImagen}
+        />
 
-                document
-                  .getElementById(
-                    `avatar-input-${usuarioId}`
-                  )
-                  ?.click();
-              }}
-              className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
-            >
-              Añadir foto
-            </button>
+        {/* =========================
+            BOTÓN EDITAR
+        ========================= */}
 
-            {/* ELIMINAR FOTO */}
-            {avatar && (
+        <div className="absolute bottom-0 right-0">
+
+          <button
+            type="button"
+            disabled={subiendoAvatar}
+            onClick={() =>
+              setMostrarMenuAvatar(
+                !mostrarMenuAvatar
+              )
+            }
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg ring-4 ring-white transition hover:bg-slate-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            aria-label="Editar avatar"
+          >
+            <IconPencil className="h-4 w-4" />
+          </button>
+
+          {/* =========================
+              MENÚ DEL LÁPIZ
+          ========================= */}
+
+          {mostrarMenuAvatar && (
+            <div className="absolute left-0 top-11 z-50 w-40 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200">
+
               <button
                 type="button"
                 disabled={subiendoAvatar}
-                onClick={eliminarAvatar}
-                className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                onClick={() => {
+                  setMostrarMenuAvatar(false);
+
+                  document
+                    .getElementById(
+                      `avatar-input-${usuarioId}`
+                    )
+                    ?.click();
+                }}
+                className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
               >
-                Eliminar foto
+                Añadir foto
               </button>
-            )}
 
-          </div>
-        )}
+              {avatar && (
+                <button
+                  type="button"
+                  disabled={subiendoAvatar}
+                  onClick={eliminarAvatar}
+                  className="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                >
+                  Eliminar foto
+                </button>
+              )}
 
+            </div>
+          )}
+
+        </div>
       </div>
 
-    </div>
+      {/* =========================
+          RECORTADOR
+      ========================= */}
+
+      {imagenParaRecortar && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-4">
+
+          <div className="flex w-full max-w-md flex-col rounded-3xl bg-white p-5 shadow-2xl">
+
+            {/* TÍTULO */}
+
+            <div className="mb-4 text-center">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Ajusta tu foto
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Arrastra la imagen para colocarla
+                como quieras dentro del círculo.
+              </p>
+            </div>
+
+            {/* =========================
+                ÁREA DE RECORTE
+            ========================= */}
+
+            <div
+              className="relative mx-auto h-[min(75vw,360px)] w-[min(75vw,360px)] max-h-[360px] max-w-[360px] overflow-hidden rounded-2xl bg-slate-950 touch-none select-none"
+              onPointerDown={comenzarArrastre}
+              onPointerMove={moverImagen}
+              onPointerUp={terminarArrastre}
+              onPointerCancel={terminarArrastre}
+              onPointerLeave={() => {
+                if (arrastrando) {
+                  terminarArrastre();
+                }
+              }}
+            >
+
+              {/* IMAGEN */}
+
+              <img
+                src={imagenParaRecortar}
+                alt="Imagen para recortar"
+                draggable={false}
+                className="absolute left-1/2 top-1/2 max-h-full max-w-full select-none object-contain"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  transform: `
+                    translate(
+                      calc(-50% + ${posicion.x}px),
+                      calc(-50% + ${posicion.y}px)
+                    )
+                    scale(${zoom})
+                  `,
+                  transformOrigin:
+                    "center center",
+                  transition: arrastrando
+                    ? "none"
+                    : "transform 0.15s ease-out",
+                }}
+              />
+
+              {/* OSCURECER EXTERIOR */}
+
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(circle at center, transparent 0, transparent 38%, rgba(0,0,0,0.58) 38.5%, rgba(0,0,0,0.58) 100%)",
+                }}
+              />
+
+              {/* CÍRCULO */}
+
+              <div className="pointer-events-none absolute left-1/2 top-1/2 h-[76%] w-[76%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
+
+              {/* TEXTO */}
+
+              <div className="pointer-events-none absolute bottom-3 left-0 right-0 text-center text-xs font-medium text-white drop-shadow-lg">
+                Arrastra para centrar
+              </div>
+            </div>
+
+            {/* =========================
+                ZOOM
+            ========================= */}
+
+            <div className="mt-5">
+
+              <div className="mb-2 flex items-center justify-between text-sm">
+                <span className="font-medium text-slate-700">
+                  Zoom
+                </span>
+
+                <span className="font-semibold text-slate-900">
+                  {zoom.toFixed(1)}×
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.05"
+                value={zoom}
+                onChange={(e) => {
+                  setZoom(
+                    Math.min(
+                      3,
+                      Math.max(
+                        1,
+                        Number(e.target.value)
+                      )
+                    )
+                  );
+                }}
+                className="w-full accent-slate-800"
+              />
+
+              <div className="mt-1 flex justify-between text-xs text-slate-400">
+                <span>1×</span>
+                <span>3×</span>
+              </div>
+            </div>
+
+            {/* =========================
+                BOTONES
+            ========================= */}
+
+            <div className="mt-5 flex gap-3">
+
+              <button
+                type="button"
+                disabled={subiendoAvatar}
+                onClick={cancelarRecorte}
+                className="flex-1 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                disabled={subiendoAvatar}
+                onClick={confirmarRecorte}
+                className="flex-1 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-slate-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {subiendoAvatar
+                  ? "Guardando..."
+                  : "Guardar foto"}
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* =========================
+          FOTO GRANDE
+      ========================= */}
+
+      {mostrarAvatarGrande && avatar && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+          onClick={() =>
+            setMostrarAvatarGrande(false)
+          }
+        >
+
+          <div
+            className="relative w-full max-w-md"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+            {/* BOTÓN CERRAR */}
+
+            <button
+              type="button"
+              onClick={() =>
+                setMostrarAvatarGrande(false)
+              }
+              className="absolute -right-2 -top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg transition hover:bg-slate-100 active:scale-95"
+              aria-label="Cerrar foto"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+              >
+                <path d="m6 6 12 12" />
+                <path d="m18 6-12 12" />
+              </svg>
+            </button>
+
+            {/* FOTO GRANDE */}
+
+            <div className="aspect-square w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
+              <img
+                src={avatar}
+                alt="Foto de perfil ampliada"
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
   );
 }
