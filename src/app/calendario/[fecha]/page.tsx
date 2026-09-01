@@ -178,7 +178,7 @@ type Solicitud = {
   fecha_fin: string;
   motivo: string | null;
   estado: string;
-  activo: boolean
+  activo: boolean;
   created_at: string;
 };
 

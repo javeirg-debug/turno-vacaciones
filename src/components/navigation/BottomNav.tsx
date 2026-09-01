@@ -17,6 +17,7 @@ export default function BottomNav() {
   const calendarioActivo = pathname.startsWith("/calendario");
   const estadisticasActivo = pathname.startsWith("/estadisticas");
   const adminActivo = pathname.startsWith("/usuarios");
+const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
 
   return (
     <>
@@ -98,43 +99,46 @@ export default function BottomNav() {
           </div>
         </button>
 
-        {/* SOLICITUDES */}
-        <Link href="/solicitudes" className="flex-1">
-          <div
-            className={`flex flex-col items-center justify-center rounded-xl py-2 transition ${
-              pathname.startsWith("/solicitudes")
-                ? "bg-slate-200 font-semibold text-slate-900"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              className="h-6 w-6"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M14 3.5V8h5"
-              />
-              <path
-                strokeLinecap="round"
-                d="M8 12h8M8 16h6"
-              />
-            </svg>
+    {/* SOLICITUDES */}
+<button
+  type="button"
+  onClick={() => setMostrarSolicitudes(true)}
+  className="flex-1"
+>
+  <div
+    className={`flex flex-col items-center justify-center rounded-xl py-2 transition ${
+      pathname.startsWith("/solicitudes")
+        ? "bg-slate-200 font-semibold text-slate-900"
+        : "text-slate-600 hover:bg-slate-100"
+    }`}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-6 w-6"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M14 3.5V8h5"
+      />
+      <path
+        strokeLinecap="round"
+        d="M8 12h8M8 16h6"
+      />
+    </svg>
 
-            <span className="text-[10px]">Solicitudes</span>
-          </div>
-        </Link>
-
+    <span className="text-[10px]">Solicitudes</span>
+  </div>
+</button>
         {/* ESTADÍSTICAS */}
         <button
           type="button"
@@ -382,6 +386,126 @@ export default function BottomNav() {
           </div>
         </div>
       )}
+
+{/* =====================================================
+    MODAL SOLICITUDES
+===================================================== */}
+
+{mostrarSolicitudes && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+    onClick={() => setMostrarSolicitudes(false)}
+  >
+    <div
+      className="w-full max-w-md rounded-[20px] bg-white p-6 shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-bold text-[#1a1a1a]">
+          Solicitudes
+        </h2>
+
+        <p className="mt-1 text-sm font-normal text-slate-500">
+          Selecciona una opción
+        </p>
+      </div>
+
+      <div className="space-y-4">
+
+        {/* SOLICITUDES GRUPALES */}
+        <Link
+          href="/solicitudes/grupales"
+          onClick={() => setMostrarSolicitudes(false)}
+          className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+        >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              className="h-7 w-7"
+              aria-hidden="true"
+            >
+              <circle cx="9" cy="7" r="3.5" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 20a6 6 0 0 1 12 0"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16 11a3.5 3.5 0 1 0 0-7"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M18 14a5 5 0 0 1 3 6"
+              />
+            </svg>
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-base font-bold text-slate-900">
+              Solicitudes Grupales
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Solicitudes de todo el equipo
+            </p>
+          </div>
+        </Link>
+
+        {/* SOLICITUDES PERSONALES */}
+        <Link
+          href="/solicitudes"
+          onClick={() => setMostrarSolicitudes(false)}
+          className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+        >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              className="h-7 w-7"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="8" r="3.5" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 21a8 8 0 0 1 16 0"
+              />
+            </svg>
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-base font-bold text-slate-900">
+              Solicitudes Personales
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Solo tus solicitudes
+            </p>
+          </div>
+        </Link>
+
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setMostrarSolicitudes(false)}
+        className="mt-5 w-full rounded-xl py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+)}
+
+
 
       {/* =====================================================
           MODAL ESTADÍSTICAS

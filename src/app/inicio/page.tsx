@@ -560,6 +560,20 @@ type Solicitud = {
   motivo: string | null;
 };
 
+
+function obtenerPermisoHoy(solicitudes: Solicitud[]) {
+  const hoy = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "Europe/Madrid",
+  });
+
+  return solicitudes.find((solicitud) => {
+    return (
+      solicitud.fecha_inicio <= hoy &&
+      solicitud.fecha_fin >= hoy
+    );
+  });
+}
+
 type Aviso = {
   texto: string;
   creado_en: string;
@@ -798,7 +812,7 @@ if (!usuario) {
 }
 
   const turnoHoy = obtenerTurnoHoy();
-
+const permisoHoy = obtenerPermisoHoy(solicitudes);
   return (
     <main className="min-h-screen bg-slate-100 px-4 pb-24 pt-6">
 
@@ -991,6 +1005,7 @@ if (!usuario) {
 ========================= */}
 
 <div className="mx-auto mt-4 w-full max-w-xl rounded-3xl bg-white p-5 shadow-lg">
+
   {/* =========================
       PARTE SUPERIOR
   ========================= */}
@@ -1018,23 +1033,23 @@ if (!usuario) {
 
       <div className="flex items-center justify-end gap-1.5">
 
-  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-    Coslada
-  </p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          Coslada
+        </p>
 
- <IconWeather
-  codigo={tiempo.codigo}
-  className="h-6 w-6"
-/>
+        <IconWeather
+          codigo={tiempo.codigo}
+          className="h-6 w-6"
+        />
 
-</div>
+      </div>
 
       <div className="mt-1 flex items-baseline justify-end gap-1.5">
 
         <span className="text-2xl font-bold leading-tight text-slate-800">
           {tiempo.temperatura !== null
-  ? `${tiempo.temperatura}°C`
-  : "--"}
+            ? `${tiempo.temperatura}°C`
+            : "--"}
         </span>
 
         <span className="text-xs font-medium text-slate-500">
@@ -1059,38 +1074,62 @@ if (!usuario) {
       TURNO
   ========================= */}
 
-
 <div className="flex items-center justify-center gap-2 rounded-2xl bg-slate-50 px-4 py-3">
 
   <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-    Hoy estás de
+    {permisoHoy ? "Hoy tienes" : "Hoy estás de"}
   </span>
 
-  {turnoHoy.icono === "sunrise" && (
-    <IconSunrise className="h-6 w-6 shrink-0" />
-  )}
+  <span className="inline-flex items-center gap-2 rounded-xl bg-slate-800 px-3 py-1.5 text-sm font-bold text-white shadow-sm">
 
-  {turnoHoy.icono === "sun" && (
-    <IconSun className="h-6 w-6 shrink-0" />
-  )}
+    {permisoHoy ? (
+      <>
+       {(() => {
+  const IconoPermiso =
+    iconosPermisos[
+      permisoHoy.tipo as keyof typeof iconosPermisos
+    ];
 
-  {turnoHoy.icono === "moon" && (
-    <IconMoon className="h-6 w-6 shrink-0" />
-  )}
+  return IconoPermiso ? (
+    <IconoPermiso className="h-5 w-5 shrink-0" />
+  ) : (
+    <IconCalendar className="h-5 w-5 shrink-0" />
+  );
+})()}
 
-  {turnoHoy.icono === "free" && (
-    <IconFree className="h-6 w-6 shrink-0" />
-  )}
+        <span>
+          {permisoHoy.tipo}
+        </span>
+      </>
+    ) : (
+      <>
+        {turnoHoy.icono === "sunrise" && (
+          <IconSunrise className="h-5 w-5 shrink-0" />
+        )}
 
-  <span className="text-lg font-bold text-slate-800">
-    {turnoHoy.texto}
+        {turnoHoy.icono === "sun" && (
+          <IconSun className="h-5 w-5 shrink-0" />
+        )}
+
+        {turnoHoy.icono === "moon" && (
+          <IconMoon className="h-5 w-5 shrink-0" />
+        )}
+
+        {turnoHoy.icono === "free" && (
+          <IconFree className="h-5 w-5 shrink-0" />
+        )}
+
+        <span>
+          {turnoHoy.texto}
+        </span>
+      </>
+    )}
+
   </span>
 
 </div>
 
-  </div>
-
-
+</div>
 
 
 
