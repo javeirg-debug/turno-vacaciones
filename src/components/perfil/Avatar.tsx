@@ -54,7 +54,7 @@ function IconPencil({ className }: IconProps) {
 
 async function comprimirImagen(
   archivo: File,
-  maxKB = 200
+  maxKB = 75
 ): Promise<Blob> {
   const imagen = new Image();
 
@@ -284,7 +284,7 @@ export default function Avatar({
       /*
        * Tamaño final del avatar.
        */
-      const tamaño = 800;
+      const tamaño = 400;
 
       const canvas = document.createElement("canvas");
       canvas.width = tamaño;
