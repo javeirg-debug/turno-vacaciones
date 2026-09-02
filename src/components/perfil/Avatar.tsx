@@ -203,9 +203,8 @@ const [avatarCargando, setAvatarCargando] = useState(true);
           return;
         }
 setAvatarCargando(true);
-        setAvatar(
-          `${avatarData.signedUrl}&t=${Date.now()}`
-        );
+setAvatar(avatarData.signedUrl);
+
       } catch (error) {
         console.error(
           "ERROR CARGANDO AVATAR:",
@@ -460,9 +459,8 @@ setAvatarCargando(true);
       /*
        * Mostrar nueva imagen.
        */
-      setAvatar(
-        `${avatarData.signedUrl}&t=${Date.now()}`
-      );
+   setAvatarCargando(true);
+setAvatar(avatarData.signedUrl);
 
       setAvatarNombreArchivo(
         nombreArchivo
