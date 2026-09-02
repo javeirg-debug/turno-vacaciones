@@ -701,7 +701,7 @@ setAvatarCargando(true);
               : "Sin foto de perfil"
           }
         >
-      {avatar ? (
+     {avatar ? (
   <>
     {avatarCargando && (
       <div className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-100">
@@ -711,12 +711,13 @@ setAvatarCargando(true);
 
     <img
       src={avatar}
-      alt="Foto de perfil"
+      alt=""
+      aria-hidden="true"
       onLoad={() => setAvatarCargando(false)}
       onError={() => setAvatarCargando(false)}
       className={`h-full w-full object-cover ${
-        avatarCargando ? "opacity-0" : "opacity-100"
-      } transition-opacity duration-200`}
+        avatarCargando ? "hidden" : "block"
+      }`}
     />
   </>
 ) : (
