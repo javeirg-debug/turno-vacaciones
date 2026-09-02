@@ -121,7 +121,7 @@ export default function Avatar({
   usuarioId,
   avatarUrl,
 }: AvatarProps) {
-  const [avatar, setAvatar] = useState<string | null>(avatarUrl);
+const [avatar, setAvatar] = useState<string | null>(null);
 const [avatarCargando, setAvatarCargando] = useState(true);
   const [avatarNombreArchivo, setAvatarNombreArchivo] =
     useState<string | null>(null);
