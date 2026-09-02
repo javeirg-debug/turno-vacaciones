@@ -122,7 +122,7 @@ export default function Avatar({
   avatarUrl,
 }: AvatarProps) {
   const [avatar, setAvatar] = useState<string | null>(avatarUrl);
-
+const [avatarCargando, setAvatarCargando] = useState(true);
   const [avatarNombreArchivo, setAvatarNombreArchivo] =
     useState<string | null>(null);
 
@@ -202,7 +202,7 @@ export default function Avatar({
           );
           return;
         }
-
+setAvatarCargando(true);
         setAvatar(
           `${avatarData.signedUrl}&t=${Date.now()}`
         );
@@ -271,7 +271,8 @@ export default function Avatar({
     }
 
     try {
-      setSubiendoAvatar(true);
+     setSubiendoAvatar(true);
+setAvatarCargando(true);
 
       const imagen = new Image();
 
@@ -693,22 +694,34 @@ export default function Avatar({
               setMostrarAvatarGrande(true);
             }
           }}
-          className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200 transition active:scale-95 disabled:cursor-default"
+         className="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200 transition active:scale-95 disabled:cursor-default"
           aria-label={
             avatar
               ? "Ver foto de perfil"
               : "Sin foto de perfil"
           }
         >
-          {avatar ? (
-            <img
-              src={avatar}
-              alt="Foto de perfil"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <IconUser className="h-16 w-16" />
-          )}
+      {avatar ? (
+  <>
+    {avatarCargando && (
+      <div className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-100">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+      </div>
+    )}
+
+    <img
+      src={avatar}
+      alt="Foto de perfil"
+      onLoad={() => setAvatarCargando(false)}
+      onError={() => setAvatarCargando(false)}
+      className={`h-full w-full object-cover ${
+        avatarCargando ? "opacity-0" : "opacity-100"
+      } transition-opacity duration-200`}
+    />
+  </>
+) : (
+  <IconUser className="h-16 w-16" />
+)}
         </button>
 
         {/* =========================
