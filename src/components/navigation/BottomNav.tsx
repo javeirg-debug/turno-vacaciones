@@ -300,6 +300,44 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
                 </div>
               </Link>
 
+
+
+              {/* CALENDARIO PERSONAL */}
+              <Link
+                href="/calendario/mio"
+                onClick={() => setMostrarCalendarios(false)}
+                className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="h-7 w-7"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="3.5" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 21a8 8 0 0 1 16 0"
+                    />
+                  </svg>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-slate-900">
+                    Calendario Personal
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Solo tus permisos
+                  </p>
+                </div>
+              </Link>
+
+
               {/* EXCEL GRUPAL */}
               <Link
                 href="/calendario/excel"
@@ -340,40 +378,6 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
                 </div>
               </Link>
 
-              {/* CALENDARIO PERSONAL */}
-              <Link
-                href="/calendario/mio"
-                onClick={() => setMostrarCalendarios(false)}
-                className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    className="h-7 w-7"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="8" r="3.5" />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 21a8 8 0 0 1 16 0"
-                    />
-                  </svg>
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-base font-bold text-slate-900">
-                    Calendario Personal
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Solo tus permisos
-                  </p>
-                </div>
-              </Link>
             </div>
 
             <button

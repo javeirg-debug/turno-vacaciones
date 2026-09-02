@@ -509,7 +509,7 @@ export default function HistorialSolicitudes() {
     />
   </svg>
 
-  Historial de peticiones
+Historial de peticiones
 </h1>
 
 

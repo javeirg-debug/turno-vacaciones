@@ -1492,6 +1492,26 @@ const permisoHoy = obtenerPermisoHoy(solicitudes);
     Próximos permisos
   </h2>
 
+  {/* NUEVA SOLICITUD */}
+  <button
+    type="button"
+    onClick={() => router.push("/solicitudes/nueva")}
+    className="
+      mt-4
+      w-full
+      rounded-xl
+      bg-slate-800
+      py-3
+      font-semibold
+      text-white
+      transition
+      hover:bg-slate-700
+      active:scale-[0.98]
+    "
+  >
+    Nueva solicitud
+  </button>
+
   {cargando ? (
 
     <p className="mt-4">

@@ -420,7 +420,7 @@ setSolicitudesVista(agrupadas);
       d="M9 4h6m-7 4h8m-8 4h5m-5 4h4M6 3h9l3 3v15H6V3z"
     />
   </svg>
-  Solicitudes
+  Mis Solicitudes
 </h1>
 
 
