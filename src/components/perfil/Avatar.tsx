@@ -136,7 +136,7 @@ const [avatarCargando, setAvatarCargando] = useState(true);
   const [imagenParaRecortar, setImagenParaRecortar] =
     useState<string | null>(null);
 
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.5);
 
   const [posicion, setPosicion] = useState({
     x: 0,
@@ -905,22 +905,22 @@ setAvatarCargando(true);
 max="3"
 step="0.05"
                 value={zoom}
-                onChange={(e) => {
-                  setZoom(
-                    Math.min(
-                      3,
-                      Math.max(
-                        0,5,
-                        Number(e.target.value)
-                      )
-                    )
-                  );
-                }}
+               onChange={(e) => {
+  setZoom(
+    Math.min(
+      3,
+      Math.max(
+        0.5,
+        Number(e.target.value)
+      )
+    )
+  );
+}}
                 className="w-full accent-slate-800"
               />
 
               <div className="mt-1 flex justify-between text-xs text-slate-400">
-                <span>0,5×</span>
+                <span>0.5×</span>
                 <span>3×</span>
               </div>
             </div>
