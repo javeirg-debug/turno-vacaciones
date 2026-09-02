@@ -901,16 +901,16 @@ setAvatarCargando(true);
 
               <input
                 type="range"
-                min="1"
-                max="3"
-                step="0.05"
+              min="0.5"
+max="3"
+step="0.05"
                 value={zoom}
                 onChange={(e) => {
                   setZoom(
                     Math.min(
                       3,
                       Math.max(
-                        1,
+                        0,5,
                         Number(e.target.value)
                       )
                     )
@@ -920,7 +920,7 @@ setAvatarCargando(true);
               />
 
               <div className="mt-1 flex justify-between text-xs text-slate-400">
-                <span>1×</span>
+                <span>0,5×</span>
                 <span>3×</span>
               </div>
             </div>
