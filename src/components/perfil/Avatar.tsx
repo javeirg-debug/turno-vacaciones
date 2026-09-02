@@ -1003,13 +1003,13 @@ setAvatarCargando(true);
 
             {/* FOTO GRANDE */}
 
-            <div className="aspect-square w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
-              <img
-                src={avatar}
-                alt="Foto de perfil ampliada"
-                className="h-full w-full object-cover"
-              />
-            </div>
+<div className="aspect-square w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl ring-1 ring-white">
+  <img
+    src={avatar}
+    alt="Foto de perfil ampliada"
+    className="h-full w-full object-cover"
+  />
+</div>
 
           </div>
         </div>
