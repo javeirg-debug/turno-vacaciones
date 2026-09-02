@@ -701,25 +701,27 @@ setAvatarCargando(true);
               : "Sin foto de perfil"
           }
         >
-     {avatar ? (
-  <>
-    {avatarCargando && (
-      <div className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-100">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
-      </div>
-    )}
-
+{avatar ? (
+  <div className="relative h-full w-full">
     <img
       src={avatar}
       alt=""
       aria-hidden="true"
       onLoad={() => setAvatarCargando(false)}
       onError={() => setAvatarCargando(false)}
-      className={`h-full w-full object-cover ${
-        avatarCargando ? "hidden" : "block"
-      }`}
+      className="h-full w-full object-cover"
     />
-  </>
+
+<div
+  className={`absolute inset-0 flex items-center justify-center rounded-full bg-slate-100 transition-opacity duration-200 ${
+    avatarCargando
+      ? "opacity-100"
+      : "pointer-events-none opacity-0"
+  }`}
+>
+  <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+</div>
+  </div>
 ) : (
   <IconUser className="h-16 w-16" />
 )}
