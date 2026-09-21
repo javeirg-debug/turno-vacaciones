@@ -19,6 +19,8 @@ export default function BottomNav() {
   const adminActivo = pathname.startsWith("/usuarios");
 const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
 
+
+
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-slate-200 bg-white px-1 py-2 shadow-lg">
@@ -727,7 +729,49 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
   </svg>
 </button>
               </div>
+{/* ORDEN DE SERVICIO */}
+<Link
+  href="/usuarios/ordenservicio"
+  onClick={() => setMostrarAdmin(false)}
+  className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+>
+  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-7 w-7"
+      aria-hidden="true"
+    >
+      <rect
+        x="5"
+        y="3"
+        width="14"
+        height="18"
+        rx="2"
+      />
 
+      <path d="M9 3v2h6V3" />
+
+      <path d="M8 9h8" />
+      <path d="M8 13h8" />
+      <path d="M8 17h5" />
+    </svg>
+  </div>
+
+  <div className="min-w-0">
+    <p className="text-base font-bold text-slate-900">
+      Orden de Servicio
+    </p>
+
+    <p className="mt-1 text-sm text-slate-500">
+      Generar la orden diaria con las personas disponibles.
+    </p>
+  </div>
+</Link>
               {/* CONFIGURACIÓN OCUPACIÓN */}
               <Link
                 href="/usuarios/ocupacion"
