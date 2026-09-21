@@ -5,6 +5,9 @@ import { supabase } from "@/lib/supabase";
 
 const AVATAR_BUCKET = "avatars";
 
+const POLICIA_PRACTICAS = "Policía en Prácticas";
+const POLICIA_PRACTICAS_VISUAL = "P.Practicas";
+
 type UsuarioOrden = {
   id: string;
   nombre: string;
@@ -42,109 +45,162 @@ type OrdenVisual = {
   creadaAt: string | null;
 };
 
-const POLICIA_PRACTICAS = "Policía en Prácticas";
+/* -------------------------------------------------------------------------- */
+/* HELPERS                                                                    */
+/* -------------------------------------------------------------------------- */
 
 function obtenerFechaLocal() {
   const ahora = new Date();
 
-  const year = ahora.getFullYear();
-  const month = String(ahora.getMonth() + 1).padStart(2, "0");
-  const day = String(ahora.getDate()).padStart(2, "0");
+  return `${ahora.getFullYear()}-${String(
+    ahora.getMonth() + 1
+  ).padStart(2, "0")}-${String(ahora.getDate()).padStart(
+    2,
+    "0"
+  )}`;
+}
 
-  return `${year}-${month}-${day}`;
+/*
+ * La tarjeta comienza mostrando SIEMPRE el día siguiente.
+ */
+function obtenerFechaManana() {
+  const manana = new Date();
+
+  manana.setDate(manana.getDate() + 1);
+
+  return `${manana.getFullYear()}-${String(
+    manana.getMonth() + 1
+  ).padStart(2, "0")}-${String(manana.getDate()).padStart(
+    2,
+    "0"
+  )}`;
+}
+
+function esPoliciaPracticas(
+  nombre: string | null | undefined
+) {
+  if (!nombre) return false;
+
+  const normalizado = nombre
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ");
+
+  return (
+    normalizado === "policia en practicas" ||
+    normalizado === "policia ep" ||
+    normalizado === "p practicas" ||
+    normalizado === "ppracticas"
+  );
 }
 
 function nombreCorto(nombre: string) {
+  if (esPoliciaPracticas(nombre)) {
+    return POLICIA_PRACTICAS_VISUAL;
+  }
+
   const partes = nombre
     .trim()
     .split(/\s+/)
     .filter(Boolean);
 
-  if (partes.length <= 1) {
-    return nombre;
-  }
+  if (partes.length <= 1) return nombre;
 
-  const nombrePrincipal = partes[0];
-
-  const iniciales = partes
+  return `${partes[0]} ${partes
     .slice(1, 3)
-    .map((parte) => `${parte.charAt(0).toUpperCase()}.`)
-    .join("");
-
-  return `${nombrePrincipal} ${iniciales}`;
+    .map(
+      (p) =>
+        `${p.charAt(0).toUpperCase()}.`
+    )
+    .join("")}`;
 }
 
 function formatearFecha(fecha: string) {
   const [year, month, day] = fecha.split("-");
 
-  if (!year || !month || !day) {
-    return fecha;
-  }
+  if (!year || !month || !day) return fecha;
 
   return `${day}/${month}/${year}`;
 }
 
-function formatearFechaHora(fecha: string | null) {
-  if (!fecha) {
-    return "";
-  }
+function formatearFechaHora(
+  fecha: string | null
+) {
+  if (!fecha) return "";
 
   const date = new Date(fecha);
 
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
+  if (Number.isNaN(date.getTime())) return "";
 
-  const dia = String(date.getDate()).padStart(2, "0");
-  const mes = String(date.getMonth() + 1).padStart(2, "0");
+  const dia = String(date.getDate()).padStart(
+    2,
+    "0"
+  );
+
+  const mes = String(
+    date.getMonth() + 1
+  ).padStart(2, "0");
+
   const year = date.getFullYear();
 
-  const horas = String(date.getHours()).padStart(2, "0");
-  const minutos = String(date.getMinutes()).padStart(2, "0");
+  const horas = String(
+    date.getHours()
+  ).padStart(2, "0");
+
+  const minutos = String(
+    date.getMinutes()
+  ).padStart(2, "0");
 
   return `${dia}/${mes}/${year} · ${horas}:${minutos}`;
 }
 
-function normalizarIndicativo(indicativo: string | null | undefined) {
-  if (!indicativo) {
-    return "";
-  }
+function normalizarIndicativo(
+  indicativo: string | null | undefined
+) {
+  if (!indicativo) return "";
 
   return indicativo
     .toUpperCase()
     .replace(/\s+/g, "")
-    .replace("-", "");
+    .replace(/-/g, "");
 }
 
-function numeroIndicativo(indicativo: string) {
-  const normalizado = normalizarIndicativo(indicativo);
+function numeroIndicativo(
+  indicativo: string
+) {
+  const numero = Number(
+    normalizarIndicativo(
+      indicativo
+    ).replace("Z", "")
+  );
 
-  const numero = Number(normalizado.replace("Z", ""));
-
-  return Number.isFinite(numero) ? numero : 9999;
+  return Number.isFinite(numero)
+    ? numero
+    : 9999;
 }
 
-function obtenerAvatarUrl(avatarUrl: string | null | undefined) {
-  if (!avatarUrl) {
-    return null;
-  }
+function obtenerAvatarUrl(
+  avatarUrl: string | null | undefined
+) {
+  if (!avatarUrl) return null;
 
   const valor = avatarUrl.trim();
 
-  if (!valor) {
-    return null;
-  }
+  if (!valor) return null;
 
-  // URL completa
-  if (/^(https?:\/\/|data:|blob:)/i.test(valor)) {
+  if (
+    /^(https?:\/\/|data:|blob:)/i.test(
+      valor
+    )
+  ) {
     return valor;
   }
 
   let path = valor;
 
-  // Permite guardar:
-  // avatars/foto.jpg
-  // foto.jpg
   const prefijo = `${AVATAR_BUCKET}/`;
 
   if (path.startsWith(prefijo)) {
@@ -164,31 +220,40 @@ function obtenerAvatarUrl(avatarUrl: string | null | undefined) {
 
 function Avatar({
   usuario,
-  size = "sm",
+  grande = false,
+  onAmpliar,
 }: {
   usuario: UsuarioOrden;
-  size?: "xs" | "sm";
+  grande?: boolean;
+  onAmpliar?: (url: string) => void;
 }) {
-  const [imagenUrl, setImagenUrl] = useState<string | null>(null);
+  const [imagen, setImagen] =
+    useState<string | null>(null);
 
   useEffect(() => {
     let cancelado = false;
 
-    async function cargarAvatar() {
-      const raw = usuario.avatar_url?.trim();
+    async function cargar() {
+      const raw =
+        usuario.avatar_url?.trim();
 
       if (!raw) {
         if (!cancelado) {
-          setImagenUrl(null);
+          setImagen(null);
         }
+
         return;
       }
 
-      // Si ya es una URL completa
-      if (/^(https?:\/\/|data:|blob:)/i.test(raw)) {
+      if (
+        /^(https?:\/\/|data:|blob:)/i.test(
+          raw
+        )
+      ) {
         if (!cancelado) {
-          setImagenUrl(raw);
+          setImagen(raw);
         }
+
         return;
       }
 
@@ -197,30 +262,38 @@ function Avatar({
       const prefijo = `${AVATAR_BUCKET}/`;
 
       if (path.startsWith(prefijo)) {
-        path = path.slice(prefijo.length);
+        path = path.slice(
+          prefijo.length
+        );
       }
 
-      // Primero intentamos URL pública
-      const publicUrl = obtenerAvatarUrl(raw);
+      const publicUrl =
+        obtenerAvatarUrl(raw);
 
       if (publicUrl) {
         if (!cancelado) {
-          setImagenUrl(publicUrl);
+          setImagen(publicUrl);
         }
+
         return;
       }
 
-      // Fallback para buckets privados
-      const { data } = await supabase.storage
-        .from(AVATAR_BUCKET)
-        .createSignedUrl(path, 60 * 60);
+      const { data } =
+        await supabase.storage
+          .from(AVATAR_BUCKET)
+          .createSignedUrl(
+            path,
+            3600
+          );
 
       if (!cancelado) {
-        setImagenUrl(data?.signedUrl ?? null);
+        setImagen(
+          data?.signedUrl ?? null
+        );
       }
     }
 
-    cargarAvatar();
+    cargar();
 
     return () => {
       cancelado = true;
@@ -228,81 +301,98 @@ function Avatar({
   }, [usuario.avatar_url]);
 
   /*
-   * Preparado para el futuro icono personalizado de
    * Policía en Prácticas.
+   *
+   * De momento mantiene el icono genérico.
+   * Cuando tengas la imagen fija, se cambia aquí.
    */
-  if (usuario.nombre === POLICIA_PRACTICAS) {
+  if (
+    esPoliciaPracticas(
+      usuario.nombre
+    )
+  ) {
     return (
       <div
         className={
-          size === "xs"
-            ? "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-600"
-            : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-600"
+          grande
+            ? "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500"
+            : "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500"
         }
-        title={POLICIA_PRACTICAS}
       >
         <svg
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.7"
-          className="h-4 w-4"
-          aria-hidden="true"
+          className="h-3.5 w-3.5"
         >
+          <circle
+            cx="11"
+            cy="8"
+            r="3"
+          />
+
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M15 19a4 4 0 0 0-8 0"
+            d="M5.5 20a6.5 6.5 0 0 1 13 0"
           />
-          <circle cx="11" cy="8" r="3" />
+
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             d="M17 11a2.5 2.5 0 1 0-1.5-4.5"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M17 19a3.5 3.5 0 0 0-1.5-3"
           />
         </svg>
       </div>
     );
   }
 
-  const tamaño =
-    size === "xs"
-      ? "h-7 w-7"
-      : "h-8 w-8";
+  const tamaño = grande
+    ? "h-7 w-7"
+    : "h-6 w-6";
 
-  if (imagenUrl) {
+  if (imagen) {
     return (
-      <div
-        className={`${tamaño} shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100`}
+      <button
+        type="button"
+        onClick={() => {
+          if (onAmpliar) {
+            onAmpliar(imagen);
+          }
+        }}
+        className={`${tamaño} shrink-0 cursor-pointer overflow-hidden rounded-full border border-slate-200 bg-slate-100`}
+        aria-label={`Ampliar foto de ${usuario.nombre}`}
       >
         <img
-          src={imagenUrl}
-          alt=""
-          className="h-full w-full object-cover"
-          onError={() => setImagenUrl(null)}
+          src={imagen}
+          alt={`Foto de ${usuario.nombre}`}
+          className="h-full w-full object-cover transition hover:scale-105"
+          onError={() =>
+            setImagen(null)
+          }
         />
-      </div>
+      </button>
     );
   }
 
   return (
     <div
-      className={`${tamaño} shrink-0 flex items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-400`}
+      className={`${tamaño} flex shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-400`}
     >
       <svg
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.6"
-        className="h-4 w-4"
-        aria-hidden="true"
+        className="h-3.5 w-3.5"
       >
-        <circle cx="12" cy="8" r="3.2" />
+        <circle
+          cx="12"
+          cy="8"
+          r="3.2"
+        />
+
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -319,24 +409,32 @@ function Avatar({
 
 function Persona({
   usuario,
-  avatarSize = "xs",
+  grande = false,
+  onAmpliar,
 }: {
   usuario: UsuarioOrden;
-  avatarSize?: "xs" | "sm";
+  grande?: boolean;
+  onAmpliar?: (url: string) => void;
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-1.5">
-      <Avatar usuario={usuario} size={avatarSize} />
+    <div className="flex min-w-0 items-center justify-center gap-1">
+      <Avatar
+        usuario={usuario}
+        grande={grande}
+        onAmpliar={onAmpliar}
+      />
 
-      <span className="truncate text-[12px] font-medium leading-none text-slate-700">
-        {nombreCorto(usuario.nombre)}
+      <span className="max-w-[95px] truncate text-[10px] font-medium leading-none text-slate-700">
+        {nombreCorto(
+          usuario.nombre
+        )}
       </span>
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTRELLA RESPONSABLE                                                       */
+/* ESTRELLA                                                                   */
 /* -------------------------------------------------------------------------- */
 
 function EstrellaResponsable() {
@@ -344,8 +442,7 @@ function EstrellaResponsable() {
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
-      className="h-4 w-4 shrink-0 text-amber-500"
-      aria-hidden="true"
+      className="h-3.5 w-3.5 shrink-0 text-amber-500"
     >
       <path d="M12 2.5l2.82 5.72 6.31.92-4.57 4.46 1.08 6.29L12 16.92l-5.64 2.97 1.08-6.29-4.57-4.46 6.31-.92L12 2.5z" />
     </svg>
@@ -353,34 +450,20 @@ function EstrellaResponsable() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* TITULO SECCION                                                             */
-/* -------------------------------------------------------------------------- */
-
-function TituloSeccion({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mb-1.5 flex items-center">
-      <h2 className="text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-        {children}
-      </h2>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/* USUARIO VISUAL                                                             */
+/* CREAR USUARIO                                                              */
 /* -------------------------------------------------------------------------- */
 
 function crearUsuarioVisual(
   usuarioId: string | null,
   nombre: string,
-  usuariosMap: Map<string, UsuarioOrden>
+  usuariosMap: Map<
+    string,
+    UsuarioOrden
+  >
 ): UsuarioOrden {
   if (usuarioId) {
-    const usuario = usuariosMap.get(usuarioId);
+    const usuario =
+      usuariosMap.get(usuarioId);
 
     if (usuario) {
       return usuario;
@@ -388,21 +471,38 @@ function crearUsuarioVisual(
   }
 
   return {
-    id: usuarioId ?? `sin-usuario-${nombre}`,
+    id:
+      usuarioId ??
+      `sin-usuario-${nombre}`,
     nombre,
     avatar_url: null,
   };
 }
 
 /* -------------------------------------------------------------------------- */
-/* COMPONENTE PRINCIPAL                                                       */
+/* COMPONENTE                                                                 */
 /* -------------------------------------------------------------------------- */
 
 export default function TarjetaOrdenServicio() {
-  const [fecha, setFecha] = useState(obtenerFechaLocal);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [orden, setOrden] = useState<OrdenVisual | null>(null);
+  const [fecha, setFecha] = useState(
+    obtenerFechaManana
+  );
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [orden, setOrden] =
+    useState<OrdenVisual | null>(null);
+
+  /*
+   * URL de la fotografía que se está
+   * mostrando ampliada.
+   */
+  const [fotoAmpliada, setFotoAmpliada] =
+    useState<string | null>(null);
 
   useEffect(() => {
     let cancelado = false;
@@ -412,9 +512,9 @@ export default function TarjetaOrdenServicio() {
       setError(null);
 
       try {
-        /* ------------------------------------------------------------------ */
-        /* ORDEN                                                               */
-        /* ------------------------------------------------------------------ */
+        /* ---------------------------------------------------------------- */
+        /* ORDEN                                                             */
+        /* ---------------------------------------------------------------- */
 
         const {
           data: ordenData,
@@ -448,15 +548,17 @@ export default function TarjetaOrdenServicio() {
           return;
         }
 
-        /* ------------------------------------------------------------------ */
-        /* PERSONAL                                                             */
-        /* ------------------------------------------------------------------ */
+        /* ---------------------------------------------------------------- */
+        /* PERSONAL                                                          */
+        /* ---------------------------------------------------------------- */
 
         const {
           data: personalData,
           error: personalError,
         } = await supabase
-          .from("ordenes_servicio_personal")
+          .from(
+            "ordenes_servicio_personal"
+          )
           .select(
             `
               id,
@@ -468,7 +570,10 @@ export default function TarjetaOrdenServicio() {
               orden
             `
           )
-          .eq("orden_id", ordenData.id)
+          .eq(
+            "orden_id",
+            ordenData.id
+          )
           .order("orden", {
             ascending: true,
             nullsFirst: false,
@@ -481,28 +586,39 @@ export default function TarjetaOrdenServicio() {
         const personal: PersonalOrden[] =
           personalData ?? [];
 
-        /* ------------------------------------------------------------------ */
-        /* USUARIOS                                                             */
-        /* ------------------------------------------------------------------ */
+        /* ---------------------------------------------------------------- */
+        /* USUARIOS                                                          */
+        /* ---------------------------------------------------------------- */
 
         const ids = Array.from(
           new Set(
             personal
-              .map((persona) => persona.usuario_id)
+              .map(
+                (persona) =>
+                  persona.usuario_id
+              )
               .filter(
-                (id): id is string => Boolean(id)
+                (
+                  id
+                ): id is string =>
+                  Boolean(id)
               )
           )
         );
 
         if (
           ordenData.creada_por &&
-          !ids.includes(ordenData.creada_por)
+          !ids.includes(
+            ordenData.creada_por
+          )
         ) {
-          ids.push(ordenData.creada_por);
+          ids.push(
+            ordenData.creada_por
+          );
         }
 
-        let usuarios: UsuarioOrden[] = [];
+        let usuarios: UsuarioOrden[] =
+          [];
 
         if (ids.length > 0) {
           const {
@@ -523,38 +639,55 @@ export default function TarjetaOrdenServicio() {
             throw usuariosError;
           }
 
-          usuarios = usuariosData ?? [];
+          usuarios =
+            usuariosData ?? [];
         }
 
-        const usuariosMap = new Map<string, UsuarioOrden>();
+        const usuariosMap =
+          new Map<
+            string,
+            UsuarioOrden
+          >();
 
-        usuarios.forEach((usuario) => {
-          usuariosMap.set(usuario.id, usuario);
-        });
-
-        /* ------------------------------------------------------------------ */
-        /* RESPONSABLE                                                         */
-        /* ------------------------------------------------------------------ */
-
-        const responsableRow = personal.find(
-          (persona) => persona.funcion === "responsable"
+        usuarios.forEach(
+          (usuario) => {
+            usuariosMap.set(
+              usuario.id,
+              usuario
+            );
+          }
         );
 
-        const responsable = responsableRow
-          ? crearUsuarioVisual(
-              responsableRow.usuario_id,
-              responsableRow.nombre,
-              usuariosMap
-            )
-          : null;
+        /* ---------------------------------------------------------------- */
+        /* RESPONSABLE                                                       */
+        /* ---------------------------------------------------------------- */
 
-        /* ------------------------------------------------------------------ */
-        /* SALA                                                                */
-        /* ------------------------------------------------------------------ */
+        const responsableRow =
+          personal.find(
+            (persona) =>
+              persona.funcion ===
+              "responsable"
+          );
 
-        const salaRow = personal.find(
-          (persona) => persona.funcion === "sala"
-        );
+        const responsable =
+          responsableRow
+            ? crearUsuarioVisual(
+                responsableRow.usuario_id,
+                responsableRow.nombre,
+                usuariosMap
+              )
+            : null;
+
+        /* ---------------------------------------------------------------- */
+        /* SALA                                                              */
+        /* ---------------------------------------------------------------- */
+
+        const salaRow =
+          personal.find(
+            (persona) =>
+              persona.funcion ===
+              "sala"
+          );
 
         const sala = salaRow
           ? crearUsuarioVisual(
@@ -564,29 +697,35 @@ export default function TarjetaOrdenServicio() {
             )
           : null;
 
-        /* ------------------------------------------------------------------ */
-        /* SEGURIDAD                                                           */
-        /* ------------------------------------------------------------------ */
+        /* ---------------------------------------------------------------- */
+        /* SEGURIDAD                                                         */
+        /* ---------------------------------------------------------------- */
 
-        const seguridadRows = personal.filter(
-          (persona) => persona.funcion === "seguridad"
-        );
+        const seguridad =
+          personal
+            .filter(
+              (persona) =>
+                persona.funcion ===
+                "seguridad"
+            )
+            .map((persona) =>
+              crearUsuarioVisual(
+                persona.usuario_id,
+                persona.nombre,
+                usuariosMap
+              )
+            );
 
-        const seguridad = seguridadRows.map((persona) =>
-          crearUsuarioVisual(
-            persona.usuario_id,
-            persona.nombre,
-            usuariosMap
-          )
-        );
+        /* ---------------------------------------------------------------- */
+        /* PICO                                                              */
+        /* ---------------------------------------------------------------- */
 
-        /* ------------------------------------------------------------------ */
-        /* PICO                                                                */
-        /* ------------------------------------------------------------------ */
-
-        const picoRow = personal.find(
-          (persona) => persona.funcion === "pico"
-        );
+        const picoRow =
+          personal.find(
+            (persona) =>
+              persona.funcion ===
+              "pico"
+          );
 
         const pico = picoRow
           ? crearUsuarioVisual(
@@ -596,102 +735,92 @@ export default function TarjetaOrdenServicio() {
             )
           : null;
 
-        /* ------------------------------------------------------------------ */
-        /* GAC                                                                 */
-        /* ------------------------------------------------------------------ */
+        /* ---------------------------------------------------------------- */
+        /* GAC                                                               */
+        /* ---------------------------------------------------------------- */
 
-        const gacRows = personal.filter(
-          (persona) => persona.funcion === "gac"
-        );
-
-        const gacMap = new Map<string, GacFila>();
-
-        gacRows.forEach((persona) => {
-          const indicativo = persona.indicativo?.trim();
-
-          if (!indicativo) {
-            return;
-          }
-
-          const clave = normalizarIndicativo(indicativo);
-
-          if (!gacMap.has(clave)) {
-            gacMap.set(clave, {
-              indicativo,
-              orden: persona.orden,
-              personal: [],
-            });
-          }
-
-          const fila = gacMap.get(clave)!;
-
-          /*
-           * El orden 1º/2º pertenece al INDICATIVO entero,
-           * no a cada agente individual.
-           */
-          if (
-            fila.orden === null ||
-            fila.orden === undefined
-          ) {
-            fila.orden = persona.orden;
-          }
-
-          fila.personal.push({
-            usuario: crearUsuarioVisual(
-              persona.usuario_id,
-              persona.nombre,
-              usuariosMap
-            ),
-            orden: persona.orden,
-          });
-        });
-
-        /*
-         * IMPORTANTE:
-         * Los indicativos SIEMPRE se ordenan numéricamente:
-         *
-         * Z-400
-         * Z-401
-         * Z-402
-         * ...
-         *
-         * El 1º/2º no altera este orden.
-         */
-        const gac = Array.from(gacMap.values()).sort(
-          (a, b) =>
-            numeroIndicativo(a.indicativo) -
-            numeroIndicativo(b.indicativo)
-        );
-
-        /* ------------------------------------------------------------------ */
-        /* CREADOR                                                             */
-        /* ------------------------------------------------------------------ */
-
-        let creador: UsuarioOrden | null = null;
-
-        if (ordenData.creada_por) {
-          creador =
-            usuariosMap.get(ordenData.creada_por) ?? null;
-        }
-
-        if (!creador) {
-          const creadorRow = personal.find(
+        const gacRows =
+          personal.filter(
             (persona) =>
-              persona.usuario_id === ordenData.creada_por
+              persona.funcion ===
+              "gac"
           );
 
-          if (creadorRow) {
-            creador = crearUsuarioVisual(
-              creadorRow.usuario_id,
-              creadorRow.nombre,
-              usuariosMap
-            );
-          }
-        }
+        const gacMap =
+          new Map<
+            string,
+            GacFila
+          >();
 
-        /* ------------------------------------------------------------------ */
-        /* RESULTADO                                                           */
-        /* ------------------------------------------------------------------ */
+        gacRows.forEach(
+          (persona) => {
+            if (!persona.indicativo)
+              return;
+
+            const clave =
+              normalizarIndicativo(
+                persona.indicativo
+              );
+
+            if (!gacMap.has(clave)) {
+              gacMap.set(clave, {
+                indicativo:
+                  persona.indicativo.trim(),
+                orden: persona.orden,
+                personal: [],
+              });
+            }
+
+            const fila =
+              gacMap.get(clave)!;
+
+            if (
+              fila.orden === null ||
+              fila.orden === undefined
+            ) {
+              fila.orden =
+                persona.orden;
+            }
+
+            fila.personal.push({
+              usuario:
+                crearUsuarioVisual(
+                  persona.usuario_id,
+                  persona.nombre,
+                  usuariosMap
+                ),
+              orden:
+                persona.orden,
+            });
+          }
+        );
+
+        const gac = Array.from(
+          gacMap.values()
+        ).sort(
+          (a, b) =>
+            numeroIndicativo(
+              a.indicativo
+            ) -
+            numeroIndicativo(
+              b.indicativo
+            )
+        );
+
+        /* ---------------------------------------------------------------- */
+        /* CREADOR                                                           */
+        /* ---------------------------------------------------------------- */
+
+        const creador =
+          ordenData.creada_por
+            ? usuariosMap.get(
+                ordenData.creada_por
+              ) ?? null
+            : null;
+
+        /* ---------------------------------------------------------------- */
+        /* RESULTADO                                                         */
+        /* ---------------------------------------------------------------- */
 
         if (!cancelado) {
           setOrden({
@@ -701,12 +830,13 @@ export default function TarjetaOrdenServicio() {
             pico,
             gac,
             creador,
-            creadaAt: ordenData.creada_at,
+            creadaAt:
+              ordenData.creada_at,
           });
         }
       } catch (err) {
         console.error(
-          "Error cargando orden de servicio:",
+          "Error cargando orden:",
           err
         );
 
@@ -714,6 +844,7 @@ export default function TarjetaOrdenServicio() {
           setError(
             "No se ha podido cargar la orden de servicio."
           );
+
           setOrden(null);
         }
       } finally {
@@ -730,305 +861,425 @@ export default function TarjetaOrdenServicio() {
     };
   }, [fecha]);
 
-  /* ------------------------------------------------------------------------ */
-  /* CARGANDO                                                                  */
-  /* ------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------- */
+  /* CARGANDO                                                               */
+  /* ---------------------------------------------------------------------- */
 
   if (cargando) {
     return (
-      <div className="mx-auto w-full max-w-2xl p-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="animate-pulse space-y-3">
-            <div className="mx-auto h-4 w-40 rounded bg-slate-200" />
-            <div className="mx-auto h-3 w-24 rounded bg-slate-200" />
-
-            <div className="h-16 rounded-lg bg-slate-100" />
-
-            <div className="h-20 rounded-lg bg-slate-100" />
-            <div className="h-20 rounded-lg bg-slate-100" />
-            <div className="h-24 rounded-lg bg-slate-100" />
+      <div className="mx-auto w-full max-w-xl p-2">
+        <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="animate-pulse space-y-2">
+            <div className="h-4 w-32 rounded bg-slate-200" />
+            <div className="h-7 rounded bg-slate-100" />
+            <div className="h-7 rounded bg-slate-100" />
+            <div className="h-28 rounded bg-slate-100" />
           </div>
         </div>
       </div>
     );
   }
 
-  /* ------------------------------------------------------------------------ */
-  /* ERROR                                                                     */
-  /* ------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------- */
+  /* ERROR REAL                                                              */
+  /* ---------------------------------------------------------------------- */
 
   if (error) {
     return (
-      <div className="mx-auto w-full max-w-2xl p-3">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+      <div className="mx-auto w-full max-w-xl p-2">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center text-xs text-red-700">
           {error}
         </div>
       </div>
     );
   }
 
-  /* ------------------------------------------------------------------------ */
-  /* SIN ORDEN                                                                 */
-  /* ------------------------------------------------------------------------ */
-
-  if (!orden) {
-    return (
-      <div className="mx-auto w-full max-w-2xl p-3">
-        <div className="mb-2 flex items-center justify-end">
-          <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none focus:border-slate-400"
-          />
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-8 text-center shadow-sm">
-          <p className="text-sm font-medium text-slate-500">
-            No hay orden de servicio para esta fecha.
-          </p>
-
-          <p className="mt-1 text-xs text-slate-400">
-            {formatearFecha(fecha)}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  /* ------------------------------------------------------------------------ */
-  /* VISTA                                                                     */
-  /* ------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------- */
+  /* VISTA                                                                   */
+  /* ---------------------------------------------------------------------- */
 
   return (
-    <div className="mx-auto w-full max-w-2xl p-3">
-      {/* FECHA */}
+    <>
+      <div className="mx-auto w-full max-w-xl p-2">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
 
-      <div className="mb-2 flex items-center justify-end">
-        <input
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none focus:border-slate-400"
-        />
-      </div>
+          {/* ================================================================ */}
+          {/* CABECERA + CALENDARIO                                             */}
+          {/* ================================================================ */}
 
-      {/* TARJETA ÚNICA */}
+          <div className="relative border-b border-slate-100 px-3 py-1.5">
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        {/* ---------------------------------------------------------------- */}
-        {/* RESPONSABLE                                                       */}
-        {/* ---------------------------------------------------------------- */}
-
-        <div className="border-b border-slate-100 px-3 py-3 text-center">
-          {orden.responsable ? (
-            <div className="flex items-center justify-center gap-1.5">
-              <EstrellaResponsable />
-
-              <span className="text-[13px] font-bold leading-tight text-slate-800">
-                {orden.responsable.nombre}
-              </span>
-            </div>
-          ) : (
-            <span className="text-[12px] text-slate-400">
-              Sin responsable
-            </span>
-          )}
-        </div>
-
-        {/* ---------------------------------------------------------------- */}
-        {/* CONTENIDO                                                         */}
-        {/* ---------------------------------------------------------------- */}
-
-        <div className="space-y-3 p-3">
-          {/* ============================================================= */}
-          {/* SALA                                                            */}
-          {/* ============================================================= */}
-
-          <section>
-            <TituloSeccion>Sala</TituloSeccion>
-
-            <div className="flex min-h-[38px] items-center justify-center rounded-lg bg-slate-50 px-2 py-1.5">
-              {orden.sala ? (
-                <Persona
-                  usuario={orden.sala}
-                  avatarSize="sm"
-                />
-              ) : (
-                <span className="text-[11px] text-slate-400">
-                  Sin personal
+            {!orden ? (
+              <div className="flex min-h-[25px] items-center pr-28">
+                <span className="truncate text-[10px] text-slate-500">
+                  No hay orden de servicio creada para el día{" "}
+                  <span className="font-semibold text-slate-700">
+                    {formatearFecha(fecha)}
+                  </span>
                 </span>
-              )}
-            </div>
-          </section>
-
-          {/* ============================================================= */}
-          {/* SEGURIDAD                                                       */}
-          {/* ============================================================= */}
-
-          <section>
-            <TituloSeccion>Seguridad</TituloSeccion>
-
-            <div className="flex min-h-[38px] items-center justify-center gap-5 rounded-lg bg-slate-50 px-2 py-1.5">
-              {orden.seguridad.length > 0 ? (
-                orden.seguridad.map((usuario, index) => (
-                  <Persona
-                    key={`${usuario.id}-${index}`}
-                    usuario={usuario}
-                    avatarSize="sm"
-                  />
-                ))
-              ) : (
-                <span className="text-[11px] text-slate-400">
-                  Sin personal
+              </div>
+            ) : (
+              <div className="flex min-h-[25px] items-center">
+                <span className="text-[11px] font-semibold text-slate-700">
+                  Orden de Servicio
                 </span>
-              )}
-            </div>
-          </section>
-
-          {/* ============================================================= */}
-          {/* GAC                                                             */}
-          {/* ============================================================= */}
-
-          {orden.gac.length > 0 && (
-            <section>
-              <TituloSeccion>GAC</TituloSeccion>
-
-              {/*
-               * SIN TARJETAS INDIVIDUALES PARA LOS Z.
-               * Cada indicativo es solamente una fila.
-               */}
-
-              <div className="overflow-hidden rounded-lg border border-slate-100">
-                {orden.gac.map((fila, index) => {
-                  const esPrimero = fila.orden === 1;
-                  const esSegundo = fila.orden === 2;
-
-                  /*
-                   * Prácticas SIEMPRE al final.
-                   *
-                   * Primero obtenemos los agentes normales
-                   * y después los de prácticas.
-                   */
-                  const personalNormal =
-                    fila.personal.filter(
-                      (persona) =>
-                        persona.usuario.nombre !==
-                        POLICIA_PRACTICAS
-                    );
-
-                  const personalPracticas =
-                    fila.personal.filter(
-                      (persona) =>
-                        persona.usuario.nombre ===
-                        POLICIA_PRACTICAS
-                    );
-
-                  const personalOrdenado = [
-                    ...personalNormal,
-                    ...personalPracticas,
-                  ];
-
-                  return (
-                    <div
-                      key={`${fila.indicativo}-${index}`}
-                      className={[
-                        "flex min-h-[42px] items-center gap-2 px-2 py-1.5",
-                        index > 0
-                          ? "border-t border-slate-100"
-                          : "",
-                        esPrimero
-                          ? "bg-blue-50/60"
-                          : esSegundo
-                            ? "bg-slate-100"
-                            : "bg-white",
-                      ].join(" ")}
-                    >
-                      {/* INDICATIVO + ORDEN */}
-
-                      <div className="flex w-[72px] shrink-0 items-center gap-1.5">
-                        <span
-                          className={[
-                            "flex h-5 min-w-5 items-center justify-center rounded px-1 text-[9px] font-bold",
-                            esPrimero
-                              ? "bg-blue-200 text-blue-800"
-                              : esSegundo
-                                ? "bg-slate-600 text-white"
-                                : "bg-slate-200 text-slate-600",
-                          ].join(" ")}
-                        >
-                          {esPrimero
-                            ? "1º"
-                            : esSegundo
-                              ? "2º"
-                              : ""}
-                        </span>
-
-                        <span className="text-[11px] font-bold text-slate-700">
-                          {fila.indicativo}
-                        </span>
-                      </div>
-
-                      {/* PERSONAS */}
-
-                      <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
-                        {personalOrdenado.map(
-                          (persona, personaIndex) => (
-                            <Persona
-                              key={`${persona.usuario.id}-${personaIndex}`}
-                              usuario={persona.usuario}
-                              avatarSize="xs"
-                            />
-                          )
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
-            </section>
-          )}
-
-          {/* ============================================================= */}
-          {/* PICO                                                            */}
-          {/* ============================================================= */}
-
-          {orden.pico && (
-            <section>
-              <TituloSeccion>PICO</TituloSeccion>
-
-              <div className="flex min-h-[38px] items-center justify-center rounded-lg bg-slate-50 px-2 py-1.5">
-                <Persona
-                  usuario={orden.pico}
-                  avatarSize="sm"
-                />
-              </div>
-            </section>
-          )}
-        </div>
-
-        {/* ---------------------------------------------------------------- */}
-        {/* PIE                                                               */}
-        {/* ---------------------------------------------------------------- */}
-
-        <div className="border-t border-slate-100 px-3 py-2 text-center">
-          <span className="text-[9px] text-slate-400">
-            Creada por{" "}
-            <span className="font-medium text-slate-500">
-              {orden.creador
-                ? nombreCorto(orden.creador.nombre)
-                : "—"}
-            </span>
-
-            {orden.creadaAt && (
-              <>
-                {" "}
-                · {formatearFechaHora(orden.creadaAt)}
-              </>
             )}
-          </span>
+
+            {/* CALENDARIO ARRIBA DERECHA */}
+
+            <div className="absolute right-2 top-1.5">
+              <input
+                type="date"
+                value={fecha}
+                onChange={(e) =>
+                  setFecha(
+                    e.target.value
+                  )
+                }
+                className="h-6 rounded border border-slate-200 bg-white px-1.5 text-[10px] text-slate-600 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* ================================================================ */}
+          {/* SIN ORDEN                                                         */}
+          {/* ================================================================ */}
+
+          {!orden ? null : (
+            <>
+              <div className="px-2.5 py-1.5">
+
+                {/* RESPONSABLE */}
+
+                <div className="flex h-6 items-center justify-center">
+                  {orden.responsable ? (
+                    <div className="flex items-center justify-center gap-1">
+                      <EstrellaResponsable />
+
+                      <span className="text-[11px] font-bold leading-none text-slate-800">
+                        {orden.responsable.nombre}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-[9px] text-slate-400">
+                      Sin responsable
+                    </span>
+                  )}
+                </div>
+
+                {/* SALA */}
+
+                <section className="mb-2">
+                  <div className="mb-0.5 text-center text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                    Sala
+                  </div>
+
+                  <div className="flex h-7 items-center justify-center">
+                    {orden.sala ? (
+                      <Persona
+                        usuario={
+                          orden.sala
+                        }
+                        grande
+                        onAmpliar={
+                          setFotoAmpliada
+                        }
+                      />
+                    ) : (
+                      <span className="text-[9px] text-slate-400">
+                        Sin personal
+                      </span>
+                    )}
+                  </div>
+                </section>
+
+                {/* SEGURIDAD */}
+
+                <section className="mb-2">
+                  <div className="mb-0.5 text-center text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                    Seguridad
+                  </div>
+
+                  <div className="flex h-7 items-center justify-center gap-4">
+                    {orden.seguridad.length ? (
+                      orden.seguridad.map(
+                        (
+                          usuario,
+                          index
+                        ) => (
+                          <Persona
+                            key={`${usuario.id}-${index}`}
+                            usuario={
+                              usuario
+                            }
+                            grande
+                            onAmpliar={
+                              setFotoAmpliada
+                            }
+                          />
+                        )
+                      )
+                    ) : (
+                      <span className="text-[9px] text-slate-400">
+                        Sin personal
+                      </span>
+                    )}
+                  </div>
+                </section>
+
+                {/* GAC */}
+
+                {orden.gac.length ? (
+                  <section className="mb-2">
+                    <div className="mb-0.5 text-center text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                      GAC
+                    </div>
+
+                    <div className="w-full">
+                      {orden.gac.map(
+                        (
+                          fila,
+                          index
+                        ) => {
+                          const esPrimero =
+                            fila.orden ===
+                            1;
+
+                          const esSegundo =
+                            fila.orden ===
+                            2;
+
+                          const normales =
+                            fila.personal.filter(
+                              (persona) =>
+                                !esPoliciaPracticas(
+                                  persona
+                                    .usuario
+                                    .nombre
+                                )
+                            );
+
+                          const practicas =
+                            fila.personal.filter(
+                              (persona) =>
+                                esPoliciaPracticas(
+                                  persona
+                                    .usuario
+                                    .nombre
+                                )
+                            );
+
+                          const izquierda =
+                            normales[0] ??
+                            null;
+
+                          const derecha =
+                            practicas[0] ??
+                            normales[1] ??
+                            null;
+
+                          return (
+                            <div
+                              key={`${fila.indicativo}-${index}`}
+                              className="flex h-8 items-center justify-center"
+                            >
+
+                              {/* ORDEN */}
+
+                              <span
+                                className={[
+                                  "mr-1 flex h-4 min-w-[18px] items-center justify-center rounded px-1 text-[8px] font-bold",
+                                  esPrimero
+                                    ? "bg-blue-100 text-blue-700"
+                                    : esSegundo
+                                      ? "bg-slate-600 text-white"
+                                      : "bg-slate-200 text-slate-600",
+                                ].join(
+                                  " "
+                                )}
+                              >
+                                {esPrimero
+                                  ? "1º"
+                                  : esSegundo
+                                    ? "2º"
+                                    : ""}
+                              </span>
+
+                              {/* INDICATIVO */}
+
+                              <span className="mr-2 w-[39px] shrink-0 text-[9px] font-bold text-slate-700">
+                                {
+                                  fila.indicativo
+                                }
+                              </span>
+
+                              {/* AGENTE IZQUIERDO */}
+
+                              <div className="flex min-w-[105px] items-center justify-end gap-1">
+                                {izquierda ? (
+                                  <>
+                                    <span className="max-w-[76px] truncate text-right text-[9px] font-medium leading-none text-slate-700">
+                                      {nombreCorto(
+                                        izquierda
+                                          .usuario
+                                          .nombre
+                                      )}
+                                    </span>
+
+                                    <Avatar
+                                      usuario={
+                                        izquierda.usuario
+                                      }
+                                      onAmpliar={
+                                        setFotoAmpliada
+                                      }
+                                    />
+                                  </>
+                                ) : null}
+                              </div>
+
+                              {/* ESPACIO CENTRAL */}
+
+                              <div className="w-2 shrink-0" />
+
+                              {/* AGENTE DERECHO */}
+
+                              <div className="flex min-w-[105px] items-center justify-start gap-1">
+                                {derecha ? (
+                                  <>
+                                    <Avatar
+                                      usuario={
+                                        derecha.usuario
+                                      }
+                                      onAmpliar={
+                                        setFotoAmpliada
+                                      }
+                                    />
+
+                                    <span className="max-w-[76px] truncate text-left text-[9px] font-medium leading-none text-slate-700">
+                                      {nombreCorto(
+                                        derecha
+                                          .usuario
+                                          .nombre
+                                      )}
+                                    </span>
+                                  </>
+                                ) : null}
+                              </div>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  </section>
+                ) : null}
+
+                {/* PICO */}
+
+                {orden.pico ? (
+                  <section>
+                    <div className="mb-0.5 text-center text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                      PICO
+                    </div>
+
+                    <div className="flex h-7 items-center justify-center">
+                      <Persona
+                        usuario={
+                          orden.pico
+                        }
+                        grande
+                        onAmpliar={
+                          setFotoAmpliada
+                        }
+                      />
+                    </div>
+                  </section>
+                ) : null}
+              </div>
+
+              {/* ============================================================ */}
+              {/* FOOTER                                                       */}
+              {/* ============================================================ */}
+
+              <div className="border-t border-slate-100 px-2 py-1 text-center">
+                <span className="text-[8px] leading-none text-slate-400">
+                  Creada por{" "}
+                  <span className="font-medium text-slate-500">
+                    {orden.creador
+                      ? nombreCorto(
+                          orden
+                            .creador
+                            .nombre
+                        )
+                      : "—"}
+                  </span>
+
+                  {orden.creadaAt
+                    ? ` · ${formatearFechaHora(
+                        orden.creadaAt
+                      )}`
+                    : ""}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* ================================================================ */}
+      {/* FOTO AMPLIADA                                                     */}
+      {/* ================================================================ */}
+
+      {fotoAmpliada && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+          onClick={() =>
+            setFotoAmpliada(null)
+          }
+        >
+          <div
+            className="relative flex max-h-[90vh] max-w-[95vw] items-center justify-center"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+            <img
+              src={fotoAmpliada}
+              alt="Foto ampliada"
+              className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setFotoAmpliada(null)
+              }
+              className="
+                absolute
+                right-2
+                top-2
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-full
+                bg-black/60
+                text-2xl
+                text-white
+                shadow-lg
+                transition
+                hover:bg-black/80
+                active:scale-95
+              "
+              aria-label="Cerrar foto"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
