@@ -9,6 +9,7 @@ import { obtenerConflictosUsuario } from "@/services/conflictos";
 import { eliminarSolicitud } from "@/services/solicitudes";
 import { iconosPermisos } from "@/components/icons/Icons";
 import Avatar from "@/components/perfil/Avatar";
+import TarjetaOrdenServicio from "@/components/ordenservicio/TarjetaOrdenServicio";
 
 type IconProps = {
   className?: string;
@@ -1133,6 +1134,7 @@ const permisoHoy = obtenerPermisoHoy(solicitudes);
 
 
 
+
       {/* =========================
           AVISOS
       ========================= */}
@@ -1163,6 +1165,14 @@ const permisoHoy = obtenerPermisoHoy(solicitudes);
         )}
 
       </div>
+
+
+      {/* =========================
+          ORDEN DE SERVICIO
+      ========================= */}
+
+      <TarjetaOrdenServicio />
+
 
       {/* =========================
     FECHAS CONFLICTIVAS
