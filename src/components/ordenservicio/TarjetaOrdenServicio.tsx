@@ -40,7 +40,6 @@ type OrdenVisual = {
   responsable: UsuarioOrden | null;
   sala: UsuarioOrden | null;
   seguridad: UsuarioOrden[];
-  pico: UsuarioOrden | null;
   gac: GacFila[];
   creador: UsuarioOrden | null;
   creadaAt: string | null;
@@ -323,8 +322,8 @@ function Avatar({
       <div
         className={
           grande
-            ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500"
-            : "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500"
+            ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-500 shadow-sm"
+            : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-500 shadow-sm"
         }
       >
         <svg
@@ -357,8 +356,8 @@ function Avatar({
   }
 
   const tamaño = grande
-    ? "h-8 w-8"
-    : "h-7 w-7";
+    ? "h-9 w-9"
+    : "h-8 w-8";
 
   if (imagen) {
     return (
@@ -369,7 +368,7 @@ function Avatar({
             onAmpliar(imagen);
           }
         }}
-        className={`${tamaño} shrink-0 cursor-pointer overflow-hidden rounded-full border border-slate-200 bg-slate-100`}
+        className={`${tamaño} shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-sm`}
         aria-label={`Ampliar foto de ${usuario.nombre}`}
       >
         <img
@@ -386,7 +385,7 @@ function Avatar({
 
   return (
     <div
-      className={`${tamaño} flex shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-400`}
+      className={`${tamaño} flex shrink-0 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-500 shadow-sm`}
     >
       <svg
         viewBox="0 0 24 24"
@@ -427,14 +426,14 @@ function Persona({
   ) => void;
 }) {
   return (
-    <div className="flex min-w-0 items-center justify-center gap-1.5">
+    <div className="flex min-w-0 items-center gap-2">
       <Avatar
         usuario={usuario}
         grande={grande}
         onAmpliar={onAmpliar}
       />
 
-      <span className="max-w-[125px] truncate text-[11px] font-semibold leading-none text-slate-700">
+      <span className="min-w-0 truncate text-[12px] font-semibold leading-tight text-slate-700">
         {nombreCorto(
           usuario.nombre
         )}
@@ -452,9 +451,38 @@ function EstrellaResponsable() {
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
-      className="h-4 w-4 shrink-0 text-amber-500"
+      className="h-5 w-5 shrink-0 text-slate-700"
     >
       <path d="M12 2.5l2.82 5.72 6.31.92-4.57 4.46 1.08 6.29L12 16.92l-5.64 2.97 1.08-6.29-4.57-4.46 6.31-.92L12 2.5z" />
+    </svg>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* ICONO CALENDARIO                                                           */
+/* -------------------------------------------------------------------------- */
+
+function IconoCalendario() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+    >
+      <rect
+        x="3.5"
+        y="5"
+        width="17"
+        height="15"
+        rx="2.5"
+      />
+
+      <path
+        strokeLinecap="round"
+        d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"
+      />
     </svg>
   );
 }
@@ -718,27 +746,20 @@ export default function TarjetaOrdenServicio() {
                 )
             );
 
-        const picoRow =
-          personal.find(
-            (persona) =>
-              persona.funcion ===
-              "pico"
-          );
-
-        const pico =
-          picoRow
-            ? crearUsuarioVisual(
-                picoRow.usuario_id,
-                picoRow.nombre,
-                usuariosMap
-              )
-            : null;
-
+        /*
+         * GAC + PICO
+         *
+         * PICO se integra como un indicativo más.
+         * Solo se añade si existe realmente una persona
+         * definida para PICO.
+         */
         const gacRows =
           personal.filter(
             (persona) =>
               persona.funcion ===
-              "gac"
+                "gac" ||
+              persona.funcion ===
+                "pico"
           );
 
         const gacMap =
@@ -749,15 +770,35 @@ export default function TarjetaOrdenServicio() {
 
         gacRows.forEach(
           (persona) => {
+            /*
+             * Si es PICO y no hay nombre/persona,
+             * no se muestra.
+             */
             if (
-              !persona.indicativo
+              persona.funcion ===
+                "pico" &&
+              !persona.nombre?.trim()
             ) {
+              return;
+            }
+
+            /*
+             * PICO puede no tener indicativo en la base.
+             * En ese caso se muestra visualmente como PICO.
+             */
+            const indicativo =
+              persona.funcion ===
+              "pico"
+                ? "PICO"
+                : persona.indicativo?.trim();
+
+            if (!indicativo) {
               return;
             }
 
             const clave =
               normalizarIndicativo(
-                persona.indicativo
+                indicativo
               );
 
             if (
@@ -766,8 +807,7 @@ export default function TarjetaOrdenServicio() {
               gacMap.set(
                 clave,
                 {
-                  indicativo:
-                    persona.indicativo.trim(),
+                  indicativo,
                   orden:
                     persona.orden,
                   personal: [],
@@ -805,15 +845,32 @@ export default function TarjetaOrdenServicio() {
         const gac =
           Array.from(
             gacMap.values()
-          ).sort(
-            (a, b) =>
+          ).sort((a, b) => {
+            /*
+             * PICO siempre queda después
+             * de los indicativos numéricos.
+             */
+            if (
+              a.indicativo === "PICO"
+            ) {
+              return 1;
+            }
+
+            if (
+              b.indicativo === "PICO"
+            ) {
+              return -1;
+            }
+
+            return (
               numeroIndicativo(
                 a.indicativo
               ) -
               numeroIndicativo(
                 b.indicativo
               )
-          );
+            );
+          });
 
         const creador =
           ordenData.creada_por
@@ -827,7 +884,6 @@ export default function TarjetaOrdenServicio() {
             responsable,
             sala,
             seguridad,
-            pico,
             gac,
             creador,
             creadaAt:
@@ -868,12 +924,12 @@ export default function TarjetaOrdenServicio() {
   if (cargando) {
     return (
       <div className="mx-auto mt-4 w-full max-w-xl">
-        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow">
-          <div className="animate-pulse space-y-2">
-            <div className="h-5 w-36 rounded bg-slate-200" />
-            <div className="h-8 rounded bg-slate-100" />
-            <div className="h-8 rounded bg-slate-100" />
-            <div className="h-32 rounded bg-slate-100" />
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(15,23,42,0.06)]">
+          <div className="animate-pulse space-y-3">
+            <div className="h-6 w-40 rounded-lg bg-slate-200" />
+            <div className="h-10 rounded-xl bg-slate-100" />
+            <div className="h-10 rounded-xl bg-slate-100" />
+            <div className="h-36 rounded-2xl bg-slate-100" />
           </div>
         </div>
       </div>
@@ -887,7 +943,7 @@ export default function TarjetaOrdenServicio() {
   if (error) {
     return (
       <div className="mx-auto mt-4 w-full max-w-xl">
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700 shadow">
+        <div className="rounded-[28px] border border-slate-300 bg-white p-5 text-center text-sm text-slate-700 shadow-[0_4px_18px_rgba(15,23,42,0.05)]">
           {error}
         </div>
       </div>
@@ -901,32 +957,33 @@ export default function TarjetaOrdenServicio() {
   return (
     <>
       <div className="mx-auto mt-4 w-full max-w-xl">
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow">
+        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.07)]">
 
           {/* CABECERA + CALENDARIO */}
 
-          <div className="relative border-b border-slate-100 px-3 py-3.5">
-
-            {!orden ? (
-              <div className="flex min-h-[34px] items-center pr-28">
-                <span className="truncate text-sm font-medium text-slate-600">
-                  No hay orden de servicio del  {" "}
-                  <span className="font-semibold text-slate-800">
+          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-5">
+            <div className="min-w-0">
+              {!orden ? (
+                <span className="block truncate text-base font-semibold text-slate-700">
+                  No hay orden de servicio del{" "}
+                  <span className="font-bold text-slate-900">
                     {formatearFecha(
                       fecha
                     )}
                   </span>
                 </span>
-              </div>
-            ) : (
-              <div className="flex min-h-[34px] items-center">
-                <span className="text-sm font-semibold text-slate-700">
+              ) : (
+                <span className="block text-[17px] font-bold tracking-tight text-slate-800">
                   Orden de Servicio
                 </span>
-              </div>
-            )}
+              )}
+            </div>
 
-            <div className="absolute right-3 top-3">
+            <div className="relative shrink-0">
+              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
+                <IconoCalendario />
+              </div>
+
               <input
                 type="date"
                 value={fecha}
@@ -935,256 +992,267 @@ export default function TarjetaOrdenServicio() {
                     e.target.value
                   )
                 }
-                className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs text-slate-600 outline-none"
+                className="h-10 w-[142px] cursor-pointer appearance-none rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               />
+
+              <div className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-slate-600">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  className="h-3.5 w-3.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5.5 7.5 10 12l4.5-4.5"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
 
           {!orden ? null : (
             <>
-              <div className="px-2.5 py-3">
+              <div className="space-y-3.5 px-3.5 py-4 sm:px-5">
 
                 {/* RESPONSABLE */}
 
-                <div className="flex h-8 items-center justify-center">
+                <div className="flex items-center justify-center py-1">
                   {orden.responsable ? (
-                    <div className="flex items-center justify-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <EstrellaResponsable />
 
-                      <span className="text-[12px] font-bold leading-none text-slate-800">
-                        {
-                          orden
-                            .responsable
-                            .nombre
-                        }
-                      </span>
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-[13px] font-bold text-slate-800">
+                          {
+                            orden
+                              .responsable
+                              .nombre
+                          }
+                        </span>
+
+                        <span className="mt-0.5 text-[10px] font-medium text-slate-500">
+                          Responsable principal
+                        </span>
+                      </div>
                     </div>
                   ) : (
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[11px] text-slate-500">
                       Sin responsable
                     </span>
                   )}
                 </div>
 
-                {/* SALA */}
+               {/* SALA */}
 
-                <section className="mb-2.5">
-                  <div className="mb-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Sala
-                  </div>
+<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+  <div className="px-3.5 py-3.5">
+    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+      Sala
+    </div>
 
-                  <div className="flex h-9 items-center justify-center">
-                    {orden.sala ? (
-                      <Persona
-                        usuario={
-                          orden.sala
-                        }
-                        grande
-                        onAmpliar={
-                          setFotoAmpliada
-                        }
-                      />
-                    ) : (
-                      <span className="text-[10px] text-slate-400">
-                        Sin personal
-                      </span>
-                    )}
-                  </div>
-                </section>
+    <div className="flex min-h-[40px] items-center">
+      {orden.sala ? (
+        <div className="flex min-w-0 items-center gap-1.5">
+          <Avatar
+            usuario={orden.sala}
+            onAmpliar={setFotoAmpliada}
+          />
 
-                {/* SEGURIDAD */}
+          <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+            {nombreCorto(orden.sala.nombre)}
+          </span>
+        </div>
+      ) : (
+        <span className="text-[10px] text-slate-500">
+          Sin personal
+        </span>
+      )}
+    </div>
+  </div>
+</section>
 
-                <section className="mb-2.5">
-                  <div className="mb-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Seguridad
-                  </div>
+{/* SEGURIDAD */}
 
-                  <div className="flex min-h-[36px] items-center justify-center gap-5">
-                    {orden.seguridad
-                      .length ? (
-                      orden.seguridad.map(
-                        (
-                          usuario,
-                          index
-                        ) => (
-                          <Persona
-                            key={`${usuario.id}-${index}`}
-                            usuario={
-                              usuario
-                            }
-                            grande
-                            onAmpliar={
-                              setFotoAmpliada
-                            }
-                          />
-                        )
-                      )
-                    ) : (
-                      <span className="text-[10px] text-slate-400">
-                        Sin personal
-                      </span>
-                    )}
-                  </div>
-                </section>
+<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+  <div className="px-3.5 py-3.5">
+    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+      Seguridad
+    </div>
 
-                {/* GAC */}
+    <div className="flex min-h-[40px] w-full items-center justify-between gap-3">
+      {orden.seguridad.length ? (
+        orden.seguridad.map(
+          (usuario, index) => (
+            <div
+              key={`${usuario.id}-${index}`}
+              className="flex min-w-0 flex-1 items-center gap-1.5"
+            >
+              <Avatar
+                usuario={usuario}
+                onAmpliar={
+                  setFotoAmpliada
+                }
+              />
+
+              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                {nombreCorto(
+                  usuario.nombre
+                )}
+              </span>
+            </div>
+          )
+        )
+      ) : (
+        <span className="text-[10px] text-slate-500">
+          Sin personal
+        </span>
+      )}
+    </div>
+  </div>
+</section>
+
+
+                {/* GAC + PICO */}
 
                 {orden.gac.length ? (
-                  <section className="mb-2.5">
-                    <div className="mb-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      GAC
-                    </div>
+                  <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div className="px-2.5 py-3 sm:px-3.5">
+                      <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+                        GAC
+                      </div>
 
-                    <div className="w-full">
-                      {orden.gac.map(
-                        (
-                          fila,
-                          index
-                        ) => {
-                          const esPrimero =
-                            fila.orden ===
-                            1;
+                      <div className="w-full">
+                        {orden.gac.map(
+                          (
+                            fila,
+                            index
+                          ) => {
+                            const esPrimero =
+                              fila.orden ===
+                              1;
 
-                          const esSegundo =
-                            fila.orden ===
-                            2;
+                            const esSegundo =
+                              fila.orden ===
+                              2;
 
-                          const normales =
-                            fila.personal.filter(
-                              (
-                                persona
-                              ) =>
-                                !esPoliciaPracticas(
+                            const normales =
+                              fila.personal.filter(
+                                (
                                   persona
-                                    .usuario
-                                    .nombre
-                                )
-                            );
+                                ) =>
+                                  !esPoliciaPracticas(
+                                    persona
+                                      .usuario
+                                      .nombre
+                                  )
+                              );
 
-                          const practicas =
-                            fila.personal.filter(
-                              (
-                                persona
-                              ) =>
-                                esPoliciaPracticas(
+                            const practicas =
+                              fila.personal.filter(
+                                (
                                   persona
-                                    .usuario
-                                    .nombre
-                                )
-                            );
+                                ) =>
+                                  esPoliciaPracticas(
+                                    persona
+                                      .usuario
+                                      .nombre
+                                  )
+                              );
 
-                          const izquierda =
-                            normales[0] ??
-                            null;
+                            const izquierda =
+                              normales[0] ??
+                              null;
 
-                          const derecha =
-                            practicas[0] ??
-                            normales[1] ??
-                            null;
+                            const derecha =
+                              practicas[0] ??
+                              normales[1] ??
+                              null;
 
-                          return (
-                            <div
-                              key={`${fila.indicativo}-${index}`}
-                              className="flex h-9 items-center justify-center"
-                            >
-                              <span
-                                className={[
-                                  "mr-1.5 flex h-5 min-w-[21px] items-center justify-center rounded px-1 text-[9px] font-bold",
-                                  esPrimero
-                                    ? "bg-blue-100 text-blue-700"
-                                    : esSegundo
-                                      ? "bg-slate-600 text-white"
-                                      : "bg-slate-200 text-slate-600",
-                                ].join(
-                                  " "
-                                )}
+                            return (
+                              <div
+                                key={`${fila.indicativo}-${index}`}
+                                className={`grid min-h-[58px] grid-cols-[54px_minmax(0,1fr)_minmax(0,1fr)_22px] items-center gap-2 ${
+                                  index > 0
+                                    ? "border-t border-slate-200"
+                                    : ""
+                                }`}
                               >
-                                {esPrimero
-                                  ? "1º"
-                                  : esSegundo
-                                    ? "2º"
-                                    : ""}
-                              </span>
+                                {/* INDICATIVO */}
 
-                              <span className="mr-2.5 w-[44px] shrink-0 text-[10px] font-bold text-slate-700">
-                                {
-                                  fila.indicativo
-                                }
-                              </span>
+                                <span className="flex h-7 min-w-0 items-center justify-center rounded-full bg-slate-700 px-2 text-[9px] font-bold tracking-wide text-white shadow-sm">
+                                  {fila.indicativo}
+                                </span>
 
-                              <div className="flex min-w-[125px] items-center justify-end gap-1.5">
-                                {izquierda ? (
-                                  <>
-                                    <span className="max-w-[92px] truncate text-right text-[10px] font-semibold leading-none text-slate-700">
-                                      {nombreCorto(
-                                        izquierda
-                                          .usuario
-                                          .nombre
-                                      )}
+                                {/* PERSONA 1 */}
+
+                                <div className="min-w-0">
+                                  {izquierda ? (
+                                    <div className="flex min-w-0 items-center gap-1.5">
+                                      <Avatar
+                                        usuario={
+                                          izquierda.usuario
+                                        }
+                                        onAmpliar={
+                                          setFotoAmpliada
+                                        }
+                                      />
+
+                                      <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                                        {nombreCorto(
+                                          izquierda
+                                            .usuario
+                                            .nombre
+                                        )}
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                </div>
+
+                                {/* PERSONA 2 */}
+
+                                <div className="min-w-0">
+                                  {derecha ? (
+                                    <div className="flex min-w-0 items-center gap-1.5">
+                                      <Avatar
+                                        usuario={
+                                          derecha.usuario
+                                        }
+                                        onAmpliar={
+                                          setFotoAmpliada
+                                        }
+                                      />
+
+                                      <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                                        {nombreCorto(
+                                          derecha
+                                            .usuario
+                                            .nombre
+                                        )}
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                </div>
+
+                                {/* 1 / 2 */}
+
+                                <div className="flex justify-end">
+                                  {esPrimero ||
+                                  esSegundo ? (
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-700 ring-1 ring-slate-200">
+                                      {esPrimero
+                                        ? "1"
+                                        : "2"}
                                     </span>
-
-                                    <Avatar
-                                      usuario={
-                                        izquierda.usuario
-                                      }
-                                      onAmpliar={
-                                        setFotoAmpliada
-                                      }
-                                    />
-                                  </>
-                                ) : null}
+                                  ) : null}
+                                </div>
                               </div>
-
-                              <div className="w-3 shrink-0" />
-
-                              <div className="flex min-w-[125px] items-center justify-start gap-1.5">
-                                {derecha ? (
-                                  <>
-                                    <Avatar
-                                      usuario={
-                                        derecha.usuario
-                                      }
-                                      onAmpliar={
-                                        setFotoAmpliada
-                                      }
-                                    />
-
-                                    <span className="max-w-[92px] truncate text-left text-[10px] font-semibold leading-none text-slate-700">
-                                      {nombreCorto(
-                                        derecha
-                                          .usuario
-                                          .nombre
-                                      )}
-                                    </span>
-                                  </>
-                                ) : null}
-                              </div>
-                            </div>
-                          );
-                        }
-                      )}
-                    </div>
-                  </section>
-                ) : null}
-
-                {/* PICO */}
-
-                {orden.pico ? (
-                  <section>
-                    <div className="mb-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      PICO
-                    </div>
-
-                    <div className="flex h-9 items-center justify-center">
-                      <Persona
-                        usuario={
-                          orden.pico
-                        }
-                        grande
-                        onAmpliar={
-                          setFotoAmpliada
-                        }
-                      />
+                            );
+                          }
+                        )}
+                      </div>
                     </div>
                   </section>
                 ) : null}
@@ -1192,10 +1260,10 @@ export default function TarjetaOrdenServicio() {
 
               {/* FOOTER */}
 
-              <div className="border-t border-slate-100 px-3 py-2.5 text-center">
-                <span className="text-[10px] leading-none text-slate-400">
+              <div className="border-t border-slate-200 px-4 py-3 text-center">
+                <span className="text-[10px] leading-none text-slate-500">
                   Creada por{" "}
-                  <span className="font-medium text-slate-500">
+                  <span className="font-medium text-slate-600">
                     {orden.creador
                       ? nombreCorto(
                           orden
