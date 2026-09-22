@@ -1,12 +1,13 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
+
 import { supabase } from "@/lib/supabase";
 
 const AVATAR_BUCKET = "avatars";
 
 const POLICIA_PRACTICAS = "Policía en Prácticas";
+
 const POLICIA_PRACTICAS_VISUAL = "P.Practicas";
 
 type UsuarioOrden = {
@@ -105,7 +106,9 @@ function nombreCorto(nombre: string) {
     .split(/\s+/)
     .filter(Boolean);
 
-  if (partes.length <= 1) return nombre;
+  if (partes.length <= 1) {
+    return nombre;
+  }
 
   return `${partes[0]} ${partes
     .slice(1, 3)
@@ -313,47 +316,28 @@ function Avatar({
     };
   }, [usuario.avatar_url]);
 
-  if (
-    esPoliciaPracticas(
-      usuario.nombre
-    )
-  ) {
-    return (
-      <div
-        className={
-          grande
-            ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-500 shadow-sm"
-            : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-500 shadow-sm"
-        }
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.7"
-          className="h-4 w-4"
-        >
-          <circle
-            cx="11"
-            cy="8"
-            r="3"
-          />
+ if (esPoliciaPracticas(usuario.nombre)) {
+  const tamaño = grande
+    ? "h-9 w-9"
+    : "h-8 w-8";
 
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5.5 20a6.5 6.5 0 0 1 13 0"
-          />
-
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M17 11a2.5 2.5 0 1 0-1.5-4.5"
-          />
-        </svg>
-      </div>
-    );
-  }
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        onAmpliar?.("/avatars/practicas.jpg")
+      }
+      className={`${tamaño} shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-sm`}
+      aria-label={`Ampliar foto de ${usuario.nombre}`}
+    >
+      <img
+        src="/avatars/practicas.jpg"
+        alt="Policía en Prácticas"
+        className="h-full w-full object-cover transition hover:scale-105"
+      />
+    </button>
+  );
+}
 
   const tamaño = grande
     ? "h-9 w-9"
@@ -443,7 +427,7 @@ function Persona({
 }
 
 /* -------------------------------------------------------------------------- */
-/* ESTRELLA                                                                   */
+/* ESTRELLA RESPONSABLE                                                       */
 /* -------------------------------------------------------------------------- */
 
 function EstrellaResponsable() {
@@ -451,13 +435,13 @@ function EstrellaResponsable() {
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
-      className="h-5 w-5 shrink-0 text-slate-700"
+      className="h-5 w-5 shrink-0 text-yellow-400"
+      aria-hidden="true"
     >
-      <path d="M12 2.5l2.82 5.72 6.31.92-4.57 4.46 1.08 6.29L12 16.92l-5.64 2.97 1.08-6.29-4.57-4.46 6.31-.92L12 2.5z" />
+      <path d="M12 2.2l2.86 5.8 6.4.93-4.63 4.52 1.09 6.38L12 16.82l-5.72 3.01 1.09-6.38-4.63-4.52 6.4-.93L12 2.2z" />
     </svg>
   );
 }
-
 /* -------------------------------------------------------------------------- */
 /* ICONO CALENDARIO                                                           */
 /* -------------------------------------------------------------------------- */
@@ -698,6 +682,10 @@ export default function TarjetaOrdenServicio() {
           }
         );
 
+        /* ------------------------------------------------------------------ */
+        /* RESPONSABLE                                                        */
+        /* ------------------------------------------------------------------ */
+
         const responsableRow =
           personal.find(
             (persona) =>
@@ -713,6 +701,10 @@ export default function TarjetaOrdenServicio() {
                 usuariosMap
               )
             : null;
+
+        /* ------------------------------------------------------------------ */
+        /* SALA                                                               */
+        /* ------------------------------------------------------------------ */
 
         const salaRow =
           personal.find(
@@ -730,6 +722,10 @@ export default function TarjetaOrdenServicio() {
               )
             : null;
 
+        /* ------------------------------------------------------------------ */
+        /* SEGURIDAD                                                          */
+        /* ------------------------------------------------------------------ */
+
         const seguridad =
           personal
             .filter(
@@ -746,13 +742,10 @@ export default function TarjetaOrdenServicio() {
                 )
             );
 
-        /*
-         * GAC + PICO
-         *
-         * PICO se integra como un indicativo más.
-         * Solo se añade si existe realmente una persona
-         * definida para PICO.
-         */
+        /* ------------------------------------------------------------------ */
+        /* GAC + PICO                                                         */
+        /* ------------------------------------------------------------------ */
+
         const gacRows =
           personal.filter(
             (persona) =>
@@ -768,29 +761,53 @@ export default function TarjetaOrdenServicio() {
             GacFila
           >();
 
+        /*
+         * Primero construimos GAC normal.
+         *
+         * PICO lo tratamos aparte porque queremos
+         * que cada persona de PICO tenga su propia
+         * fila y su propio número 1 / 2.
+         */
+
+        const picoPersonas: PersonalGac[] =
+          [];
+
         gacRows.forEach(
           (persona) => {
             /*
-             * Si es PICO y no hay nombre/persona,
-             * no se muestra.
+             * PICO
              */
+
             if (
               persona.funcion ===
-                "pico" &&
-              !persona.nombre?.trim()
+              "pico"
             ) {
+              if (
+                !persona.nombre?.trim()
+              ) {
+                return;
+              }
+
+              picoPersonas.push({
+                usuario:
+                  crearUsuarioVisual(
+                    persona.usuario_id,
+                    persona.nombre,
+                    usuariosMap
+                  ),
+                orden:
+                  persona.orden,
+              });
+
               return;
             }
 
             /*
-             * PICO puede no tener indicativo en la base.
-             * En ese caso se muestra visualmente como PICO.
+             * GAC NORMAL
              */
+
             const indicativo =
-              persona.funcion ===
-              "pico"
-                ? "PICO"
-                : persona.indicativo?.trim();
+              persona.indicativo?.trim();
 
             if (!indicativo) {
               return;
@@ -821,7 +838,8 @@ export default function TarjetaOrdenServicio() {
               )!;
 
             if (
-              fila.orden === null ||
+              fila.orden ===
+                null ||
               fila.orden ===
                 undefined
             ) {
@@ -842,26 +860,49 @@ export default function TarjetaOrdenServicio() {
           }
         );
 
-        const gac =
+        /*
+         * Convertimos los PICO en filas independientes.
+         *
+         * Si la base de datos tiene orden 1 y 2,
+         * respetamos esos números.
+         *
+         * Si no tiene orden, usamos automáticamente
+         * 1 y 2 según el orden de aparición.
+         */
+
+        const picoRows: GacFila[] =
+          picoPersonas
+            .slice(0, 2)
+            .map(
+              (persona, index) => ({
+                indicativo:
+                  "PICO",
+                orden:
+                  persona.orden ===
+                    1 ||
+                  persona.orden ===
+                    2
+                    ? persona.orden
+                    : index + 1,
+                personal: [
+                  persona,
+                ],
+              })
+            )
+            .sort(
+              (a, b) =>
+                (a.orden ?? 999) -
+                (b.orden ?? 999)
+            );
+
+        /*
+         * GAC normal
+         */
+
+        const gacNormales =
           Array.from(
             gacMap.values()
           ).sort((a, b) => {
-            /*
-             * PICO siempre queda después
-             * de los indicativos numéricos.
-             */
-            if (
-              a.indicativo === "PICO"
-            ) {
-              return 1;
-            }
-
-            if (
-              b.indicativo === "PICO"
-            ) {
-              return -1;
-            }
-
             return (
               numeroIndicativo(
                 a.indicativo
@@ -872,12 +913,29 @@ export default function TarjetaOrdenServicio() {
             );
           });
 
+        /*
+         * PICO siempre al final.
+         */
+
+        const gac: GacFila[] = [
+          ...gacNormales,
+          ...picoRows,
+        ];
+
+        /* ------------------------------------------------------------------ */
+        /* CREADOR                                                            */
+        /* ------------------------------------------------------------------ */
+
         const creador =
           ordenData.creada_por
             ? usuariosMap.get(
                 ordenData.creada_por
               ) ?? null
             : null;
+
+        /* ------------------------------------------------------------------ */
+        /* GUARDAR ORDEN VISUAL                                               */
+        /* ------------------------------------------------------------------ */
 
         if (!cancelado) {
           setOrden({
@@ -927,8 +985,11 @@ export default function TarjetaOrdenServicio() {
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(15,23,42,0.06)]">
           <div className="animate-pulse space-y-3">
             <div className="h-6 w-40 rounded-lg bg-slate-200" />
+
             <div className="h-10 rounded-xl bg-slate-100" />
+
             <div className="h-10 rounded-xl bg-slate-100" />
+
             <div className="h-36 rounded-2xl bg-slate-100" />
           </div>
         </div>
@@ -950,33 +1011,42 @@ export default function TarjetaOrdenServicio() {
     );
   }
 
-  /* ---------------------------------------------------------------------- */
+   /* ---------------------------------------------------------------------- */
   /* VISTA                                                                  */
   /* ---------------------------------------------------------------------- */
 
   return (
     <>
       <div className="mx-auto mt-4 w-full max-w-xl">
-        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.07)]">
+        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
 
           {/* CABECERA + CALENDARIO */}
 
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-5">
-            <div className="min-w-0">
-              {!orden ? (
-                <span className="block truncate text-base font-semibold text-slate-700">
-                  No hay orden de servicio del{" "}
-                  <span className="font-bold text-slate-900">
-                    {formatearFecha(
-                      fecha
-                    )}
-                  </span>
-                </span>
-              ) : (
-                <span className="block text-[17px] font-bold tracking-tight text-slate-800">
-                  Orden de Servicio
-                </span>
-              )}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                className="h-5 w-5 shrink-0 text-slate-700"
+              >
+                <rect
+                  x="4"
+                  y="4"
+                  width="16"
+                  height="16"
+                  rx="3"
+                />
+                <path
+                  strokeLinecap="round"
+                  d="M8 8h8M8 12h5M8 16h3"
+                />
+              </svg>
+
+              <span className="truncate text-[16px] font-bold tracking-tight text-slate-800">
+                Orden de Servicio
+              </span>
             </div>
 
             <div className="relative shrink-0">
@@ -988,9 +1058,7 @@ export default function TarjetaOrdenServicio() {
                 type="date"
                 value={fecha}
                 onChange={(e) =>
-                  setFecha(
-                    e.target.value
-                  )
+                  setFecha(e.target.value)
                 }
                 className="h-10 w-[142px] cursor-pointer appearance-none rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               />
@@ -1013,9 +1081,19 @@ export default function TarjetaOrdenServicio() {
             </div>
           </div>
 
-          {!orden ? null : (
+          {/* SIN ORDEN */}
+
+          {!orden ? (
+            <p className="mt-5 text-sm text-slate-600">
+              No se ha creado ninguna orden para{" "}
+              <span className="font-bold text-slate-800">
+                {formatearFecha(fecha)}
+              </span>
+              .
+            </p>
+          ) : (
             <>
-              <div className="space-y-3.5 px-3.5 py-4 sm:px-5">
+              <div className="mt-4 space-y-3.5">
 
                 {/* RESPONSABLE */}
 
@@ -1024,19 +1102,9 @@ export default function TarjetaOrdenServicio() {
                     <div className="flex items-center gap-2">
                       <EstrellaResponsable />
 
-                      <div className="flex flex-col leading-tight">
-                        <span className="text-[13px] font-bold text-slate-800">
-                          {
-                            orden
-                              .responsable
-                              .nombre
-                          }
-                        </span>
-
-                        <span className="mt-0.5 text-[10px] font-medium text-slate-500">
-                          Responsable principal
-                        </span>
-                      </div>
+                      <span className="text-[13px] font-bold text-slate-800">
+                        {orden.responsable.nombre}
+                      </span>
                     </div>
                   ) : (
                     <span className="text-[11px] text-slate-500">
@@ -1045,126 +1113,112 @@ export default function TarjetaOrdenServicio() {
                   )}
                 </div>
 
-               {/* SALA */}
+                {/* SALA */}
 
-<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-  <div className="px-3.5 py-3.5">
-    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
-      Sala
-    </div>
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                  <div className="px-3.5 py-3.5">
+                    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+                      Sala
+                    </div>
 
-    <div className="flex min-h-[40px] items-center">
-      {orden.sala ? (
-        <div className="flex min-w-0 items-center gap-1.5">
-          <Avatar
-            usuario={orden.sala}
-            onAmpliar={setFotoAmpliada}
-          />
+                    <div className="flex min-h-[40px] items-center">
+                      {orden.sala ? (
+                        <div className="flex min-w-0 items-center gap-1.5">
+                          <Avatar
+                            usuario={orden.sala}
+                            onAmpliar={setFotoAmpliada}
+                          />
 
-          <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
-            {nombreCorto(orden.sala.nombre)}
-          </span>
-        </div>
-      ) : (
-        <span className="text-[10px] text-slate-500">
-          Sin personal
-        </span>
-      )}
-    </div>
-  </div>
-</section>
+                          <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                            {nombreCorto(
+                              orden.sala.nombre
+                            )}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-slate-500">
+                          Sin personal
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </section>
 
-{/* SEGURIDAD */}
+                {/* SEGURIDAD */}
 
-<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-  <div className="px-3.5 py-3.5">
-    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
-      Seguridad
-    </div>
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                  <div className="px-3.5 py-3.5">
+                    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+                      Seguridad
+                    </div>
 
-    <div className="flex min-h-[40px] w-full items-center justify-between gap-3">
-      {orden.seguridad.length ? (
-        orden.seguridad.map(
-          (usuario, index) => (
-            <div
-              key={`${usuario.id}-${index}`}
-              className="flex min-w-0 flex-1 items-center gap-1.5"
-            >
-              <Avatar
-                usuario={usuario}
-                onAmpliar={
-                  setFotoAmpliada
-                }
-              />
+                    <div className="flex min-h-[40px] w-full items-center justify-between gap-3">
+                      {orden.seguridad.length ? (
+                        orden.seguridad.map(
+                          (usuario, index) => (
+                            <div
+                              key={`${usuario.id}-${index}`}
+                              className="flex min-w-0 flex-1 items-center gap-1.5"
+                            >
+                              <Avatar
+                                usuario={usuario}
+                                onAmpliar={setFotoAmpliada}
+                              />
 
-              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
-                {nombreCorto(
-                  usuario.nombre
-                )}
-              </span>
-            </div>
-          )
-        )
-      ) : (
-        <span className="text-[10px] text-slate-500">
-          Sin personal
-        </span>
-      )}
-    </div>
-  </div>
-</section>
-
+                              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                                {nombreCorto(
+                                  usuario.nombre
+                                )}
+                              </span>
+                            </div>
+                          )
+                        )
+                      ) : (
+                        <span className="text-[10px] text-slate-500">
+                          Sin personal
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </section>
 
                 {/* GAC + PICO */}
 
                 {orden.gac.length ? (
                   <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                    <div className="px-2.5 py-3 sm:px-3.5">
+                    <div className="px-2.5 pt-3 pb-0 sm:px-3.5">
+
                       <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
                         GAC
                       </div>
 
                       <div className="w-full">
                         {orden.gac.map(
-                          (
-                            fila,
-                            index
-                          ) => {
+                          (fila, index) => {
                             const esPrimero =
-                              fila.orden ===
-                              1;
+                              fila.orden === 1;
 
                             const esSegundo =
-                              fila.orden ===
-                              2;
+                              fila.orden === 2;
 
                             const normales =
                               fila.personal.filter(
-                                (
-                                  persona
-                                ) =>
+                                (persona) =>
                                   !esPoliciaPracticas(
-                                    persona
-                                      .usuario
-                                      .nombre
+                                    persona.usuario.nombre
                                   )
                               );
 
                             const practicas =
                               fila.personal.filter(
-                                (
-                                  persona
-                                ) =>
+                                (persona) =>
                                   esPoliciaPracticas(
-                                    persona
-                                      .usuario
-                                      .nombre
+                                    persona.usuario.nombre
                                   )
                               );
 
                             const izquierda =
-                              normales[0] ??
-                              null;
+                              normales[0] ?? null;
 
                             const derecha =
                               practicas[0] ??
@@ -1173,13 +1227,14 @@ export default function TarjetaOrdenServicio() {
 
                             return (
                               <div
-                                key={`${fila.indicativo}-${index}`}
+                                key={`${fila.indicativo}-${fila.orden}-${index}`}
                                 className={`grid min-h-[58px] grid-cols-[54px_minmax(0,1fr)_minmax(0,1fr)_22px] items-center gap-2 ${
                                   index > 0
                                     ? "border-t border-slate-200"
                                     : ""
                                 }`}
                               >
+
                                 {/* INDICATIVO */}
 
                                 <span className="flex h-7 min-w-0 items-center justify-center rounded-full bg-slate-700 px-2 text-[9px] font-bold tracking-wide text-white shadow-sm">
@@ -1202,9 +1257,7 @@ export default function TarjetaOrdenServicio() {
 
                                       <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
                                         {nombreCorto(
-                                          izquierda
-                                            .usuario
-                                            .nombre
+                                          izquierda.usuario.nombre
                                         )}
                                       </span>
                                     </div>
@@ -1227,9 +1280,7 @@ export default function TarjetaOrdenServicio() {
 
                                       <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
                                         {nombreCorto(
-                                          derecha
-                                            .usuario
-                                            .nombre
+                                          derecha.usuario.nombre
                                         )}
                                       </span>
                                     </div>
@@ -1260,15 +1311,13 @@ export default function TarjetaOrdenServicio() {
 
               {/* FOOTER */}
 
-              <div className="border-t border-slate-200 px-4 py-3 text-center">
+              <div className="px-4 pt-1 pb-2 text-center">
                 <span className="text-[10px] leading-none text-slate-500">
                   Creada por{" "}
                   <span className="font-medium text-slate-600">
                     {orden.creador
                       ? nombreCorto(
-                          orden
-                            .creador
-                            .nombre
+                          orden.creador.nombre
                         )
                       : "—"}
                   </span>
