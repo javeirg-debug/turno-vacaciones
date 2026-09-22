@@ -390,6 +390,13 @@ export default function OrdenServicioFecha() {
     setPicoSeleccionado,
   ] = useState("");
 
+  const [
+  ordenEntradaPico,
+  setOrdenEntradaPico,
+] = useState<
+  "primero" | "segundo" | ""
+>("");
+
   /* =======================================================
      SEGURIDAD
   ======================================================= */
@@ -474,11 +481,13 @@ export default function OrdenServicioFecha() {
         Array(indicativos.length * 2).fill("")
       );
 
-      setPicoSeleccionado("");
+setPicoSeleccionado("");
 
-      setSeleccionesSeguridad(
-        Array(3).fill("")
-      );
+setOrdenEntradaPico("");
+
+setSeleccionesSeguridad(
+  Array(3).fill("")
+);
 
       setSalaSeleccionado("");
 
@@ -715,103 +724,39 @@ export default function OrdenServicioFecha() {
                     claveIndicativo
                 );
 
-              const filaOrden1 =
-                filas.find(
-                  (fila) =>
-                    fila.orden === 1
-                );
+const ordenIndicativo =
+  filas.some(
+    (fila) =>
+      fila.orden === 1
+  )
+    ? "primero"
+    : filas.some(
+        (fila) =>
+          fila.orden === 2
+      )
+      ? "segundo"
+      : "";
 
-              const filaOrden2 =
-                filas.find(
-                  (fila) =>
-                    fila.orden === 2
-                );
+filas
+  .slice(0, 2)
+  .forEach(
+    (
+      fila,
+      posicion
+    ) => {
+      nuevoGac[
+        indiceIndicativo * 2 +
+          posicion
+      ] =
+        convertirPersonalASeleccion(
+          fila
+        );
+    }
+  );
 
-              const filasSinOrden =
-                filas.filter(
-                  (fila) =>
-                    fila.orden === null
-                );
-
-              /*
-               * La base de datos guarda quién entra
-               * 1º y quién entra 2º, pero no guarda
-               * cuál de los dos desplegables originales
-               * ocupaba cada persona.
-               *
-               * Por eso al cargar:
-               *   - orden 1 -> primer desplegable
-               *   - orden 2 -> segundo desplegable
-               *
-               * La prioridad 1º/2º queda exactamente
-               * conservada.
-               */
-
-              if (
-                filaOrden1 &&
-                filaOrden2
-              ) {
-                nuevoGac[
-                  indiceIndicativo * 2
-                ] =
-                  convertirPersonalASeleccion(
-                    filaOrden1
-                  );
-
-                nuevoGac[
-                  indiceIndicativo * 2 + 1
-                ] =
-                  convertirPersonalASeleccion(
-                    filaOrden2
-                  );
-
-                nuevoOrdenEntradaGac[
-                  indiceIndicativo
-                ] = "primero";
-              } else if (
-                filaOrden1
-              ) {
-                nuevoGac[
-                  indiceIndicativo * 2
-                ] =
-                  convertirPersonalASeleccion(
-                    filaOrden1
-                  );
-
-                nuevoOrdenEntradaGac[
-                  indiceIndicativo
-                ] = "primero";
-              } else if (
-                filaOrden2
-              ) {
-                nuevoGac[
-                  indiceIndicativo * 2
-                ] =
-                  convertirPersonalASeleccion(
-                    filaOrden2
-                  );
-
-                nuevoOrdenEntradaGac[
-                  indiceIndicativo
-                ] = "segundo";
-              } else {
-                filasSinOrden
-                  .slice(0, 2)
-                  .forEach(
-                    (
-                      fila,
-                      posicion
-                    ) => {
-                      nuevoGac[
-                        indiceIndicativo * 2 +
-                          posicion
-                      ] =
-                        convertirPersonalASeleccion(
-                          fila
-                        );
-                    }
-                  );
-              }
+nuevoOrdenEntradaGac[
+  indiceIndicativo
+] = ordenIndicativo;
             }
           );
 
@@ -827,19 +772,27 @@ export default function OrdenServicioFecha() {
              PICO
           ------------------------------------------------- */
 
-          const filaPico =
-            personal.find(
-              (fila) =>
-                fila.funcion === "pico"
-            );
+const filaPico =
+  personal.find(
+    (fila) =>
+      fila.funcion === "pico"
+  );
 
-          setPicoSeleccionado(
-            filaPico
-              ? convertirPersonalASeleccion(
-                  filaPico
-                )
-              : ""
-          );
+setPicoSeleccionado(
+  filaPico
+    ? convertirPersonalASeleccion(
+        filaPico
+      )
+    : ""
+);
+
+setOrdenEntradaPico(
+  filaPico?.orden === 1
+    ? "primero"
+    : filaPico?.orden === 2
+      ? "segundo"
+      : ""
+);
 
           /* -------------------------------------------------
              SEGURIDAD
@@ -1699,14 +1652,15 @@ export default function OrdenServicioFecha() {
          4. PREPARAR PERSONAL
       --------------------------------------------------- */
 
-      const personal: {
-        orden_id: string;
-        usuario_id: string | null;
-        nombre: string;
-        indicativo: string | null;
-        funcion: string;
-        orden: number | null;
-      }[] = [];
+const personal: {
+  orden_id: string;
+  usuario_id: string | null;
+  nombre: string;
+  indicativo: string | null;
+  funcion: string;
+  orden: number | null;
+  fecha_orden: string;
+}[] = [];
 
       function añadirPersonal(
         usuarioId: string,
@@ -1719,15 +1673,16 @@ export default function OrdenServicioFecha() {
           usuarioId ===
           POLICIA_PRACTICAS
         ) {
-          personal.push({
-            orden_id: ordenId!,
-            usuario_id: null,
-            nombre:
-              "Policía en Prácticas",
-            indicativo,
-            funcion,
-            orden,
-          });
+personal.push({
+  orden_id: ordenId!,
+  usuario_id: null,
+  nombre:
+    "Policía en Prácticas",
+  indicativo,
+  funcion,
+  orden,
+  fecha_orden: fecha,
+});
 
           return;
         }
@@ -1740,14 +1695,15 @@ export default function OrdenServicioFecha() {
 
         if (!usuario) return;
 
-        personal.push({
-          orden_id: ordenId!,
-          usuario_id: usuario.id,
-          nombre: usuario.nombre,
-          indicativo,
-          funcion,
-          orden,
-        });
+personal.push({
+  orden_id: ordenId!,
+  usuario_id: usuario.id,
+  nombre: usuario.nombre,
+  indicativo,
+  funcion,
+  orden,
+  fecha_orden: fecha,
+});
       }
 
       /* ---------------------------------------------------
@@ -1765,101 +1721,87 @@ export default function OrdenServicioFecha() {
         );
       }
 
-      /* ---------------------------------------------------
-         6. GAC
-      --------------------------------------------------- */
+/* ---------------------------------------------------
+   6. GAC
+--------------------------------------------------- */
 
-      indicativos.forEach(
-        (
-          indicativo,
-          indiceIndicativo
-        ) => {
-          const indicePersona1 =
-            indiceIndicativo * 2;
+indicativos.forEach(
+  (indicativo, indiceIndicativo) => {
+    const indicePersona1 =
+      indiceIndicativo * 2;
 
-          const indicePersona2 =
-            indiceIndicativo * 2 + 1;
+    const indicePersona2 =
+      indiceIndicativo * 2 + 1;
 
-          const persona1 =
-            seleccionesGac[
-              indicePersona1
-            ];
+    const persona1 =
+      seleccionesGac[indicePersona1];
 
-          const persona2 =
-            seleccionesGac[
-              indicePersona2
-            ];
+    const persona2 =
+      seleccionesGac[indicePersona2];
 
-          const ordenEntrada =
-            ordenEntradaGac[
-              indiceIndicativo
-            ];
+    const ordenEntrada =
+      ordenEntradaGac[indiceIndicativo];
 
-          if (persona1) {
-            let orden:
-              | number
-              | null = null;
+    /*
+     * El número pertenece al indicativo completo.
+     *
+     * 1º = los dos componentes entran de Primeras
+     * 2º = los dos componentes entran de Segundas
+     */
 
-            if (
-              ordenEntrada ===
-              "primero"
-            ) {
-              orden = 1;
-            } else if (
-              ordenEntrada ===
-              "segundo"
-            ) {
-              orden = 2;
-            }
+    let orden: number | null = null;
 
-            añadirPersonal(
-              persona1,
-              indicativo,
-              "gac",
-              orden
-            );
-          }
+    if (ordenEntrada === "primero") {
+      orden = 1;
+    } else if (ordenEntrada === "segundo") {
+      orden = 2;
+    }
 
-          if (persona2) {
-            let orden:
-              | number
-              | null = null;
-
-            if (
-              ordenEntrada ===
-              "primero"
-            ) {
-              orden = 2;
-            } else if (
-              ordenEntrada ===
-              "segundo"
-            ) {
-              orden = 1;
-            }
-
-            añadirPersonal(
-              persona2,
-              indicativo,
-              "gac",
-              orden
-            );
-          }
-        }
+    if (persona1) {
+      añadirPersonal(
+        persona1,
+        indicativo,
+        "gac",
+        orden
       );
+    }
 
+    if (persona2) {
+      añadirPersonal(
+        persona2,
+        indicativo,
+        "gac",
+        orden
+      );
+    }
+  }
+);
       /* ---------------------------------------------------
          7. PICO
       --------------------------------------------------- */
 
-      if (picoSeleccionado) {
-        añadirPersonal(
-          picoSeleccionado,
-          "PICO",
-          "pico",
-          null
-        );
-      }
+if (picoSeleccionado) {
+  let ordenPico: number | null = null;
 
+  if (
+    ordenEntradaPico ===
+    "primero"
+  ) {
+    ordenPico = 1;
+  } else if (
+    ordenEntradaPico ===
+    "segundo"
+  ) {
+    ordenPico = 2;
+  }
+
+  añadirPersonal(
+    picoSeleccionado,
+    "PICO",
+    "pico",
+    ordenPico
+  );
+}
       /* ---------------------------------------------------
          8. SEGURIDAD
       --------------------------------------------------- */
@@ -2425,18 +2367,99 @@ export default function OrdenServicioFecha() {
             "
           >
 
-            <span
-              className="
-                w-14
-                shrink-0
-                text-center
-                text-sm
-                font-bold
-                text-slate-800
-              "
-            >
-              PICO
-            </span>
+           <div
+  className="
+    flex
+    w-14
+    shrink-0
+    flex-col
+    items-center
+  "
+>
+  <span
+    className="
+      text-center
+      text-sm
+      font-bold
+      text-slate-800
+    "
+  >
+    PICO
+  </span>
+
+  <div
+    className="
+      mt-1
+      flex
+      overflow-hidden
+      rounded-md
+      border
+      border-slate-300
+    "
+  >
+    <button
+      type="button"
+      onClick={() => {
+        setOrdenEntradaPico(
+          (actual) =>
+            actual ===
+            "primero"
+              ? ""
+              : "primero"
+        );
+      }}
+      className={`
+        flex
+        h-6
+        w-7
+        items-center
+        justify-center
+        text-[10px]
+        font-bold
+        ${
+          ordenEntradaPico ===
+          "primero"
+            ? "bg-slate-700 text-white"
+            : "bg-slate-100 text-slate-500"
+        }
+      `}
+    >
+      1º
+    </button>
+
+    <div className="w-px bg-slate-300" />
+
+    <button
+      type="button"
+      onClick={() => {
+        setOrdenEntradaPico(
+          (actual) =>
+            actual ===
+            "segundo"
+              ? ""
+              : "segundo"
+        );
+      }}
+      className={`
+        flex
+        h-6
+        w-7
+        items-center
+        justify-center
+        text-[10px]
+        font-bold
+        ${
+          ordenEntradaPico ===
+          "segundo"
+            ? "bg-slate-700 text-white"
+            : "bg-slate-100 text-slate-500"
+        }
+      `}
+    >
+      2º
+    </button>
+  </div>
+</div>
 
             <div className="flex-1">
 

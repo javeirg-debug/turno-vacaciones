@@ -1,9 +1,11 @@
+
 "use client";
 
 import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import EstadoBaseDatos from "@/components/mantenimiento/EstadoBaseDatos";
 
 export default function BottomNav() {
   const { usuario } = useUser();
@@ -13,13 +15,12 @@ export default function BottomNav() {
   const [mostrarEstadisticas, setMostrarEstadisticas] = useState(false);
   const [mostrarAdmin, setMostrarAdmin] = useState(false);
   const [mostrarInfoUsuarios, setMostrarInfoUsuarios] = useState(false);
+  const [mostrarEstadoBD, setMostrarEstadoBD] = useState(false);
 
   const calendarioActivo = pathname.startsWith("/calendario");
   const estadisticasActivo = pathname.startsWith("/estadisticas");
   const adminActivo = pathname.startsWith("/usuarios");
-const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
-
-
+  const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
 
   return (
     <>
@@ -101,46 +102,47 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
           </div>
         </button>
 
-    {/* SOLICITUDES */}
-<button
-  type="button"
-  onClick={() => setMostrarSolicitudes(true)}
-  className="flex-1"
->
-  <div
-    className={`flex flex-col items-center justify-center rounded-xl py-2 transition ${
-      pathname.startsWith("/solicitudes")
-        ? "bg-slate-200 font-semibold text-slate-900"
-        : "text-slate-600 hover:bg-slate-100"
-    }`}
-  >
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      className="h-6 w-6"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M14 3.5V8h5"
-      />
-      <path
-        strokeLinecap="round"
-        d="M8 12h8M8 16h6"
-      />
-    </svg>
+        {/* SOLICITUDES */}
+        <button
+          type="button"
+          onClick={() => setMostrarSolicitudes(true)}
+          className="flex-1"
+        >
+          <div
+            className={`flex flex-col items-center justify-center rounded-xl py-2 transition ${
+              pathname.startsWith("/solicitudes")
+                ? "bg-slate-200 font-semibold text-slate-900"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              className="h-6 w-6"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M14 3.5V8h5"
+              />
+              <path
+                strokeLinecap="round"
+                d="M8 12h8M8 16h6"
+              />
+            </svg>
 
-    <span className="text-[10px]">Solicitudes</span>
-  </div>
-</button>
+            <span className="text-[10px]">Solicitudes</span>
+          </div>
+        </button>
+
         {/* ESTADÍSTICAS */}
         <button
           type="button"
@@ -202,29 +204,29 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
                   : "text-slate-600 hover:bg-slate-100"
               }`}
             >
-             <svg
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth="1.8"
-  strokeLinecap="round"
-  strokeLinejoin="round"
-  className="h-6 w-6"
-  aria-hidden="true"
->
-  <path d="M12 3.5v2" />
-  <path d="M12 18.5v2" />
-  <path d="M3.5 12h2" />
-  <path d="M18.5 12h2" />
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6"
+                aria-hidden="true"
+              >
+                <path d="M12 3.5v2" />
+                <path d="M12 18.5v2" />
+                <path d="M3.5 12h2" />
+                <path d="M18.5 12h2" />
 
-  <path d="m6 6 1.4 1.4" />
-  <path d="m16.6 16.6 1.4 1.4" />
-  <path d="m18 6-1.4 1.4" />
-  <path d="m7.4 16.6L6 18" />
+                <path d="m6 6 1.4 1.4" />
+                <path d="m16.6 16.6 1.4 1.4" />
+                <path d="m18 6-1.4 1.4" />
+                <path d="m7.4 16.6L6 18" />
 
-  <circle cx="12" cy="12" r="6" />
-  <circle cx="12" cy="12" r="2.5" />
-</svg>
+                <circle cx="12" cy="12" r="6" />
+                <circle cx="12" cy="12" r="2.5" />
+              </svg>
 
               <span className="text-[10px]">Admin</span>
             </div>
@@ -302,8 +304,6 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
                 </div>
               </Link>
 
-
-
               {/* CALENDARIO PERSONAL */}
               <Link
                 href="/calendario/mio"
@@ -338,7 +338,6 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
                   </p>
                 </div>
               </Link>
-
 
               {/* EXCEL GRUPAL */}
               <Link
@@ -393,125 +392,123 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
         </div>
       )}
 
-{/* =====================================================
-    MODAL SOLICITUDES
-===================================================== */}
+      {/* =====================================================
+          MODAL SOLICITUDES
+      ===================================================== */}
 
-{mostrarSolicitudes && (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-    onClick={() => setMostrarSolicitudes(false)}
-  >
-    <div
-      className="w-full max-w-md rounded-[20px] bg-white p-6 shadow-2xl"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-[#1a1a1a]">
-          Solicitudes
-        </h2>
-
-        <p className="mt-1 text-sm font-normal text-slate-500">
-          Selecciona una opción
-        </p>
-      </div>
-
-      <div className="space-y-4">
-
-        {/* SOLICITUDES GRUPALES */}
-        <Link
-          href="/solicitudes/grupales"
+      {mostrarSolicitudes && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
           onClick={() => setMostrarSolicitudes(false)}
-          className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              className="h-7 w-7"
-              aria-hidden="true"
+          <div
+            className="w-full max-w-md rounded-[20px] bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-bold text-[#1a1a1a]">
+                Solicitudes
+              </h2>
+
+              <p className="mt-1 text-sm font-normal text-slate-500">
+                Selecciona una opción
+              </p>
+            </div>
+
+            <div className="space-y-4">
+
+              {/* SOLICITUDES GRUPALES */}
+              <Link
+                href="/solicitudes/grupales"
+                onClick={() => setMostrarSolicitudes(false)}
+                className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="h-7 w-7"
+                    aria-hidden="true"
+                  >
+                    <circle cx="9" cy="7" r="3.5" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 20a6 6 0 0 1 12 0"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16 11a3.5 3.5 0 1 0 0-7"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M18 14a5 5 0 0 1 3 6"
+                    />
+                  </svg>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-slate-900">
+                    Solicitudes Grupales
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Solicitudes de todo el equipo
+                  </p>
+                </div>
+              </Link>
+
+              {/* SOLICITUDES PERSONALES */}
+              <Link
+                href="/solicitudes"
+                onClick={() => setMostrarSolicitudes(false)}
+                className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="h-7 w-7"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="3.5" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 21a8 8 0 0 1 16 0"
+                    />
+                  </svg>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-slate-900">
+                    Solicitudes Personales
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Solo tus solicitudes
+                  </p>
+                </div>
+              </Link>
+
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMostrarSolicitudes(false)}
+              className="mt-5 w-full rounded-xl py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
             >
-              <circle cx="9" cy="7" r="3.5" />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 20a6 6 0 0 1 12 0"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16 11a3.5 3.5 0 1 0 0-7"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M18 14a5 5 0 0 1 3 6"
-              />
-            </svg>
+              Cancelar
+            </button>
           </div>
-
-          <div className="min-w-0">
-            <p className="text-base font-bold text-slate-900">
-              Solicitudes Grupales
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Solicitudes de todo el equipo
-            </p>
-          </div>
-        </Link>
-
-        {/* SOLICITUDES PERSONALES */}
-        <Link
-          href="/solicitudes"
-          onClick={() => setMostrarSolicitudes(false)}
-          className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
-        >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              className="h-7 w-7"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="8" r="3.5" />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 21a8 8 0 0 1 16 0"
-              />
-            </svg>
-          </div>
-
-          <div className="min-w-0">
-            <p className="text-base font-bold text-slate-900">
-              Solicitudes Personales
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Solo tus solicitudes
-            </p>
-          </div>
-        </Link>
-
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setMostrarSolicitudes(false)}
-        className="mt-5 w-full rounded-xl py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
-      >
-        Cancelar
-      </button>
-    </div>
-  </div>
-)}
-
-
+        </div>
+      )}
 
       {/* =====================================================
           MODAL ESTADÍSTICAS
@@ -639,10 +636,53 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
             className="w-full max-w-md rounded-[20px] bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* CABECERA ADMINISTRACIÓN */}
             <div className="mb-6 text-center">
-              <h2 className="text-2xl font-bold text-[#1a1a1a]">
-                Administración
-              </h2>
+<div className="flex items-center justify-center gap-6">                <h2 className="text-2xl font-bold text-[#1a1a1a]">
+                  Administración
+                </h2>
+
+                {/* SOLO SUPERADMIN */}
+                {usuario?.superadmin === true && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMostrarAdmin(false);
+                      setMostrarEstadoBD(true);
+                    }}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-700 active:scale-95"
+                    aria-label="Estado de la base de datos"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      className="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <ellipse
+                        cx="12"
+                        cy="5"
+                        rx="7"
+                        ry="3"
+                      />
+
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5"
+                      />
+
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
 
               <p className="mt-1 text-sm font-normal text-slate-500">
                 Selecciona una opción
@@ -660,24 +700,24 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
                     <svg
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth="1.8"
-  className="h-7 w-7"
-  aria-hidden="true"
->
-  <circle cx="9" cy="8" r="3.5" />
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M3 20a6 6 0 0 1 12 0"
-  />
-  <path
-    strokeLinecap="round"
-    d="M18 11v6M15 14h6"
-  />
-</svg>
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      className="h-7 w-7"
+                      aria-hidden="true"
+                    >
+                      <circle cx="9" cy="8" r="3.5" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 20a6 6 0 0 1 12 0"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        d="M18 11v6M15 14h6"
+                      />
+                    </svg>
                   </div>
 
                   <div className="min-w-0">
@@ -693,85 +733,87 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
 
                 {/* INFORMACIÓN */}
                 <button
-  type="button"
-  onClick={() => setMostrarInfoUsuarios(true)}
-  className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 shadow-sm transition hover:bg-slate-200 active:scale-95"
-  aria-label="Información sobre gestión de usuarios"
->
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    className="h-4 w-4"
-    aria-hidden="true"
-  >
-    <circle
-      cx="12"
-      cy="12"
-      r="9"
-      stroke="#94A3B8"
-    />
+                  type="button"
+                  onClick={() => setMostrarInfoUsuarios(true)}
+                  className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 shadow-sm transition hover:bg-slate-200 active:scale-95"
+                  aria-label="Información sobre gestión de usuarios"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      stroke="#94A3B8"
+                    />
 
-    <path
-      stroke="#64748B"
-      strokeLinecap="round"
-      d="M12 10.5v6"
-    />
+                    <path
+                      stroke="#64748B"
+                      strokeLinecap="round"
+                      d="M12 10.5v6"
+                    />
 
-    <circle
-      cx="12"
-      cy="7"
-      r=".8"
-      fill="#64748B"
-      stroke="none"
-    />
-  </svg>
-</button>
+                    <circle
+                      cx="12"
+                      cy="7"
+                      r=".8"
+                      fill="#64748B"
+                      stroke="none"
+                    />
+                  </svg>
+                </button>
               </div>
-{/* ORDEN DE SERVICIO */}
-<Link
-  href="/usuarios/ordenservicio"
-  onClick={() => setMostrarAdmin(false)}
-  className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
->
-  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-7 w-7"
-      aria-hidden="true"
-    >
-      <rect
-        x="5"
-        y="3"
-        width="14"
-        height="18"
-        rx="2"
-      />
 
-      <path d="M9 3v2h6V3" />
+              {/* ORDEN DE SERVICIO */}
+              <Link
+                href="/usuarios/ordenservicio"
+                onClick={() => setMostrarAdmin(false)}
+                className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-7 w-7"
+                    aria-hidden="true"
+                  >
+                    <rect
+                      x="5"
+                      y="3"
+                      width="14"
+                      height="18"
+                      rx="2"
+                    />
 
-      <path d="M8 9h8" />
-      <path d="M8 13h8" />
-      <path d="M8 17h5" />
-    </svg>
-  </div>
+                    <path d="M9 3v2h6V3" />
 
-  <div className="min-w-0">
-    <p className="text-base font-bold text-slate-900">
-      Orden de Servicio
-    </p>
+                    <path d="M8 9h8" />
+                    <path d="M8 13h8" />
+                    <path d="M8 17h5" />
+                  </svg>
+                </div>
 
-    <p className="mt-1 text-sm text-slate-500">
-      Generar la orden diaria con las personas disponibles.
-    </p>
-  </div>
-</Link>
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-slate-900">
+                    Orden de Servicio
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Generar la orden diaria con las personas disponibles.
+                  </p>
+                </div>
+              </Link>
+
               {/* CONFIGURACIÓN OCUPACIÓN */}
               <Link
                 href="/usuarios/ocupacion"
@@ -780,23 +822,23 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
                   <svg
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth="1.8"
-  className="h-7 w-7"
-  aria-hidden="true"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M12 3.5C7.3 3.5 3.5 7.2 3.5 12c0 4.7 3.5 8.5 8.2 8.5 1.2 0 2.1-.9 2.1-2.1 0-.7-.3-1.2-.8-1.7-.4-.4-.2-1 .4-1h2.1c3 0 5-2 5-4.8 0-4.2-3.8-7.4-8.5-7.4Z"
-  />
-  <circle cx="8" cy="10" r="1" />
-  <circle cx="11" cy="7.5" r="1" />
-  <circle cx="15" cy="7.5" r="1" />
-  <circle cx="17.5" cy="10.5" r="1" />
-</svg>
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="h-7 w-7"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 3.5C7.3 3.5 3.5 7.2 3.5 12c0 4.7 3.5 8.5 8.2 8.5 1.2 0 2.1-.9 2.1-2.1 0-.7-.3-1.2-.8-1.7-.4-.4-.2-1 .4-1h2.1c3 0 5-2 5-4.8 0-4.2-3.8-7.4-8.5-7.4Z"
+                    />
+                    <circle cx="8" cy="10" r="1" />
+                    <circle cx="11" cy="7.5" r="1" />
+                    <circle cx="15" cy="7.5" r="1" />
+                    <circle cx="17.5" cy="10.5" r="1" />
+                  </svg>
                 </div>
 
                 <div className="min-w-0">
@@ -1034,6 +1076,19 @@ const [mostrarSolicitudes, setMostrarSolicitudes] = useState(false);
           </div>
         </div>
       )}
+
+      {/* =====================================================
+          ESTADO BASE DE DATOS
+      ===================================================== */}
+
+{mostrarEstadoBD && (
+  <EstadoBaseDatos
+    onClose={() => {
+      setMostrarEstadoBD(false);
+      setMostrarAdmin(true);
+    }}
+  />
+)}
     </>
   );
 }

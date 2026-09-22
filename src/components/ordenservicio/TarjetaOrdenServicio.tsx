@@ -1098,7 +1098,7 @@ lineas.push(
   return (
     <>
       <div className="mx-auto mt-4 w-full max-w-xl">
-        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+<div className="rounded-3xl border border-slate-200 bg-white px-4 pb-0 pt-4 shadow-sm">
           {/* CABECERA + CALENDARIO */}
 
           <div className="flex items-center justify-between gap-3">
@@ -1229,79 +1229,43 @@ lineas.push(
                   )}
                 </div>
 
-                {/* SALA */}
+          
 
-                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                  <div className="px-3.5 py-3.5">
-                    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
-                      Sala
-                    </div>
+{/* SEGURIDAD */}
 
-                    <div className="flex min-h-[40px] items-center">
-                      {orden.sala ? (
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <Avatar
-                            usuario={orden.sala}
-                            onAmpliar={setFotoAmpliada}
-                          />
+<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+  <div className="px-3.5 pb-2.5 pt-3">
+    <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+      Seguridad
+    </div>
 
-                          <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
-                            {nombreCorto(
-                              orden.sala.nombre
-                            )}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-[10px] text-slate-500">
-                          Sin personal
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </section>
+    <div className="flex w-full items-center justify-between gap-3">
+      {orden.seguridad.length ? (
+        orden.seguridad.map(
+          (usuario, index) => (
+            <div
+              key={`${usuario.id}-${index}`}
+              className="flex min-w-0 flex-1 items-center gap-1.5"
+            >
+              <Avatar
+                usuario={usuario}
+                onAmpliar={setFotoAmpliada}
+              />
 
-                {/* SEGURIDAD */}
-
-                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                  <div className="px-3.5 py-3.5">
-                    <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
-                      Seguridad
-                    </div>
-
-                    <div className="flex min-h-[40px] w-full items-center justify-between gap-3">
-                      {orden.seguridad.length ? (
-                        orden.seguridad.map(
-                          (
-                            usuario,
-                            index
-                          ) => (
-                            <div
-                              key={`${usuario.id}-${index}`}
-                              className="flex min-w-0 flex-1 items-center gap-1.5"
-                            >
-                              <Avatar
-                                usuario={usuario}
-                                onAmpliar={
-                                  setFotoAmpliada
-                                }
-                              />
-
-                              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
-                                {nombreCorto(
-                                  usuario.nombre
-                                )}
-                              </span>
-                            </div>
-                          )
-                        )
-                      ) : (
-                        <span className="text-[10px] text-slate-500">
-                          Sin personal
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </section>
+              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                {nombreCorto(usuario.nombre)}
+              </span>
+            </div>
+          )
+        )
+      ) : (
+        <span className="text-[10px] text-slate-500">
+          Sin personal
+        </span>
+      )}
+    </div>
+  </div>
+</section>
 
                 {/* GAC + PICO */}
 
@@ -1433,6 +1397,34 @@ lineas.push(
                   </section>
                 ) : null}
               </div>
+{/* SALA */}
+
+<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+  <div className="px-3.5 pb-2.5 pt-3">
+    <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+      Sala
+    </div>
+
+    <div className="flex items-center">
+      {orden.sala ? (
+        <div className="flex min-w-0 items-center gap-1.5">
+          <Avatar
+            usuario={orden.sala}
+            onAmpliar={setFotoAmpliada}
+          />
+
+          <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+            {nombreCorto(orden.sala.nombre)}
+          </span>
+        </div>
+      ) : (
+        <span className="text-[10px] text-slate-500">
+          Sin personal
+        </span>
+      )}
+    </div>
+  </div>
+</section>
 
               {/* FOOTER */}
 
