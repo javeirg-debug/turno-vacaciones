@@ -316,28 +316,28 @@ function Avatar({
     };
   }, [usuario.avatar_url]);
 
- if (esPoliciaPracticas(usuario.nombre)) {
-  const tamaño = grande
-    ? "h-9 w-9"
-    : "h-8 w-8";
+  if (esPoliciaPracticas(usuario.nombre)) {
+    const tamaño = grande
+      ? "h-9 w-9"
+      : "h-8 w-8";
 
-  return (
-    <button
-      type="button"
-      onClick={() =>
-        onAmpliar?.("/avatars/practicas.jpg")
-      }
-      className={`${tamaño} shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-sm`}
-      aria-label={`Ampliar foto de ${usuario.nombre}`}
-    >
-      <img
-        src="/avatars/practicas.jpg"
-        alt="Policía en Prácticas"
-        className="h-full w-full object-cover transition hover:scale-105"
-      />
-    </button>
-  );
-}
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          onAmpliar?.("/avatars/practicas.jpg")
+        }
+        className={`${tamaño} shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-white bg-slate-100 shadow-sm`}
+        aria-label={`Ampliar foto de ${usuario.nombre}`}
+      >
+        <img
+          src="/avatars/practicas.jpg"
+          alt="Policía en Prácticas"
+          className="h-full w-full object-cover transition hover:scale-105"
+        />
+      </button>
+    );
+  }
 
   const tamaño = grande
     ? "h-9 w-9"
@@ -383,7 +383,6 @@ function Avatar({
           cy="8"
           r="3.2"
         />
-
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -442,6 +441,7 @@ function EstrellaResponsable() {
     </svg>
   );
 }
+
 /* -------------------------------------------------------------------------- */
 /* ICONO CALENDARIO                                                           */
 /* -------------------------------------------------------------------------- */
@@ -524,6 +524,13 @@ export default function TarjetaOrdenServicio() {
 
   const [fotoAmpliada, setFotoAmpliada] =
     useState<string | null>(null);
+
+  /* ---------------------------------------------------------------------- */
+  /* AÑADIDO: MENÚ EXPORTAR                                                */
+  /* ---------------------------------------------------------------------- */
+
+  const [menuExportar, setMenuExportar] =
+    useState(false);
 
   useEffect(() => {
     let cancelado = false;
@@ -761,23 +768,11 @@ export default function TarjetaOrdenServicio() {
             GacFila
           >();
 
-        /*
-         * Primero construimos GAC normal.
-         *
-         * PICO lo tratamos aparte porque queremos
-         * que cada persona de PICO tenga su propia
-         * fila y su propio número 1 / 2.
-         */
-
         const picoPersonas: PersonalGac[] =
           [];
 
         gacRows.forEach(
           (persona) => {
-            /*
-             * PICO
-             */
-
             if (
               persona.funcion ===
               "pico"
@@ -801,10 +796,6 @@ export default function TarjetaOrdenServicio() {
 
               return;
             }
-
-            /*
-             * GAC NORMAL
-             */
 
             const indicativo =
               persona.indicativo?.trim();
@@ -860,16 +851,6 @@ export default function TarjetaOrdenServicio() {
           }
         );
 
-        /*
-         * Convertimos los PICO en filas independientes.
-         *
-         * Si la base de datos tiene orden 1 y 2,
-         * respetamos esos números.
-         *
-         * Si no tiene orden, usamos automáticamente
-         * 1 y 2 según el orden de aparición.
-         */
-
         const picoRows: GacFila[] =
           picoPersonas
             .slice(0, 2)
@@ -895,10 +876,6 @@ export default function TarjetaOrdenServicio() {
                 (b.orden ?? 999)
             );
 
-        /*
-         * GAC normal
-         */
-
         const gacNormales =
           Array.from(
             gacMap.values()
@@ -912,10 +889,6 @@ export default function TarjetaOrdenServicio() {
               )
             );
           });
-
-        /*
-         * PICO siempre al final.
-         */
 
         const gac: GacFila[] = [
           ...gacNormales,
@@ -976,6 +949,116 @@ export default function TarjetaOrdenServicio() {
   }, [fecha]);
 
   /* ---------------------------------------------------------------------- */
+  /* AÑADIDO: COPIAR ORDEN PARA WHATSAPP                                  */
+  /* ---------------------------------------------------------------------- */
+
+  const copiarOrden = async () => {
+    if (!orden) return;
+
+    const lineas: string[] = [];
+
+    lineas.push("📋 ORDEN DE SERVICIO");
+    lineas.push(
+      `📅 ${formatearFecha(fecha)}`
+    );
+
+    lineas.push("");
+
+    if (orden.responsable) {
+      lineas.push(
+        `⭐ Responsable: ${orden.responsable.nombre}`
+      );
+
+      lineas.push("");
+    }
+
+    lineas.push("🎧 SALA");
+
+    if (orden.sala) {
+      lineas.push(
+        `• ${orden.sala.nombre}`
+      );
+    } else {
+      lineas.push(
+        "• Sin personal"
+      );
+    }
+
+    lineas.push("");
+
+    lineas.push("🛡️ SEGURIDAD");
+
+    if (orden.seguridad.length) {
+      orden.seguridad.forEach(
+        (persona) => {
+          lineas.push(
+            `• ${persona.nombre}`
+          );
+        }
+      );
+    } else {
+      lineas.push(
+        "• Sin personal"
+      );
+    }
+
+    if (orden.gac.length) {
+      lineas.push("");
+      lineas.push("🚔 GAC");
+
+      orden.gac.forEach(
+        (fila) => {
+          lineas.push("");
+
+lineas.push(
+  `${fila.indicativo}${
+    fila.orden === 1
+      ? " · Primeras"
+      : fila.orden === 2
+        ? " · Segundas"
+        : ""
+  }`
+);
+
+          fila.personal.forEach(
+            (persona) => {
+              lineas.push(
+                `• ${persona.usuario.nombre}`
+              );
+            }
+          );
+        }
+      );
+    }
+
+    lineas.push("");
+
+    lineas.push(
+      `Creada por: ${
+        orden.creador
+          ? nombreCorto(
+              orden.creador.nombre
+            )
+          : "—"
+      }`
+    );
+
+    if (orden.creadaAt) {
+      lineas.push(
+        formatearFechaHora(
+          orden.creadaAt
+        )
+      );
+    }
+
+    await navigator.clipboard.writeText(
+      lineas.join("\n")
+    );
+
+    setMenuExportar(false);
+  };
+
+  /* ---------------------------------------------------------------------- */
   /* CARGANDO                                                               */
   /* ---------------------------------------------------------------------- */
 
@@ -985,11 +1068,8 @@ export default function TarjetaOrdenServicio() {
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_4px_18px_rgba(15,23,42,0.06)]">
           <div className="animate-pulse space-y-3">
             <div className="h-6 w-40 rounded-lg bg-slate-200" />
-
             <div className="h-10 rounded-xl bg-slate-100" />
-
             <div className="h-10 rounded-xl bg-slate-100" />
-
             <div className="h-36 rounded-2xl bg-slate-100" />
           </div>
         </div>
@@ -1011,7 +1091,7 @@ export default function TarjetaOrdenServicio() {
     );
   }
 
-   /* ---------------------------------------------------------------------- */
+  /* ---------------------------------------------------------------------- */
   /* VISTA                                                                  */
   /* ---------------------------------------------------------------------- */
 
@@ -1019,7 +1099,6 @@ export default function TarjetaOrdenServicio() {
     <>
       <div className="mx-auto mt-4 w-full max-w-xl">
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-
           {/* CABECERA + CALENDARIO */}
 
           <div className="flex items-center justify-between gap-3">
@@ -1038,6 +1117,7 @@ export default function TarjetaOrdenServicio() {
                   height="16"
                   rx="3"
                 />
+
                 <path
                   strokeLinecap="round"
                   d="M8 8h8M8 12h5M8 16h3"
@@ -1049,35 +1129,72 @@ export default function TarjetaOrdenServicio() {
               </span>
             </div>
 
-            <div className="relative shrink-0">
-              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
-                <IconoCalendario />
+            <div className="flex shrink-0 items-center gap-1.5">
+              {/* CALENDARIO */}
+
+              <div className="relative shrink-0">
+                <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
+                  <IconoCalendario />
+                </div>
+
+                <input
+                  type="date"
+                  value={fecha}
+                  onChange={(e) =>
+                    setFecha(
+                      e.target.value
+                    )
+                  }
+                  className="h-10 w-[142px] cursor-pointer appearance-none rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                />
+
+                <div className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-slate-600">
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    className="h-3.5 w-3.5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.5 7.5 10 12l4.5-4.5"
+                    />
+                  </svg>
+                </div>
               </div>
 
-              <input
-                type="date"
-                value={fecha}
-                onChange={(e) =>
-                  setFecha(e.target.value)
-                }
-                className="h-10 w-[142px] cursor-pointer appearance-none rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              />
+              {/* TRES PUNTOS */}
 
-              <div className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-slate-600">
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  className="h-3.5 w-3.5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5.5 7.5 10 12l4.5-4.5"
-                  />
-                </svg>
-              </div>
+              {orden ? (
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMenuExportar(
+                        (valor) => !valor
+                      )
+                    }
+                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-xl font-bold text-slate-600 shadow-sm transition hover:bg-slate-50"
+                    aria-label="Opciones de exportación"
+                  >
+                    ⋮
+                  </button>
+
+                  {menuExportar ? (
+                    <div className="absolute right-0 top-12 z-20 w-44 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                      <button
+                        type="button"
+                        onClick={copiarOrden}
+                        className="w-full px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Copiar orden
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -1094,7 +1211,6 @@ export default function TarjetaOrdenServicio() {
           ) : (
             <>
               <div className="mt-4 space-y-3.5">
-
                 {/* RESPONSABLE */}
 
                 <div className="flex items-center justify-center py-1">
@@ -1155,14 +1271,19 @@ export default function TarjetaOrdenServicio() {
                     <div className="flex min-h-[40px] w-full items-center justify-between gap-3">
                       {orden.seguridad.length ? (
                         orden.seguridad.map(
-                          (usuario, index) => (
+                          (
+                            usuario,
+                            index
+                          ) => (
                             <div
                               key={`${usuario.id}-${index}`}
                               className="flex min-w-0 flex-1 items-center gap-1.5"
                             >
                               <Avatar
                                 usuario={usuario}
-                                onAmpliar={setFotoAmpliada}
+                                onAmpliar={
+                                  setFotoAmpliada
+                                }
                               />
 
                               <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
@@ -1187,19 +1308,23 @@ export default function TarjetaOrdenServicio() {
                 {orden.gac.length ? (
                   <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
                     <div className="px-2.5 pt-3 pb-0 sm:px-3.5">
-
                       <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
                         GAC
                       </div>
 
                       <div className="w-full">
                         {orden.gac.map(
-                          (fila, index) => {
+                          (
+                            fila,
+                            index
+                          ) => {
                             const esPrimero =
-                              fila.orden === 1;
+                              fila.orden ===
+                              1;
 
                             const esSegundo =
-                              fila.orden === 2;
+                              fila.orden ===
+                              2;
 
                             const normales =
                               fila.personal.filter(
@@ -1218,7 +1343,8 @@ export default function TarjetaOrdenServicio() {
                               );
 
                             const izquierda =
-                              normales[0] ?? null;
+                              normales[0] ??
+                              null;
 
                             const derecha =
                               practicas[0] ??
@@ -1234,7 +1360,6 @@ export default function TarjetaOrdenServicio() {
                                     : ""
                                 }`}
                               >
-
                                 {/* INDICATIVO */}
 
                                 <span className="flex h-7 min-w-0 items-center justify-center rounded-full bg-slate-700 px-2 text-[9px] font-bold tracking-wide text-white shadow-sm">
@@ -1314,6 +1439,7 @@ export default function TarjetaOrdenServicio() {
               <div className="px-4 pt-1 pb-2 text-center">
                 <span className="text-[10px] leading-none text-slate-500">
                   Creada por{" "}
+
                   <span className="font-medium text-slate-600">
                     {orden.creador
                       ? nombreCorto(
