@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 import { supabase } from "@/lib/supabase";
+import CalendarioOrdenServicio from "@/components/ordenservicio/CalendarioOrdenServicio";
 
 const AVATAR_BUCKET = "avatars";
 
@@ -383,6 +384,7 @@ function Avatar({
           cy="8"
           r="3.2"
         />
+
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -524,6 +526,9 @@ export default function TarjetaOrdenServicio() {
 
   const [fotoAmpliada, setFotoAmpliada] =
     useState<string | null>(null);
+
+  const [mostrarCalendario, setMostrarCalendario] =
+    useState(false);
 
   /* ---------------------------------------------------------------------- */
   /* AÑADIDO: MENÚ EXPORTAR                                                */
@@ -949,7 +954,7 @@ export default function TarjetaOrdenServicio() {
   }, [fecha]);
 
   /* ---------------------------------------------------------------------- */
-  /* AÑADIDO: COPIAR ORDEN PARA WHATSAPP                                  */
+  /* COPIAR ORDEN PARA WHATSAPP                                             */
   /* ---------------------------------------------------------------------- */
 
   const copiarOrden = async () => {
@@ -1010,15 +1015,15 @@ export default function TarjetaOrdenServicio() {
         (fila) => {
           lineas.push("");
 
-lineas.push(
-  `${fila.indicativo}${
-    fila.orden === 1
-      ? " · Primeras"
-      : fila.orden === 2
-        ? " · Segundas"
-        : ""
-  }`
-);
+          lineas.push(
+            `${fila.indicativo}${
+              fila.orden === 1
+                ? " · Primeras"
+                : fila.orden === 2
+                  ? " · Segundas"
+                  : ""
+            }`
+          );
 
           fila.personal.forEach(
             (persona) => {
@@ -1098,7 +1103,8 @@ lineas.push(
   return (
     <>
       <div className="mx-auto mt-4 w-full max-w-xl">
-<div className="rounded-3xl border border-slate-200 bg-white px-4 pb-0 pt-4 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 bg-white px-4 pb-0 pt-4 shadow-sm">
+
           {/* CABECERA + CALENDARIO */}
 
           <div className="flex items-center justify-between gap-3">
@@ -1129,42 +1135,59 @@ lineas.push(
               </span>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1.5">
-              {/* CALENDARIO */}
+<div className="relative flex shrink-0 items-center gap-1.5">
+              {/* BOTÓN CALENDARIO */}
 
-              <div className="relative shrink-0">
-                <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
-                  <IconoCalendario />
-                </div>
-
-                <input
-                  type="date"
-                  value={fecha}
-                  onChange={(e) =>
-                    setFecha(
-                      e.target.value
-                    )
+              <button
+                type="button"
+                onClick={() =>
+                  setMostrarCalendario(
+                    (valor) => !valor
+                  )
+                }
+                className={`
+                  flex
+                  h-10
+                  w-10
+                  items-center
+                  justify-center
+                  rounded-xl
+                  border
+                  bg-white
+                  shadow-sm
+                  transition
+                  active:scale-95
+                  ${
+                    mostrarCalendario
+                      ? "border-slate-500 bg-slate-100 text-slate-800"
+                      : "border-slate-300 text-slate-600 hover:bg-slate-50"
                   }
-                  className="h-10 w-[142px] cursor-pointer appearance-none rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                />
+                `}
+                aria-label="Abrir calendario"
+                aria-expanded={
+                  mostrarCalendario
+                }
+              >
+                <IconoCalendario />
+              </button>
+{mostrarCalendario && (
+  <>
+    <div
+      className="fixed inset-0 z-40"
+      onClick={() =>
+        setMostrarCalendario(false)
+      }
+    />
 
-                <div className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-slate-600">
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    className="h-3.5 w-3.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5.5 7.5 10 12l4.5-4.5"
-                    />
-                  </svg>
-                </div>
-              </div>
-
+<div className="absolute right-0 bottom-12 z-50 w-[320px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">      <CalendarioOrdenServicio
+        onSeleccionarFecha={(nuevaFecha) => {
+          setFecha(nuevaFecha);
+          setMostrarCalendario(false);
+        }}
+      />
+    </div>
+  </>
+)}
               {/* TRES PUNTOS */}
 
               {orden ? (
@@ -1198,21 +1221,24 @@ lineas.push(
             </div>
           </div>
 
-{/* SIN ORDEN */}
 
-{!orden ? (
-  <div className="px-1 pb-4 pt-5">
-    <p className="text-sm text-slate-600">
-      No se ha creado ninguna orden para{" "}
-      <span className="font-bold text-slate-800">
-        {formatearFecha(fecha)}
-      </span>
-      .
-    </p>
-  </div>
-) : (
+
+          {/* SIN ORDEN */}
+
+          {!orden ? (
+            <div className="px-1 pb-4 pt-5">
+              <p className="text-sm text-slate-600">
+                No se ha creado ninguna orden para{" "}
+                <span className="font-bold text-slate-800">
+                  {formatearFecha(fecha)}
+                </span>
+                .
+              </p>
+            </div>
+          ) : (
             <>
               <div className="mt-4 space-y-3.5">
+
                 {/* RESPONSABLE */}
 
                 <div className="flex items-center justify-center py-1">
@@ -1231,49 +1257,56 @@ lineas.push(
                   )}
                 </div>
 
-          
+                {/* SEGURIDAD */}
 
-{/* SEGURIDAD */}
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                  <div className="px-3.5 pb-2.5 pt-3">
+                    <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+                      Seguridad
+                    </div>
 
-<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-  <div className="px-3.5 pb-2.5 pt-3">
-    <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
-      Seguridad
-    </div>
+                    <div className="flex w-full items-center justify-between gap-3">
+                      {orden.seguridad.length ? (
+                        orden.seguridad.map(
+                          (
+                            usuario,
+                            index
+                          ) => (
+                            <div
+                              key={`${usuario.id}-${index}`}
+                              className="flex min-w-0 flex-1 items-center gap-1.5"
+                            >
+                              <Avatar
+                                usuario={
+                                  usuario
+                                }
+                                onAmpliar={
+                                  setFotoAmpliada
+                                }
+                              />
 
-    <div className="flex w-full items-center justify-between gap-3">
-      {orden.seguridad.length ? (
-        orden.seguridad.map(
-          (usuario, index) => (
-            <div
-              key={`${usuario.id}-${index}`}
-              className="flex min-w-0 flex-1 items-center gap-1.5"
-            >
-              <Avatar
-                usuario={usuario}
-                onAmpliar={setFotoAmpliada}
-              />
-
-              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
-                {nombreCorto(usuario.nombre)}
-              </span>
-            </div>
-          )
-        )
-      ) : (
-        <span className="text-[10px] text-slate-500">
-          Sin personal
-        </span>
-      )}
-    </div>
-  </div>
-</section>
+                              <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                                {nombreCorto(
+                                  usuario.nombre
+                                )}
+                              </span>
+                            </div>
+                          )
+                        )
+                      ) : (
+                        <span className="text-[10px] text-slate-500">
+                          Sin personal
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </section>
 
                 {/* GAC + PICO */}
 
                 {orden.gac.length ? (
                   <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                    <div className="px-2.5 pt-3 pb-0 sm:px-3.5">
+                    <div className="px-2.5 pb-0 pt-3 sm:px-3.5">
                       <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
                         GAC
                       </div>
@@ -1399,37 +1432,45 @@ lineas.push(
                   </section>
                 ) : null}
               </div>
-{/* SALA */}
 
-<section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-  <div className="px-3.5 pb-2.5 pt-3">
-    <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
-      Sala
-    </div>
+              {/* SALA */}
 
-<div className="flex items-center justify-center">      {orden.sala ? (
-        <div className="flex min-w-0 items-center gap-1.5">
-          <Avatar
-            usuario={orden.sala}
-            onAmpliar={setFotoAmpliada}
-          />
+              <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <div className="px-3.5 pb-2.5 pt-3">
+                  <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-700">
+                    Sala
+                  </div>
 
-          <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
-            {nombreCorto(orden.sala.nombre)}
-          </span>
-        </div>
-      ) : (
-        <span className="text-[10px] text-slate-500">
-          Sin personal
-        </span>
-      )}
-    </div>
-  </div>
-</section>
+                  <div className="flex items-center justify-center">
+                    {orden.sala ? (
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <Avatar
+                          usuario={
+                            orden.sala
+                          }
+                          onAmpliar={
+                            setFotoAmpliada
+                          }
+                        />
+
+                        <span className="min-w-0 truncate text-[10px] font-semibold leading-tight text-slate-700">
+                          {nombreCorto(
+                            orden.sala.nombre
+                          )}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] text-slate-500">
+                        Sin personal
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </section>
 
               {/* FOOTER */}
 
-              <div className="px-4 pt-1 pb-2 text-center">
+              <div className="px-4 pb-2 pt-1 text-center">
                 <span className="text-[10px] leading-none text-slate-500">
                   Creada por{" "}
 
