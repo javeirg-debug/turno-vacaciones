@@ -1198,17 +1198,19 @@ lineas.push(
             </div>
           </div>
 
-          {/* SIN ORDEN */}
+{/* SIN ORDEN */}
 
-          {!orden ? (
-            <p className="mt-5 text-sm text-slate-600">
-              No se ha creado ninguna orden para{" "}
-              <span className="font-bold text-slate-800">
-                {formatearFecha(fecha)}
-              </span>
-              .
-            </p>
-          ) : (
+{!orden ? (
+  <div className="px-1 pb-4 pt-5">
+    <p className="text-sm text-slate-600">
+      No se ha creado ninguna orden para{" "}
+      <span className="font-bold text-slate-800">
+        {formatearFecha(fecha)}
+      </span>
+      .
+    </p>
+  </div>
+) : (
             <>
               <div className="mt-4 space-y-3.5">
                 {/* RESPONSABLE */}
@@ -1405,8 +1407,7 @@ lineas.push(
       Sala
     </div>
 
-    <div className="flex items-center">
-      {orden.sala ? (
+<div className="flex items-center justify-center">      {orden.sala ? (
         <div className="flex min-w-0 items-center gap-1.5">
           <Avatar
             usuario={orden.sala}

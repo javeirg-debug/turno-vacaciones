@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/navigation/BottomNav";
 import { supabase } from "@/lib/supabase";
-import { obtenerAvisoActivo } from "@/services/avisos";
 import { obtenerConflictosUsuario } from "@/services/conflictos";
 import { eliminarSolicitud } from "@/services/solicitudes";
 import { iconosPermisos } from "@/components/icons/Icons";
 import Avatar from "@/components/perfil/Avatar";
 import TarjetaOrdenServicio from "@/components/ordenservicio/TarjetaOrdenServicio";
+import Aviso from "@/components/avisos/Aviso";
 
 type IconProps = {
   className?: string;
@@ -575,16 +575,6 @@ function obtenerPermisoHoy(solicitudes: Solicitud[]) {
   });
 }
 
-type Aviso = {
-  texto: string;
-  creado_en: string;
-  creado_por: string;
-
-  usuarios: {
-    nombre: string;
-  } | null;
-};
-
 type FechaConflictiva = {
   fecha: string;
   gac: number;
@@ -607,8 +597,6 @@ const [avatarUrl, setAvatarUrl] =
   const [solicitudesVista, setSolicitudesVista] =
     useState<any[]>([]);
 
-  const [aviso, setAviso] =
-    useState<Aviso | null>(null);
 
   const [fechasConflictivas, setFechasConflictivas] =
     useState<FechaConflictiva[] | null>(null);
@@ -747,10 +735,6 @@ setTiempo({
 
       setFechasConflictivas(conflictos);
 
-      const avisoActivo =
-        await obtenerAvisoActivo();
-
-      setAviso(avisoActivo);
 
       setCargando(false);
     }
@@ -1139,40 +1123,13 @@ const permisoHoy = obtenerPermisoHoy(solicitudes);
           AVISOS
       ========================= */}
 
-      <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow">
-
-        <h2 className="flex items-center gap-2 text-xl font-bold text-amber-900">
-          <IconAlert className="h-5 w-5" />
-          Avisos
-        </h2>
-
-        {aviso ? (
-          <>
-            <p className="mt-3 text-amber-800">
-              {aviso.texto}
-            </p>
-
-            <p className="mt-4 text-sm italic text-amber-700">
-              Creado por {aviso.usuarios?.nombre}
-              <br />
-              {formatearFecha(aviso.creado_en)}
-            </p>
-          </>
-        ) : (
-          <p className="mt-3 text-amber-800">
-            No hay avisos actualmente.
-          </p>
-        )}
-
-      </div>
-
+<Aviso />
 
       {/* =========================
           ORDEN DE SERVICIO
       ========================= */}
 
       <TarjetaOrdenServicio />
-
 
       {/* =========================
     FECHAS CONFLICTIVAS

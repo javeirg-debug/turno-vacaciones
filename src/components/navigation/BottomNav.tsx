@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -550,7 +549,7 @@ export default function BottomNav() {
                     className="h-7 w-7"
                     aria-hidden="true"
                   >
-                    <circle cx="9" cy="7" r="3.5" />
+                    <circle cx="9" cy="7" r="3" />
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -636,58 +635,58 @@ export default function BottomNav() {
             className="w-full max-w-md rounded-[20px] bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* CABECERA ADMINISTRACIÓN */}
-            <div className="mb-6 text-center">
-<div className="flex items-center justify-center gap-6">                <h2 className="text-2xl font-bold text-[#1a1a1a]">
-                  Administración
-                </h2>
+        {/* CABECERA ADMINISTRACIÓN */}
+<div className="relative mb-6 text-center">
+  <h2 className="text-2xl font-bold text-[#1a1a1a]">
+    Administración
+  </h2>
 
-                {/* SOLO SUPERADMIN */}
-                {usuario?.superadmin === true && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMostrarAdmin(false);
-                      setMostrarEstadoBD(true);
-                    }}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-700 active:scale-95"
-                    aria-label="Estado de la base de datos"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      className="h-5 w-5"
-                      aria-hidden="true"
-                    >
-                      <ellipse
-                        cx="12"
-                        cy="5"
-                        rx="7"
-                        ry="3"
-                      />
+  {/* SOLO SUPERADMIN */}
+  {usuario?.superadmin === true && (
+    <button
+      type="button"
+      onClick={() => {
+        setMostrarAdmin(false);
+        setMostrarEstadoBD(true);
+      }}
+      className="absolute right-0 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl bg-slate-100 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-700 active:scale-95"
+      aria-label="Estado de la base de datos"
+      title="Estado de la base de datos"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        className="h-5 w-5"
+        aria-hidden="true"
+      >
+        <ellipse
+          cx="12"
+          cy="5"
+          rx="7"
+          ry="3"
+        />
 
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5"
-                      />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5"
+        />
 
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7"
+        />
+      </svg>
+    </button>
+  )}
 
-              <p className="mt-1 text-sm font-normal text-slate-500">
-                Selecciona una opción
-              </p>
-            </div>
+  <p className="mt-1 text-sm font-normal text-slate-500">
+    Selecciona una opción
+  </p>
+</div>
 
             <div className="space-y-4">
 
@@ -848,44 +847,6 @@ export default function BottomNav() {
 
                   <p className="mt-1 text-sm text-slate-500">
                     Configurar colores y niveles del calendario.
-                  </p>
-                </div>
-              </Link>
-
-              {/* AVISOS */}
-              <Link
-                href="/usuarios/avisos"
-                onClick={() => setMostrarAdmin(false)}
-                className="group flex items-center gap-4 rounded-[18px] bg-slate-100 p-5 text-slate-900 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    className="h-7 w-7"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 17h16l-1.5-2.5V10a6.5 6.5 0 0 0-13 0v4.5L4 17Z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      d="M9.5 20h5"
-                    />
-                  </svg>
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-base font-bold text-slate-900">
-                    Avisos
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Crear, modificar o eliminar el aviso visible para todos los usuarios.
                   </p>
                 </div>
               </Link>
@@ -1081,14 +1042,14 @@ export default function BottomNav() {
           ESTADO BASE DE DATOS
       ===================================================== */}
 
-{mostrarEstadoBD && (
-  <EstadoBaseDatos
-    onClose={() => {
-      setMostrarEstadoBD(false);
-      setMostrarAdmin(true);
-    }}
-  />
-)}
+      {mostrarEstadoBD && (
+        <EstadoBaseDatos
+          onClose={() => {
+            setMostrarEstadoBD(false);
+            setMostrarAdmin(true);
+          }}
+        />
+      )}
     </>
   );
 }
