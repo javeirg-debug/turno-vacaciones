@@ -75,15 +75,50 @@ function obtenerFechaLocal() {
  */
 
 function obtenerFechaManana() {
-  const manana = new Date();
+  const hoy = new Date();
 
-  manana.setDate(manana.getDate() + 1);
+  // Primera mañana del ciclo: 05/01/2026
+  const fechaReferencia = new Date(2026, 0, 5);
 
-  return `${manana.getFullYear()}-${String(
-    manana.getMonth() + 1
-  ).padStart(2, "0")}-${String(
-    manana.getDate()
-  ).padStart(2, "0")}`;
+  // Empezamos siempre desde mañana
+  const fecha = new Date(hoy);
+  fecha.setHours(0, 0, 0, 0);
+  fecha.setDate(fecha.getDate() + 1);
+
+  fechaReferencia.setHours(0, 0, 0, 0);
+
+  while (true) {
+    const diferencia = Math.round(
+      (
+        fecha.getTime() -
+        fechaReferencia.getTime()
+      ) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    // Ciclo de 12 días:
+    // 0-1  → mañanas
+    // 2-3  → tardes
+    // 4-5  → noches
+    // 6-11 → libres
+    const posicionCiclo =
+      ((diferencia % 12) + 12) % 12;
+
+    const esDiaDeTrabajo =
+      posicionCiclo >= 0 &&
+      posicionCiclo <= 5;
+
+    if (esDiaDeTrabajo) {
+      return `${fecha.getFullYear()}-${String(
+        fecha.getMonth() + 1
+      ).padStart(2, "0")}-${String(
+        fecha.getDate()
+      ).padStart(2, "0")}`;
+    }
+
+    // Si es libre, avanzamos al siguiente día
+    fecha.setDate(fecha.getDate() + 1);
+  }
 }
 
 function esPoliciaPracticas(
@@ -1455,41 +1490,39 @@ export default function TarjetaOrdenServicio() {
 
             <div className="relative flex shrink-0 items-center gap-1.5">
 
-              {/* BOTÓN CALENDARIO */}
-
-              <button
-                type="button"
-                onClick={() =>
-                  setMostrarCalendario(
-                    (valor) => !valor
-                  )
-                }
-                className={`
-                  flex
-                  h-10
-                  w-10
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  bg-white
-                  shadow-sm
-                  transition
-                  active:scale-95
-                  ${
-                    mostrarCalendario
-                      ? "border-slate-500 bg-slate-100 text-slate-800"
-                      : "border-slate-300 text-slate-600 hover:bg-slate-50"
-                  }
-                `}
-                aria-label="Abrir calendario"
-                aria-expanded={
-                  mostrarCalendario
-                }
-              >
-                <IconoCalendario />
-              </button>
-
+{/* BOTÓN CALENDARIO */}
+<button
+  type="button"
+  onClick={() =>
+    setMostrarCalendario(
+      (valor) => !valor
+    )
+  }
+  className={`
+    flex
+    h-10
+    items-center
+    justify-center
+    rounded-xl
+    border
+    bg-white
+    px-3
+    shadow-sm
+    transition
+    active:scale-95
+    ${
+      mostrarCalendario
+        ? "border-slate-500 bg-slate-100 text-slate-800"
+        : "border-slate-300 text-slate-600 hover:bg-slate-50"
+    }
+  `}
+  aria-label="Abrir calendario"
+  aria-expanded={mostrarCalendario}
+>
+  <span className="text-[12px] font-bold">
+    {formatearFecha(fecha)}
+  </span>
+</button>
               {mostrarCalendario && (
                 <>
                   <div

@@ -2227,7 +2227,7 @@ export default function OrdenServicioFecha() {
       );
 
       router.push(
-        "/usuarios/ordenservicio"
+        "/inicio"
       );
     } catch (error) {
       console.error(
