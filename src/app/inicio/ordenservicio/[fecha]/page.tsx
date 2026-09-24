@@ -336,6 +336,20 @@ export default function OrdenServicioFecha() {
   const turnoHoy = obtenerTurno(fecha);
 
   /* =======================================================
+     PROTECCIÓN DE LA PÁGINA
+  ======================================================= */
+
+  const [
+    comprobandoAcceso,
+    setComprobandoAcceso,
+  ] = useState(true);
+
+  const [
+    accesoAutorizado,
+    setAccesoAutorizado,
+  ] = useState(false);
+
+  /* =======================================================
      USUARIOS DISPONIBLES
   ======================================================= */
 
@@ -391,11 +405,11 @@ export default function OrdenServicioFecha() {
   ] = useState("");
 
   const [
-  ordenEntradaPico,
-  setOrdenEntradaPico,
-] = useState<
-  "primero" | "segundo" | ""
->("");
+    ordenEntradaPico,
+    setOrdenEntradaPico,
+  ] = useState<
+    "primero" | "segundo" | ""
+  >("");
 
   /* =======================================================
      SEGURIDAD
@@ -449,6 +463,286 @@ export default function OrdenServicioFecha() {
   ] = useState(false);
 
   /* =======================================================
+     COMPROBAR ACCESO SEGÚN CADENA DE MANDO
+  ======================================================= */
+
+  async function comprobarAccesoResponsable() {
+    const {
+      data: authData,
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      throw authError;
+    }
+
+    const usuarioAuth =
+      authData.user;
+
+    if (!usuarioAuth) {
+      return false;
+    }
+
+    /* -----------------------------------------------------
+       USUARIO ACTUAL
+    ----------------------------------------------------- */
+
+    const {
+      data: usuarioActual,
+      error: usuarioError,
+    } = await supabase
+      .from("usuarios")
+      .select(
+        "id, rol, categoria, orden_responsable, activo"
+      )
+      .eq("id", usuarioAuth.id)
+      .eq("activo", true)
+      .single();
+
+    if (usuarioError) {
+      throw usuarioError;
+    }
+
+    if (!usuarioActual) {
+      return false;
+    }
+
+    /* -----------------------------------------------------
+       ADMIN -> SIEMPRE
+    ----------------------------------------------------- */
+
+    if (
+      usuarioActual.rol ===
+      "admin"
+    ) {
+      return true;
+    }
+
+    /* -----------------------------------------------------
+       OFICIAL -> SIEMPRE
+       Aunque esté de vacaciones.
+    ----------------------------------------------------- */
+
+    const categoriaActual =
+      (usuarioActual.categoria ??
+        "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        );
+
+    if (
+      categoriaActual ===
+      "oficial"
+    ) {
+      return true;
+    }
+
+    /* -----------------------------------------------------
+       POLICÍA
+    ----------------------------------------------------- */
+
+    if (
+      categoriaActual !==
+      "policia"
+    ) {
+      return false;
+    }
+
+    /* -----------------------------------------------------
+       POLICÍAS ACTIVOS
+    ----------------------------------------------------- */
+
+    const {
+      data: policias,
+      error: policiasError,
+    } = await supabase
+      .from("usuarios")
+      .select(
+        "id, categoria, orden_responsable"
+      )
+      .eq("activo", true);
+
+    if (policiasError) {
+      throw policiasError;
+    }
+
+    /* -----------------------------------------------------
+       VACACIONES PARA ESTA FECHA
+    ----------------------------------------------------- */
+
+    const {
+      data: vacaciones,
+      error: vacacionesError,
+    } = await supabase
+      .from(
+        "vacaciones_con_usuario"
+      )
+      .select("usuario_id")
+      .lte(
+        "fecha_inicio",
+        fecha
+      )
+      .gte(
+        "fecha_fin",
+        fecha
+      );
+
+    if (vacacionesError) {
+      throw vacacionesError;
+    }
+
+    const usuariosDeVacaciones =
+      new Set(
+        (vacaciones ?? [])
+          .map(
+            (vacacion) =>
+              vacacion.usuario_id
+          )
+          .filter(
+            (
+              id
+            ): id is string =>
+              Boolean(id)
+          )
+      );
+
+    /* -----------------------------------------------------
+       CADENA DE RESPONSABLES
+       1 -> 2 -> 3
+    ----------------------------------------------------- */
+
+    const cadenaPolicial =
+      (policias ?? [])
+        .filter((policia) => {
+          const categoria =
+            (policia.categoria ??
+              "")
+              .trim()
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(
+                /[\u0300-\u036f]/g,
+                ""
+              );
+
+          return (
+            categoria ===
+              "policia" &&
+            [1, 2, 3].includes(
+              policia.orden_responsable ??
+                0
+            )
+          );
+        })
+        .sort(
+          (a, b) =>
+            (a.orden_responsable ??
+              999) -
+            (b.orden_responsable ??
+              999)
+        );
+
+    /* -----------------------------------------------------
+       EL TOPE ES EL PRIMER POLICÍA DISPONIBLE
+    ----------------------------------------------------- */
+
+    const responsablePolicial =
+      cadenaPolicial.find(
+        (policia) =>
+          !usuariosDeVacaciones.has(
+            policia.id
+          )
+      );
+
+    /*
+     * Si no hay ningún policía disponible,
+     * ningún policía puede gestionar.
+     */
+
+    if (!responsablePolicial) {
+      return false;
+    }
+
+    /* -----------------------------------------------------
+       COMPROBAR NIVEL DEL USUARIO ACTUAL
+    ----------------------------------------------------- */
+
+    const nivelActual =
+      usuarioActual.orden_responsable ??
+      999;
+
+    const nivelTope =
+      responsablePolicial.orden_responsable ??
+      999;
+
+    /*
+     * El que tiene el tope puede gestionar
+     * y también todos los anteriores de la cadena.
+     */
+
+    return (
+      [1, 2, 3].includes(
+        nivelActual
+      ) &&
+      nivelActual <=
+        nivelTope
+    );
+  }
+
+  /* =======================================================
+     PROTEGER PÁGINA
+  ======================================================= */
+
+  useEffect(() => {
+    let cancelado = false;
+
+    async function comprobarAcceso() {
+      try {
+        setComprobandoAcceso(true);
+        setAccesoAutorizado(false);
+
+        const autorizado =
+          await comprobarAccesoResponsable();
+
+        if (cancelado) {
+          return;
+        }
+
+        if (!autorizado) {
+          router.replace("/inicio");
+          return;
+        }
+
+        setAccesoAutorizado(true);
+      } catch (error) {
+        console.error(
+          "Error comprobando acceso a la orden de servicio:",
+          error
+        );
+
+        if (!cancelado) {
+          setAccesoAutorizado(false);
+          router.replace("/inicio");
+        }
+      } finally {
+        if (!cancelado) {
+          setComprobandoAcceso(false);
+        }
+      }
+    }
+
+    comprobarAcceso();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [fecha, router]);
+
+  /* =======================================================
      CONVERTIR FILA GUARDADA EN SELECCIÓN
   ======================================================= */
 
@@ -470,6 +764,13 @@ export default function OrdenServicioFecha() {
   ======================================================= */
 
   useEffect(() => {
+    if (
+      comprobandoAcceso ||
+      !accesoAutorizado
+    ) {
+      return;
+    }
+
     async function cargarUsuariosDisponibles() {
       setCargandoUsuarios(true);
 
@@ -481,13 +782,13 @@ export default function OrdenServicioFecha() {
         Array(indicativos.length * 2).fill("")
       );
 
-setPicoSeleccionado("");
+      setPicoSeleccionado("");
 
-setOrdenEntradaPico("");
+      setOrdenEntradaPico("");
 
-setSeleccionesSeguridad(
-  Array(3).fill("")
-);
+      setSeleccionesSeguridad(
+        Array(3).fill("")
+      );
 
       setSalaSeleccionado("");
 
@@ -724,39 +1025,39 @@ setSeleccionesSeguridad(
                     claveIndicativo
                 );
 
-const ordenIndicativo =
-  filas.some(
-    (fila) =>
-      fila.orden === 1
-  )
-    ? "primero"
-    : filas.some(
-        (fila) =>
-          fila.orden === 2
-      )
-      ? "segundo"
-      : "";
+              const ordenIndicativo =
+                filas.some(
+                  (fila) =>
+                    fila.orden === 1
+                )
+                  ? "primero"
+                  : filas.some(
+                      (fila) =>
+                        fila.orden === 2
+                    )
+                    ? "segundo"
+                    : "";
 
-filas
-  .slice(0, 2)
-  .forEach(
-    (
-      fila,
-      posicion
-    ) => {
-      nuevoGac[
-        indiceIndicativo * 2 +
-          posicion
-      ] =
-        convertirPersonalASeleccion(
-          fila
-        );
-    }
-  );
+              filas
+                .slice(0, 2)
+                .forEach(
+                  (
+                    fila,
+                    posicion
+                  ) => {
+                    nuevoGac[
+                      indiceIndicativo * 2 +
+                        posicion
+                    ] =
+                      convertirPersonalASeleccion(
+                        fila
+                      );
+                  }
+                );
 
-nuevoOrdenEntradaGac[
-  indiceIndicativo
-] = ordenIndicativo;
+              nuevoOrdenEntradaGac[
+                indiceIndicativo
+              ] = ordenIndicativo;
             }
           );
 
@@ -772,27 +1073,27 @@ nuevoOrdenEntradaGac[
              PICO
           ------------------------------------------------- */
 
-const filaPico =
-  personal.find(
-    (fila) =>
-      fila.funcion === "pico"
-  );
+          const filaPico =
+            personal.find(
+              (fila) =>
+                fila.funcion === "pico"
+            );
 
-setPicoSeleccionado(
-  filaPico
-    ? convertirPersonalASeleccion(
-        filaPico
-      )
-    : ""
-);
+          setPicoSeleccionado(
+            filaPico
+              ? convertirPersonalASeleccion(
+                  filaPico
+                )
+              : ""
+          );
 
-setOrdenEntradaPico(
-  filaPico?.orden === 1
-    ? "primero"
-    : filaPico?.orden === 2
-      ? "segundo"
-      : ""
-);
+          setOrdenEntradaPico(
+            filaPico?.orden === 1
+              ? "primero"
+              : filaPico?.orden === 2
+                ? "segundo"
+                : ""
+          );
 
           /* -------------------------------------------------
              SEGURIDAD
@@ -1156,7 +1457,11 @@ setOrdenEntradaPico(
     }
 
     cargarUsuariosDisponibles();
-  }, [fecha]);
+  }, [
+    fecha,
+    comprobandoAcceso,
+    accesoAutorizado,
+  ]);
 
   /* =======================================================
      RESPONSABLES
@@ -1492,6 +1797,23 @@ setOrdenEntradaPico(
       setGuardandoOrden(true);
 
       /* ---------------------------------------------------
+         COMPROBAR PERMISO ANTES DE GUARDAR
+      --------------------------------------------------- */
+
+      const autorizado =
+        await comprobarAccesoResponsable();
+
+      if (!autorizado) {
+        alert(
+          "No tienes permiso para gestionar esta orden de servicio."
+        );
+
+        router.replace("/inicio");
+
+        return;
+      }
+
+      /* ---------------------------------------------------
          1. USUARIO AUTENTICADO
       --------------------------------------------------- */
 
@@ -1652,15 +1974,15 @@ setOrdenEntradaPico(
          4. PREPARAR PERSONAL
       --------------------------------------------------- */
 
-const personal: {
-  orden_id: string;
-  usuario_id: string | null;
-  nombre: string;
-  indicativo: string | null;
-  funcion: string;
-  orden: number | null;
-  fecha_orden: string;
-}[] = [];
+      const personal: {
+        orden_id: string;
+        usuario_id: string | null;
+        nombre: string;
+        indicativo: string | null;
+        funcion: string;
+        orden: number | null;
+        fecha_orden: string;
+      }[] = [];
 
       function añadirPersonal(
         usuarioId: string,
@@ -1673,16 +1995,16 @@ const personal: {
           usuarioId ===
           POLICIA_PRACTICAS
         ) {
-personal.push({
-  orden_id: ordenId!,
-  usuario_id: null,
-  nombre:
-    "Policía en Prácticas",
-  indicativo,
-  funcion,
-  orden,
-  fecha_orden: fecha,
-});
+          personal.push({
+            orden_id: ordenId!,
+            usuario_id: null,
+            nombre:
+              "Policía en Prácticas",
+            indicativo,
+            funcion,
+            orden,
+            fecha_orden: fecha,
+          });
 
           return;
         }
@@ -1695,15 +2017,15 @@ personal.push({
 
         if (!usuario) return;
 
-personal.push({
-  orden_id: ordenId!,
-  usuario_id: usuario.id,
-  nombre: usuario.nombre,
-  indicativo,
-  funcion,
-  orden,
-  fecha_orden: fecha,
-});
+        personal.push({
+          orden_id: ordenId!,
+          usuario_id: usuario.id,
+          nombre: usuario.nombre,
+          indicativo,
+          funcion,
+          orden,
+          fecha_orden: fecha,
+        });
       }
 
       /* ---------------------------------------------------
@@ -1721,87 +2043,89 @@ personal.push({
         );
       }
 
-/* ---------------------------------------------------
-   6. GAC
---------------------------------------------------- */
+      /* ---------------------------------------------------
+         6. GAC
+      --------------------------------------------------- */
 
-indicativos.forEach(
-  (indicativo, indiceIndicativo) => {
-    const indicePersona1 =
-      indiceIndicativo * 2;
+      indicativos.forEach(
+        (indicativo, indiceIndicativo) => {
+          const indicePersona1 =
+            indiceIndicativo * 2;
 
-    const indicePersona2 =
-      indiceIndicativo * 2 + 1;
+          const indicePersona2 =
+            indiceIndicativo * 2 + 1;
 
-    const persona1 =
-      seleccionesGac[indicePersona1];
+          const persona1 =
+            seleccionesGac[indicePersona1];
 
-    const persona2 =
-      seleccionesGac[indicePersona2];
+          const persona2 =
+            seleccionesGac[indicePersona2];
 
-    const ordenEntrada =
-      ordenEntradaGac[indiceIndicativo];
+          const ordenEntrada =
+            ordenEntradaGac[indiceIndicativo];
 
-    /*
-     * El número pertenece al indicativo completo.
-     *
-     * 1º = los dos componentes entran de Primeras
-     * 2º = los dos componentes entran de Segundas
-     */
+          /*
+           * El número pertenece al indicativo completo.
+           *
+           * 1º = los dos componentes entran de Primeras
+           * 2º = los dos componentes entran de Segundas
+           */
 
-    let orden: number | null = null;
+          let orden: number | null = null;
 
-    if (ordenEntrada === "primero") {
-      orden = 1;
-    } else if (ordenEntrada === "segundo") {
-      orden = 2;
-    }
+          if (ordenEntrada === "primero") {
+            orden = 1;
+          } else if (ordenEntrada === "segundo") {
+            orden = 2;
+          }
 
-    if (persona1) {
-      añadirPersonal(
-        persona1,
-        indicativo,
-        "gac",
-        orden
+          if (persona1) {
+            añadirPersonal(
+              persona1,
+              indicativo,
+              "gac",
+              orden
+            );
+          }
+
+          if (persona2) {
+            añadirPersonal(
+              persona2,
+              indicativo,
+              "gac",
+              orden
+            );
+          }
+        }
       );
-    }
 
-    if (persona2) {
-      añadirPersonal(
-        persona2,
-        indicativo,
-        "gac",
-        orden
-      );
-    }
-  }
-);
       /* ---------------------------------------------------
          7. PICO
       --------------------------------------------------- */
 
-if (picoSeleccionado) {
-  let ordenPico: number | null = null;
+      if (picoSeleccionado) {
+        let ordenPico: number | null = null;
 
-  if (
-    ordenEntradaPico ===
-    "primero"
-  ) {
-    ordenPico = 1;
-  } else if (
-    ordenEntradaPico ===
-    "segundo"
-  ) {
-    ordenPico = 2;
-  }
+        if (
+          ordenEntradaPico ===
+          "primero"
+        ) {
+          ordenPico = 1;
+        } else if (
+          ordenEntradaPico ===
+          "segundo"
+        ) {
+          ordenPico = 2;
+        }
 
-  añadirPersonal(
-    picoSeleccionado,
-    "PICO",
-    "pico",
-    ordenPico
-  );
-}
+        añadirPersonal(
+          picoSeleccionado,
+          "PICO",
+          "pico",
+          ordenPico
+        );
+      }
+
       /* ---------------------------------------------------
          8. SEGURIDAD
       --------------------------------------------------- */
@@ -1917,6 +2241,25 @@ if (picoSeleccionado) {
     } finally {
       setGuardandoOrden(false);
     }
+  }
+
+  /* =======================================================
+     ESPERAR A LA COMPROBACIÓN DE PERMISOS
+  ======================================================= */
+
+  if (
+    comprobandoAcceso ||
+    !accesoAutorizado
+  ) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
+        <div className="rounded-2xl bg-white px-6 py-5 text-center shadow-sm">
+          <p className="text-sm font-semibold text-slate-700">
+            Comprobando permisos...
+          </p>
+        </div>
+      </main>
+    );
   }
 
   /* =======================================================
@@ -2367,99 +2710,99 @@ if (picoSeleccionado) {
             "
           >
 
-           <div
-  className="
-    flex
-    w-14
-    shrink-0
-    flex-col
-    items-center
-  "
->
-  <span
-    className="
-      text-center
-      text-sm
-      font-bold
-      text-slate-800
-    "
-  >
-    PICO
-  </span>
+            <div
+              className="
+                flex
+                w-14
+                shrink-0
+                flex-col
+                items-center
+              "
+            >
+              <span
+                className="
+                  text-center
+                  text-sm
+                  font-bold
+                  text-slate-800
+                "
+              >
+                PICO
+              </span>
 
-  <div
-    className="
-      mt-1
-      flex
-      overflow-hidden
-      rounded-md
-      border
-      border-slate-300
-    "
-  >
-    <button
-      type="button"
-      onClick={() => {
-        setOrdenEntradaPico(
-          (actual) =>
-            actual ===
-            "primero"
-              ? ""
-              : "primero"
-        );
-      }}
-      className={`
-        flex
-        h-6
-        w-7
-        items-center
-        justify-center
-        text-[10px]
-        font-bold
-        ${
-          ordenEntradaPico ===
-          "primero"
-            ? "bg-slate-700 text-white"
-            : "bg-slate-100 text-slate-500"
-        }
-      `}
-    >
-      1º
-    </button>
+              <div
+                className="
+                  mt-1
+                  flex
+                  overflow-hidden
+                  rounded-md
+                  border
+                  border-slate-300
+                "
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrdenEntradaPico(
+                      (actual) =>
+                        actual ===
+                        "primero"
+                          ? ""
+                          : "primero"
+                    );
+                  }}
+                  className={`
+                    flex
+                    h-6
+                    w-7
+                    items-center
+                    justify-center
+                    text-[10px]
+                    font-bold
+                    ${
+                      ordenEntradaPico ===
+                      "primero"
+                        ? "bg-slate-700 text-white"
+                        : "bg-slate-100 text-slate-500"
+                    }
+                  `}
+                >
+                  1º
+                </button>
 
-    <div className="w-px bg-slate-300" />
+                <div className="w-px bg-slate-300" />
 
-    <button
-      type="button"
-      onClick={() => {
-        setOrdenEntradaPico(
-          (actual) =>
-            actual ===
-            "segundo"
-              ? ""
-              : "segundo"
-        );
-      }}
-      className={`
-        flex
-        h-6
-        w-7
-        items-center
-        justify-center
-        text-[10px]
-        font-bold
-        ${
-          ordenEntradaPico ===
-          "segundo"
-            ? "bg-slate-700 text-white"
-            : "bg-slate-100 text-slate-500"
-        }
-      `}
-    >
-      2º
-    </button>
-  </div>
-</div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrdenEntradaPico(
+                      (actual) =>
+                        actual ===
+                        "segundo"
+                          ? ""
+                          : "segundo"
+                    );
+                  }}
+                  className={`
+                    flex
+                    h-6
+                    w-7
+                    items-center
+                    justify-center
+                    text-[10px]
+                    font-bold
+                    ${
+                      ordenEntradaPico ===
+                      "segundo"
+                        ? "bg-slate-700 text-white"
+                        : "bg-slate-100 text-slate-500"
+                    }
+                  `}
+                >
+                  2º
+                </button>
+              </div>
+            </div>
 
             <div className="flex-1">
 
@@ -2710,9 +3053,7 @@ if (picoSeleccionado) {
 
         <button
           type="button"
-          onClick={
-            guardarOrdenServicio
-          }
+          onClick={guardarOrdenServicio}
           disabled={guardandoOrden}
           className="
             mt-7
@@ -2742,9 +3083,7 @@ if (picoSeleccionado) {
         <button
           type="button"
           onClick={() =>
-            router.push(
-              "/usuarios/ordenservicio"
-            )
+            router.push("/inicio")
           }
           className="
             mt-3

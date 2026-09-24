@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import { supabase } from "@/lib/supabase";
+
 import CalendarioOrdenServicio from "@/components/ordenservicio/CalendarioOrdenServicio";
 
 const AVATAR_BUCKET = "avatars";
@@ -15,6 +18,12 @@ type UsuarioOrden = {
   id: string;
   nombre: string;
   avatar_url?: string | null;
+};
+
+type UsuarioResponsable = {
+  id: string;
+  categoria: string | null;
+  orden_responsable: number | null;
 };
 
 type PersonalOrden = {
@@ -64,6 +73,7 @@ function obtenerFechaLocal() {
 /*
  * La tarjeta comienza mostrando SIEMPRE el día siguiente.
  */
+
 function obtenerFechaManana() {
   const manana = new Date();
 
@@ -186,6 +196,18 @@ function numeroIndicativo(
   return Number.isFinite(numero)
     ? numero
     : 9999;
+}
+
+function normalizarCategoria(
+  categoria: string | null | undefined
+) {
+  if (!categoria) return "";
+
+  return categoria
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -384,7 +406,6 @@ function Avatar({
           cy="8"
           r="3.2"
         />
-
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -464,10 +485,37 @@ function IconoCalendario() {
         height="15"
         rx="2.5"
       />
-
       <path
         strokeLinecap="round"
         d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"
+      />
+    </svg>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* ICONO LAPIZ                                                                */
+/* -------------------------------------------------------------------------- */
+
+function IconoLapiz() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-3.5 w-3.5"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 20h9"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5z"
       />
     </svg>
   );
@@ -508,6 +556,8 @@ function crearUsuarioVisual(
 /* -------------------------------------------------------------------------- */
 
 export default function TarjetaOrdenServicio() {
+  const router = useRouter();
+
   const [fecha, setFecha] =
     useState(
       obtenerFechaManana
@@ -530,12 +580,278 @@ export default function TarjetaOrdenServicio() {
   const [mostrarCalendario, setMostrarCalendario] =
     useState(false);
 
+  const [puedeGestionar, setPuedeGestionar] =
+    useState(false);
+
   /* ---------------------------------------------------------------------- */
   /* AÑADIDO: MENÚ EXPORTAR                                                */
   /* ---------------------------------------------------------------------- */
 
   const [menuExportar, setMenuExportar] =
     useState(false);
+
+  useEffect(() => {
+    let cancelado = false;
+
+    async function comprobarPermisoResponsable() {
+      try {
+        setPuedeGestionar(false);
+
+        const {
+          data: authData,
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError) {
+          throw authError;
+        }
+
+        const usuarioActual =
+          authData.user;
+
+        if (!usuarioActual) {
+          return;
+        }
+
+        const {
+          data: datosUsuario,
+          error: usuarioError,
+        } = await supabase
+          .from("usuarios")
+          .select(
+            "id, rol, categoria, orden_responsable"
+          )
+          .eq(
+            "id",
+            usuarioActual.id
+          )
+          .single();
+
+        if (usuarioError) {
+          throw usuarioError;
+        }
+
+        /*
+         * ADMIN SIEMPRE PUEDE CREAR Y EDITAR.
+         */
+
+        if (
+          datosUsuario?.rol ===
+          "admin"
+        ) {
+          if (!cancelado) {
+            setPuedeGestionar(true);
+          }
+
+          return;
+        }
+
+        /*
+         * OFICIAL SIEMPRE PUEDE CREAR Y EDITAR,
+         * ESTÉ O NO DE VACACIONES.
+         */
+
+        if (
+          normalizarCategoria(
+            datosUsuario?.categoria
+          ) === "oficial"
+        ) {
+          if (!cancelado) {
+            setPuedeGestionar(true);
+          }
+
+          return;
+        }
+
+        /*
+         * Cargamos personal activo para calcular
+         * el tope de la cadena policial.
+         */
+
+        const {
+          data: candidatosData,
+          error: candidatosError,
+        } = await supabase
+          .from("usuarios")
+          .select(
+            `
+              id,
+              categoria,
+              orden_responsable
+            `
+          )
+          .eq(
+            "activo",
+            true
+          );
+
+        if (candidatosError) {
+          throw candidatosError;
+        }
+
+        const candidatos: UsuarioResponsable[] =
+          candidatosData ?? [];
+
+        /*
+         * Usuarios que están de vacaciones
+         * en la fecha seleccionada.
+         */
+
+        const {
+          data: vacacionesData,
+          error: vacacionesError,
+        } = await supabase
+          .from(
+            "vacaciones_con_usuario"
+          )
+          .select(
+            "usuario_id"
+          )
+          .lte(
+            "fecha_inicio",
+            fecha
+          )
+          .gte(
+            "fecha_fin",
+            fecha
+          );
+
+        if (vacacionesError) {
+          throw vacacionesError;
+        }
+
+        const usuariosDeVacaciones =
+          new Set(
+            (vacacionesData ?? [])
+              .map(
+                (vacacion) =>
+                  vacacion.usuario_id
+              )
+              .filter(
+                (
+                  id
+                ): id is string =>
+                  Boolean(id)
+              )
+          );
+
+        /*
+         * Buscamos policías activos con orden
+         * 1 -> 2 -> 3.
+         *
+         * El primer policía que NO esté de vacaciones
+         * es el TOPE de la cadena.
+         */
+
+        const policias =
+          candidatos
+            .filter(
+              (usuario) =>
+                normalizarCategoria(
+                  usuario.categoria
+                ) === "policia" &&
+                [1, 2, 3].includes(
+                  usuario.orden_responsable ??
+                    0
+                )
+            )
+            .sort(
+              (a, b) =>
+                (
+                  a.orden_responsable ??
+                  999
+                ) -
+                (
+                  b.orden_responsable ??
+                  999
+                )
+            );
+
+        const responsablePolicia =
+          policias.find(
+            (policia) =>
+              !usuariosDeVacaciones.has(
+                policia.id
+              )
+          );
+
+        /*
+         * Si no hay ningún policía disponible,
+         * ningún policía puede gestionar.
+         *
+         * Oficial y Admin ya fueron autorizados
+         * anteriormente.
+         */
+
+        if (!responsablePolicia) {
+          if (!cancelado) {
+            setPuedeGestionar(false);
+          }
+
+          return;
+        }
+
+        /*
+         * EL TOPE ES EL PRIMER POLICÍA DISPONIBLE.
+         *
+         * Todos los policías anteriores y el propio
+         * tope pueden crear/editar.
+         *
+         * Ejemplo:
+         *
+         * Policía 1 disponible
+         *   -> solo Policía 1
+         *
+         * Policía 1 vacaciones
+         * Policía 2 disponible
+         *   -> Policía 1 + Policía 2
+         *
+         * Policía 1 y 2 vacaciones
+         * Policía 3 disponible
+         *   -> Policía 1 + Policía 2 + Policía 3
+         */
+
+        const nivelActual =
+          datosUsuario?.orden_responsable ??
+          999;
+
+        const nivelTope =
+          responsablePolicia.orden_responsable ??
+          999;
+
+        const puedeGestionar =
+          normalizarCategoria(
+            datosUsuario?.categoria
+          ) === "policia" &&
+          [1, 2, 3].includes(
+            nivelActual
+          ) &&
+          nivelActual <=
+            nivelTope;
+
+        if (!cancelado) {
+          setPuedeGestionar(
+            puedeGestionar
+          );
+        }
+      } catch (err) {
+        console.error(
+          "Error comprobando responsable de la orden:",
+          err
+        );
+
+        if (!cancelado) {
+          setPuedeGestionar(false);
+        }
+      }
+    }
+
+    comprobarPermisoResponsable();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [fecha]);
 
   useEffect(() => {
     let cancelado = false;
@@ -962,7 +1278,10 @@ export default function TarjetaOrdenServicio() {
 
     const lineas: string[] = [];
 
-    lineas.push("📋 ORDEN DE SERVICIO");
+    lineas.push(
+      "📋 ORDEN DE SERVICIO"
+    );
+
     lineas.push(
       `📅 ${formatearFecha(fecha)}`
     );
@@ -1123,7 +1442,6 @@ export default function TarjetaOrdenServicio() {
                   height="16"
                   rx="3"
                 />
-
                 <path
                   strokeLinecap="round"
                   d="M8 8h8M8 12h5M8 16h3"
@@ -1135,7 +1453,8 @@ export default function TarjetaOrdenServicio() {
               </span>
             </div>
 
-<div className="relative flex shrink-0 items-center gap-1.5">
+            <div className="relative flex shrink-0 items-center gap-1.5">
+
               {/* BOTÓN CALENDARIO */}
 
               <button
@@ -1170,24 +1489,72 @@ export default function TarjetaOrdenServicio() {
               >
                 <IconoCalendario />
               </button>
-{mostrarCalendario && (
-  <>
-    <div
-      className="fixed inset-0 z-40"
-      onClick={() =>
-        setMostrarCalendario(false)
-      }
-    />
 
-<div className="absolute right-0 bottom-12 z-50 w-[320px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">      <CalendarioOrdenServicio
-        onSeleccionarFecha={(nuevaFecha) => {
-          setFecha(nuevaFecha);
-          setMostrarCalendario(false);
-        }}
-      />
-    </div>
-  </>
-)}
+              {mostrarCalendario && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() =>
+                      setMostrarCalendario(false)
+                    }
+                  />
+
+                  <div className="absolute right-0 bottom-12 z-50 w-[320px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                    <CalendarioOrdenServicio
+                      onSeleccionarFecha={(
+                        nuevaFecha
+                      ) => {
+                        setFecha(
+                          nuevaFecha
+                        );
+
+                        setMostrarCalendario(
+                          false
+                        );
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* BOTÓN CREAR / EDITAR */}
+
+              {puedeGestionar ? (
+                orden ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(
+                        `/inicio/ordenservicio/${fecha}`
+                      )
+                    }
+                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 active:scale-95"
+                    aria-label={`Editar orden de servicio del ${formatearFecha(
+                      fecha
+                    )}`}
+                    title="Editar orden"
+                  >
+                    <IconoLapiz />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(
+                        `/inicio/ordenservicio/${fecha}`
+                      )
+                    }
+                    className="flex h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-2.5 text-[11px] font-bold text-slate-600 shadow-sm transition hover:bg-slate-50 active:scale-95"
+                    aria-label={`Crear orden de servicio del ${formatearFecha(
+                      fecha
+                    )}`}
+                    title="Crear orden"
+                  >
+                    Crear
+                  </button>
+                )
+              ) : null}
+
               {/* TRES PUNTOS */}
 
               {orden ? (
@@ -1220,8 +1587,6 @@ export default function TarjetaOrdenServicio() {
               ) : null}
             </div>
           </div>
-
-
 
           {/* SIN ORDEN */}
 
@@ -1473,7 +1838,6 @@ export default function TarjetaOrdenServicio() {
               <div className="px-4 pb-2 pt-1 text-center">
                 <span className="text-[10px] leading-none text-slate-500">
                   Creada por{" "}
-
                   <span className="font-medium text-slate-600">
                     {orden.creador
                       ? nombreCorto(
