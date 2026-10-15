@@ -22,6 +22,7 @@ export default function GestionUsuariosCliente({
   usuarios,
 }: Props) {
   const [busqueda, setBusqueda] = useState("");
+  const [fotoAmpliada, setFotoAmpliada] = useState<string | null>(null);
 
   function obtenerIniciales(nombre: string) {
     const partes = nombre
@@ -501,11 +502,22 @@ export default function GestionUsuariosCliente({
     `}
   >
     {usuario.avatar_url ? (
-      <img
-        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`}
-        alt={`Foto de ${usuario.nombre}`}
-        className="h-full w-full object-cover"
-      />
+      <button
+        type="button"
+        onClick={() =>
+          setFotoAmpliada(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`
+          )
+        }
+        className="h-full w-full cursor-zoom-in"
+        aria-label={`Ampliar foto de ${usuario.nombre}`}
+      >
+        <img
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`}
+          alt={`Foto de ${usuario.nombre}`}
+          className="h-full w-full object-cover"
+        />
+      </button>
     ) : (
       <div className="flex h-full w-full items-center justify-center text-lg font-bold">
         {obtenerIniciales(
@@ -746,11 +758,22 @@ export default function GestionUsuariosCliente({
     `}
   >
     {usuario.avatar_url ? (
-      <img
-        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`}
-        alt={`Foto de ${usuario.nombre}`}
-        className="h-full w-full object-cover"
-      />
+      <button
+        type="button"
+        onClick={() =>
+          setFotoAmpliada(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`
+          )
+        }
+        className="h-full w-full cursor-zoom-in"
+        aria-label={`Ampliar foto de ${usuario.nombre}`}
+      >
+        <img
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${usuario.avatar_url}`}
+          alt={`Foto de ${usuario.nombre}`}
+          className="h-full w-full object-cover"
+        />
+      </button>
     ) : (
       <div className="flex h-full w-full items-center justify-center text-lg font-bold">
         {obtenerIniciales(
@@ -894,6 +917,41 @@ export default function GestionUsuariosCliente({
           )}
 
       </div>
+
+      {/* =========================
+          FOTO AMPLIADA
+      ========================= */}
+
+      {fotoAmpliada && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setFotoAmpliada(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Foto ampliada"
+        >
+          <div
+            className="relative flex max-h-[90vh] max-w-[95vw] items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={fotoAmpliada}
+              alt="Foto ampliada"
+              className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+            />
+
+            <button
+              type="button"
+              onClick={() => setFotoAmpliada(null)}
+              className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-2xl text-white shadow-lg transition hover:bg-black/80 active:scale-95"
+              aria-label="Cerrar foto"
+              title="Cerrar"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
