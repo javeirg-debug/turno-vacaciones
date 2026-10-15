@@ -548,120 +548,167 @@ export default function Presentacion() {
       );
   }, []);
 
-  useEffect(() => {
-    async function cargar() {
-      try {
-        const respuestaTiempo =
-          await fetch(
-            "https://api.open-meteo.com/v1/forecast?latitude=40.4233&longitude=-3.5613&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FMadrid"
-          );
+ // =========================
+// CARGAR TIEMPO
+// =========================
 
-        if (respuestaTiempo.ok) {
-          const datosTiempo =
-            await respuestaTiempo.json();
+useEffect(() => {
+  let cancelado = false;
 
-          setTiempo({
-            temperatura:
-              Math.round(
-                datosTiempo
-                  .current
-                  .temperature_2m
-              ),
-            maxima:
-              Math.round(
-                datosTiempo
-                  .daily
-                  .temperature_2m_max[0]
-              ),
-            minima:
-              Math.round(
-                datosTiempo
-                  .daily
-                  .temperature_2m_min[0]
-              ),
-            codigo:
-              datosTiempo
-                .current
-                .weather_code,
-          });
-        }
+  async function cargarTiempo() {
+    try {
+      const respuesta = await fetch(
+        "https://api.open-meteo.com/v1/forecast?latitude=40.4233&longitude=-3.5613&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FMadrid"
+      );
 
-        const {
-          data: {
-            user,
-          },
-        } =
-          await supabase.auth.getUser();
+      if (!respuesta.ok) return;
 
-        if (!user) {
-          router.replace(
-            "/login"
-          );
-          return;
-        }
+      const datos = await respuesta.json();
 
-        const {
-          data: perfil,
-        } =
-          await supabase
-            .from("usuarios")
-            .select(
-              "id,nombre,rol,sexo,categoria,puesto,avatar_url,indicativo"
+      if (cancelado) return;
+
+      setTiempo({
+        temperatura: Math.round(
+          datos.current.temperature_2m
+        ),
+        maxima: Math.round(
+          datos.daily.temperature_2m_max[0]
+        ),
+        minima: Math.round(
+          datos.daily.temperature_2m_min[0]
+        ),
+        codigo: datos.current.weather_code,
+      });
+    } catch (error) {
+      console.error("Error al cargar el tiempo:", error);
+    }
+  }
+
+  cargarTiempo();
+
+  return () => {
+    cancelado = true;
+  };
+}, []);
+
+
+// =========================
+// CARGAR USUARIO Y PERMISOS
+// =========================
+
+useEffect(() => {
+  let cancelado = false;
+
+  async function cargarUsuario() {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+
+      const [
+        resultadoPerfil,
+        resultadoSolicitudes,
+      ] = await Promise.all([
+        supabase
+          .from("usuarios")
+          .select(
+            "id,nombre,rol,sexo,categoria,puesto,avatar_url,indicativo"
+          )
+          .eq("id", user.id)
+          .single(),
+
+        supabase
+          .from("vacaciones")
+          .select(
+            "id,tipo,fecha_inicio,fecha_fin,motivo"
+          )
+          .eq("usuario_id", user.id)
+          .gte(
+            "fecha_fin",
+            new Date().toLocaleDateString(
+              "sv-SE",
+              {
+                timeZone: "Europe/Madrid",
+              }
             )
-            .eq(
-              "id",
-              user.id
-            )
-            .single();
+          )
+          .order("fecha_inicio"),
+      ]);
 
-        setUsuario(perfil);
+      if (cancelado) return;
 
-        const hoy =
-          new Date()
-            .toISOString()
-            .split("T")[0];
-
-        const { data } =
-          await supabase
-            .from("vacaciones")
-            .select(
-              "id,tipo,fecha_inicio,fecha_fin,motivo"
-            )
-            .eq(
-              "usuario_id",
-              user.id
-            )
-            .gte(
-              "fecha_fin",
-              hoy
-            )
-            .order(
-              "fecha_inicio"
-            );
-
-        setSolicitudes(
-          data || []
+      if (
+        resultadoPerfil.error ||
+        !resultadoPerfil.data
+      ) {
+        console.error(
+          "Error al cargar el perfil:",
+          resultadoPerfil.error
         );
+        return;
+      }
 
-        const conflictos =
-          await obtenerConflictosUsuario(
-            user.id
-          );
-
-        setFechasConflictivas(
-          conflictos
-        );
-      } finally {
+      setUsuario(resultadoPerfil.data);
+      setSolicitudes(
+        resultadoSolicitudes.data || []
+      );
+    } catch (error) {
+      console.error(
+        "Error al cargar la presentación:",
+        error
+      );
+    } finally {
+      if (!cancelado) {
         setCargando(false);
       }
     }
-
-    cargar();
-  }, [router]);
-
-  if (cargando || !usuario) {
-    return null;
   }
+
+  cargarUsuario();
+
+  return () => {
+    cancelado = true;
+  };
+}, [router]);
+
+if (cargando || !usuario) {
+  return (
+    <div className="mx-auto mt-4 w-full max-w-xl animate-pulse rounded-3xl bg-white p-5 shadow-lg">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <div className="h-3 w-14 rounded bg-slate-200" />
+          <div className="h-8 w-24 rounded bg-slate-200" />
+        </div>
+
+        <div className="space-y-2">
+          <div className="ml-auto h-3 w-16 rounded bg-slate-200" />
+          <div className="h-6 w-28 rounded bg-slate-200" />
+        </div>
+      </div>
+
+      <div className="my-4 h-px bg-slate-100" />
+
+      <div className="flex items-center gap-4">
+        <div className="h-20 w-20 shrink-0 rounded-full bg-slate-200" />
+
+        <div className="flex-1 space-y-3">
+          <div className="h-5 w-3/4 rounded bg-slate-200" />
+          <div className="h-4 w-1/2 rounded bg-slate-200" />
+          <div className="h-4 w-2/3 rounded bg-slate-200" />
+        </div>
+      </div>
+
+      <div className="my-4 h-px bg-slate-100" />
+
+      <div className="h-12 rounded-2xl bg-slate-100" />
+    </div>
+  );
+}
 
   const turnoHoy =
     obtenerTurnoHoy();
