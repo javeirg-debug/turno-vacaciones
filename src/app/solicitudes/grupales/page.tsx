@@ -612,9 +612,9 @@ const [filtroTipo, setFiltroTipo] = useState("Todos");
               activo
             )
           `)
-          .order("fecha_inicio", {
-            ascending: true,
-          });
+          .order("created_at", {
+  ascending: false,
+});
 
         if (error) {
           throw error;

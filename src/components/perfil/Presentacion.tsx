@@ -659,19 +659,7 @@ export default function Presentacion() {
     cargar();
   }, [router]);
 
-  if (cargando) {
-    return (
-      <div className="mx-auto mt-4 w-full max-w-xl rounded-3xl bg-white p-5 shadow-lg">
-        <div className="flex items-center justify-center py-8">
-          <div className="text-sm text-slate-500">
-            Cargando...
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!usuario) {
+  if (cargando || !usuario) {
     return null;
   }
 
